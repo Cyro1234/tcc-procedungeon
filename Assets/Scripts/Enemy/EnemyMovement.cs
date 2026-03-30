@@ -20,6 +20,8 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] float strength = 4f;
     [SerializeField] float knockbackDuration = 0.15f;
 
+    [SerializeField] private AudioClip damageSound;
+
 
     private void Awake()
     {
@@ -33,6 +35,7 @@ public class EnemyMovement : MonoBehaviour
         animator = GetComponent<Animator>();
 
         health = maxHealth;
+
     }
 
     // Update is called once per frame
@@ -80,6 +83,10 @@ public class EnemyMovement : MonoBehaviour
     {
         health -= damage;
         StartCoroutine(Knockback(sender));
+
+        // Som
+        AudioSource.PlayClipAtPoint(damageSound, transform.position, 1f);
+
         if (health <= 0)
         {
             Destroy(gameObject);

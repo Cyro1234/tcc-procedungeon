@@ -5,6 +5,13 @@ public class HeartSystem : MonoBehaviour
     public GameObject[] hearts;
     int life = 3;
 
+    private GameOverManager gameOverManager;
+
+    private void Start()
+    {
+        gameOverManager = FindFirstObjectByType<GameOverManager>();
+    }
+
     void Update()
     {
         for (int i = 0; i < hearts.Length; i++)
@@ -21,5 +28,18 @@ public class HeartSystem : MonoBehaviour
         life -= damage;
         life = Mathf.Max(life, 0);
         Debug.Log("TOMOU DANO! LIFE: " + life + " - CONTAINERS: " + hearts.Length);
+        if (life <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+
+        if (gameOverManager != null)
+        {
+            gameOverManager.ShowGameOver();
+        }
     }
 }

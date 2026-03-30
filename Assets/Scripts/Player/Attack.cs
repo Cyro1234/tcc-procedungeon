@@ -8,6 +8,8 @@ public class Attack : MonoBehaviour
     float atkDuration = 0.3f;
     float atkTimer = 0f;
 
+    [SerializeField] private AudioClip swordSound;
+
     // Update is called once per frame
     void Update()
     {
@@ -18,6 +20,8 @@ public class Attack : MonoBehaviour
     {
         if (isAttacking == false)
         {
+            AudioSource.PlayClipAtPoint(swordSound, transform.position, 1f);
+
             Melee.SetActive(true);
             isAttacking = true;
             // Realizar animacao

@@ -186,6 +186,7 @@ MonoBehaviour:
   maxHealth: 3
   strength: 16
   knockbackDuration: 0.15
+  damageSound: {fileID: 8300000, guid: cdead41fde43af6488e74fc849c173b9, type: 3}
 --- !u!95 &2797659141505411982
 Animator:
   serializedVersion: 7
