@@ -2,8 +2,10 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - Enemy
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -25,9 +27,9 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - Layer 1
+  - Layer 2
+  - Layer 3
   - 
   - 
   - 
@@ -41,3 +43,26 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground
+    uniqueID: 2425651459
+    locked: 0
+  - name: WalkInFront
+    uniqueID: 4250941897
+    locked: 0
+  - name: Collision
+    uniqueID: 4189426099
+    locked: 0
+  - name: Player
+    uniqueID: 4131693589
+    locked: 0
+  - name: WalkBehind
+    uniqueID: 2133534781
+    locked: 0
+  - name: Decor
+    uniqueID: 325210273
+    locked: 0
+  - name: UI
+    uniqueID: 581561709
+    locked: 0
+  m_RenderingLayers:
+  - Default
