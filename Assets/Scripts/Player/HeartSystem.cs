@@ -7,6 +7,8 @@ public class HeartSystem : MonoBehaviour
 
     private GameOverManager gameOverManager;
 
+    [SerializeField] private AudioClip hurtSound;
+
     private void Start()
     {
         gameOverManager = FindFirstObjectByType<GameOverManager>();
@@ -24,13 +26,18 @@ public class HeartSystem : MonoBehaviour
     }
 
     public void takeDamage(int damage) 
-    { 
+    {
+
         life -= damage;
         life = Mathf.Max(life, 0);
         Debug.Log("TOMOU DANO! LIFE: " + life + " - CONTAINERS: " + hearts.Length);
         if (life <= 0)
         {
             Die();
+        }
+        else
+        {
+            AudioSource.PlayClipAtPoint(hurtSound, transform.position, 1f);
         }
     }
 

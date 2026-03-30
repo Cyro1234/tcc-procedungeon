@@ -16,7 +16,7 @@ public class GameOverManager : MonoBehaviour
     public void ShowGameOver()
     {
         audioManager.PlayGameOverMusic();
-        audioSource.PlayOneShot(deathSound, 1f);
+        audioSource.PlayOneShot(deathSound, 0.8f);
         gameOverPanel.SetActive(true);
         Time.timeScale = 0f; // pausa o jogo
     }
