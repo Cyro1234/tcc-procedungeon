@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class HeartSystem : MonoBehaviour
 {
@@ -7,11 +8,14 @@ public class HeartSystem : MonoBehaviour
 
     private GameOverManager gameOverManager;
 
+    private AudioSource audioSource;
+
     [SerializeField] private AudioClip hurtSound;
 
     private void Start()
     {
         gameOverManager = FindFirstObjectByType<GameOverManager>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -37,7 +41,7 @@ public class HeartSystem : MonoBehaviour
         }
         else
         {
-            AudioSource.PlayClipAtPoint(hurtSound, transform.position, 1f);
+            audioSource.PlayOneShot(hurtSound, 0.3f);
         }
     }
 
