@@ -17,36 +17,37 @@ public static class ProceduralGenerationAlgorithms
         path.Add(startPosition);
         var previousPosition = startPosition;
 
-        for (int i = 0; i < walkLength; i++)
+        for (int i = 0; i < walkLength; i++) // Iteracoes para a quantidade de passos
         {
             var newPosition = previousPosition + Direction2D.GetRandomCardinalDirection(); // Anda para uma nova posicao aleatoria
             path.Add(newPosition);
             previousPosition = newPosition;
         }
 
-        return path;
+        return path; // Hash com as posicoes que foram andadas
     }
 
 
     public static List<BoundsInt> BinarySpacePartitioning(BoundsInt spaceToSplit, int minWidth, int minHeight)
     {
-        Queue<BoundsInt> roomsQueue = new Queue<BoundsInt>();
-        List<BoundsInt> roomsList = new List<BoundsInt>();
+        // BoundsInt guarda as posicoes x,y dos cantos das salas para formar o retangulo
+        Queue<BoundsInt> roomsQueue = new Queue<BoundsInt>(); // Salas que estao esperando para serem divididas
+        List<BoundsInt> roomsList = new List<BoundsInt>(); // Salas feitas
         roomsQueue.Enqueue(spaceToSplit);
 
-        while (roomsQueue.Count > 0)
+        while (roomsQueue.Count > 0) // Enquanto ainda tem salas possiveis de serem divididas
         {
             var room = roomsQueue.Dequeue();
-            if (room.size.y >= minHeight && room.size.x >= minWidth)
+            if (room.size.y >= minHeight && room.size.x >= minWidth) // Se a sala possui tamanho minimo especificado. Se nao tiver, a sala eh descartada
             {
-                if (Random.value < 0.5f)
+                if (Random.value < 0.5f) // 50% de chance
                 {
                     // Precisa de espaco para dividir e as duas salas criadas estejam dentro do minWidth e minHeight, por isso verifica se tem o dobro do tamanho
                     if (room.size.y >= minHeight * 2)
                     {
                         SplitHorizontally(minHeight, roomsQueue, room);
                     }
-                    else if (room.size.x >= minWidth * 2)
+                    else if (room.size.x >= minWidth * 2) // Se nao deu pra dividir horizontalmente, tenta verticalmente
                     {
                         SplitVertically(minWidth, roomsQueue, room);
                     }
@@ -62,7 +63,7 @@ public static class ProceduralGenerationAlgorithms
                     {
                         SplitVertically(minWidth, roomsQueue, room);
                     }
-                    else if (room.size.y >= minHeight * 2)
+                    else if (room.size.y >= minHeight * 2) // Se nao deu pra dividir verticalmente, tenta horizontalmente
                     {
                         SplitHorizontally(minHeight, roomsQueue, room);
                     }
@@ -73,7 +74,7 @@ public static class ProceduralGenerationAlgorithms
                 }
             }
         }
-        return roomsList;
+        return roomsList; // Salas criadas
     }
 
     private static void SplitVertically(int minWidth, Queue<BoundsInt> roomsQueue, BoundsInt room)
@@ -95,6 +96,7 @@ public static class ProceduralGenerationAlgorithms
     }
 }
 
+// Usado no random walk e para criar as paredes das salas
 public static class Direction2D
 {
     public static List<Vector2Int> cardinalDirections = new List<Vector2Int>

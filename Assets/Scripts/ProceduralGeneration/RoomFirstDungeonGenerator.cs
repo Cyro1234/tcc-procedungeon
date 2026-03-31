@@ -4,6 +4,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+// Utilizao o BSP para gerar as salas
 public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 {
 
@@ -43,23 +44,30 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         }
         enemies.Clear();
 
+        // Obtem todas posicoes das salas geradas
         var roomList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)startPostion, new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
+        
+        // Coloca os offsets para que as salas fiquem um pouco distantes entre as outras
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
-
         floor = CreateSimpleRooms(roomList);
 
+        // Obtem o ponto central das salas
         List<Vector2Int> roomsCenters = new List<Vector2Int>();
         foreach (var room in roomList)
         {
             roomsCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
         }
 
+        // Spawn do jogador e saida. O spawn eh a primeira sala e a saida a ultima sala gerada.
         PlaceSpawnAndExit(roomsCenters);
+        
         SpawnEnemies(roomList);
 
+        // Conectar salas com corredores
         HashSet<Vector2Int> corridors = ConnectRooms(roomsCenters);
         floor.UnionWith(corridors);
 
+        // Coloca o chao e paredes
         tileMapVisualizer.PaintFloorTiles(floor);
         WallGenerator.CreateWalls(floor, tileMapVisualizer);
 
@@ -70,19 +78,21 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Nao spawna inimigos no spawn do jogador, por isso i = 1
         for (int i = 1; i < roomsList.Count; i++)
         {
-            int rng = Random.Range(0, maxEnemiesPerRoom + 1);
+            int rng = Random.Range(0, maxEnemiesPerRoom + 1); // Quantidade de inimigos na sala
             for (int j = 0; j < rng; j++) 
             {
+                // Posicao do inimigo a spawnar
                 int randomX = Random.Range(roomsList[i].xMin + 5, roomsList[i].xMax - 5); // +-5 para nao spawnar na parede, pensar em uma solucao melhor eh ideal
                 int randomY = Random.Range(roomsList[i].yMin + 5, roomsList[i].yMax - 5);
 
                 Vector3 spawnPos = new Vector3(randomX, randomY, 0);
 
+                // Instancia o inimigo na posicao
                 GameObject enemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
-                enemies.Add(enemy);
+                enemies.Add(enemy); // Guarda em uma lista para que possa limpar os inimigos ao concluir a fase
             }
         }
-        Debug.Log("SPAWNOU " + enemies.Count);
+        Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
     }
 
     // Coloca o jogador no spawn e cria a saida da fase
@@ -93,11 +103,11 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         player.transform.position = new Vector3(roomsCenters[0].x, roomsCenters[0].y, 0);
 
         // Cria a escada da ultima sala
-        // 
         tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);
         
     }
 
+    // Conecta as salas com um corredor
     private HashSet<Vector2Int> ConnectRooms(List<Vector2Int> roomsCenters)
     {
         HashSet<Vector2Int> corridors = new HashSet<Vector2Int>();
@@ -115,13 +125,15 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         return corridors;
     }
 
+    // Cria o corredor entre as salas. Funcao auxiliar de ConnectRooms
     private HashSet<Vector2Int> CreateCorridor(Vector2Int currentRoomCenter, Vector2Int destination)
     {
         HashSet<Vector2Int> corridor = new HashSet<Vector2Int>();
         var position = currentRoomCenter;
         corridor.Add(position);
 
-        while (position.y != destination.y)
+        // A partir da posicao inicial
+        while (position.y != destination.y) // Vai subindo ou descendo ate chegar no Y da sala de destino
         {
             if (destination.y > position.y) 
             {
@@ -133,7 +145,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             }
             corridor.Add(position);
         }
-        while (position.x != destination.x)
+        while (position.x != destination.x) // Vai andando pros lados ate chegar no x da sala de destino
         {
             if (destination.x > position.x) 
             {
@@ -148,6 +160,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         return corridor;
     }
 
+    // Acha a sala mais perto da sala atual. Funcao auxiliar de ConnectRooms
     private Vector2Int FindClosestPointTo(Vector2Int currentRoomCenter, List<Vector2Int> roomsCenters)
     {
         Vector2Int closest = Vector2Int.zero;
@@ -166,6 +179,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         return closest;
     }
 
+    // Coloca os offsets das salas para nao ficar todas coladas
     private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomList)
     {
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();

@@ -20,14 +20,15 @@ public class Attack : MonoBehaviour
     {
         if (isAttacking == false)
         {
-            AudioSource.PlayClipAtPoint(swordSound, transform.position, 1f);
+            AudioSource.PlayClipAtPoint(swordSound, transform.position, 1f); // SFX do ataque
 
             Melee.SetActive(true);
             isAttacking = true;
-            // Realizar animacao
+            // TODO: Realizar animacao, quando tiver
         }
     }
 
+    // Tempo que a hitbox do ataque fica ativada
     void checkMeleeTimer() 
     {
         if (isAttacking) 

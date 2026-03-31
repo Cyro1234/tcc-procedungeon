@@ -20,6 +20,7 @@ public class HeartSystem : MonoBehaviour
 
     void Update()
     {
+        // Decrementa os containers de vida na UI
         for (int i = 0; i < hearts.Length; i++)
         {
             if (i < life)
@@ -33,7 +34,7 @@ public class HeartSystem : MonoBehaviour
     {
 
         life -= damage;
-        life = Mathf.Max(life, 0);
+        life = Mathf.Max(life, 0); // No maximo fica com 0 vidas
         Debug.Log("TOMOU DANO! LIFE: " + life + " - CONTAINERS: " + hearts.Length);
         if (life <= 0)
         {
@@ -41,7 +42,7 @@ public class HeartSystem : MonoBehaviour
         }
         else
         {
-            audioSource.PlayOneShot(hurtSound, 0.3f);
+            audioSource.PlayOneShot(hurtSound, 0.3f); // TODO: tirar valores hardcoded de volume em todos os campos de volume
         }
     }
 

@@ -13,6 +13,7 @@ public class GameOverManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
+    // Mostra a tela de gameover e pausa o jogo
     public void ShowGameOver()
     {
         audioManager.PlayGameOverMusic();

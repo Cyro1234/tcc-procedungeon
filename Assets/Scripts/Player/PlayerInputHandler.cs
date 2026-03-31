@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour
 {
+    // Inputs definidos pelo InputSystem do unity
+
 
     private InputSystem_Actions inputActions;
     private Attack attackScript;

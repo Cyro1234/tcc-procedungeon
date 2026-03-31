@@ -19,7 +19,7 @@ public class AudioManager : MonoBehaviour
         
     }
 
-
+    // Toca musica de fundo em loop
     public void PlayGameplayMusic()
     {
         if (musicSource.clip == gameplayMusic && musicSource.isPlaying) return;
@@ -29,6 +29,7 @@ public class AudioManager : MonoBehaviour
         musicSource.Play();
     }
 
+    // Toca a musica de GameOver sem loop
     public void PlayGameOverMusic()
     {
         if (musicSource.clip == gameOverMusic && musicSource.isPlaying) return;
@@ -38,6 +39,7 @@ public class AudioManager : MonoBehaviour
         musicSource.Play();
     }
 
+    // Para qualquer musica que esteja tocando
     public void StopMusic()
     {
         musicSource.Stop();

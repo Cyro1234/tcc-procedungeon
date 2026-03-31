@@ -12,6 +12,7 @@ public class EnemyMovement : MonoBehaviour
 
     [SerializeField] int viewDistance = 12;
 
+    // TODO: Colocar a vida do inimigo em um script separado para deixar mais organizado
     [SerializeField] float maxHealth = 3f;
     private float health;
 
@@ -28,7 +29,6 @@ public class EnemyMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         target = GameObject.Find("Player").transform;
@@ -39,12 +39,13 @@ public class EnemyMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void Update() // Calcula pra onde o inimigo deve andar
     {
-        if (target)
+        if (target) // Se tiver um jogador para seguir
         {
-            if (Vector3.Distance(target.position, transform.position) < viewDistance)
-            {
+            if (Vector3.Distance(target.position, transform.position) < viewDistance) // Verifica se o jogador esta na distancia de visao do inimigo
+            { // Mover em direcao ao jogador
+                // Animacao walk
                 animator.SetBool("isWalking", true);
                 Vector3 direction = (target.position - transform.position).normalized;
                 moveDirection = direction;
@@ -53,7 +54,8 @@ public class EnemyMovement : MonoBehaviour
                 animator.SetFloat("InputY", moveDirection.y);
             }
             else
-            {
+            { // Fica parado
+                // Animacao idle
                 animator.SetBool("isWalking", false);
                 animator.SetFloat("LastInputX", moveDirection.x);
                 animator.SetFloat("LastInputY", moveDirection.y);
@@ -61,18 +63,18 @@ public class EnemyMovement : MonoBehaviour
                 Vector3 direction = Vector3.zero.normalized;
                 moveDirection = direction;
 
-
             }
 
+            // Roda o inimigo. NAO UTILIZADO NESSES SPRITES
             // float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             // rb.rotation = angle;
 
         }
     }
 
-    private void FixedUpdate()
+    private void FixedUpdate() // Move o inimigo para o local calculado em Update() guardado na variavel moveDirection
     {
-        if (isKnockedBack) return;
+        if (isKnockedBack) return; // Se nao tiver isso, a movimentacao do inimigo ira cancelar o knockback
         if (target)
         {
             rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * moveSpeed;
@@ -99,10 +101,10 @@ public class EnemyMovement : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
 
-        Vector2 direction = ((Vector2)transform.position - (Vector2)sender.transform.position).normalized;
+        Vector2 direction = ((Vector2)transform.position - (Vector2)sender.transform.position).normalized; // Calcula pra onde fazer o knockback dependendo da posicao do dano
         rb.AddForce(direction * strength, ForceMode2D.Impulse);
 
-        yield return new WaitForSeconds(knockbackDuration);
+        yield return new WaitForSeconds(knockbackDuration); // Espera alguns frames para que tenha o efeito de knockback, impedindo tomar mais de 1 knockback com o mesmo dano
 
         rb.linearVelocity = Vector2.zero;
         isKnockedBack = false;

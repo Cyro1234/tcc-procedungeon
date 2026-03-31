@@ -31,12 +31,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // Movimentacao do jogador
     public void Move(InputAction.CallbackContext context)
     {
         animator.SetBool("isWalking", true);
 
-        if (context.canceled)
-        {
+        if (context.canceled) // Parou de andar. Soltou as teclas de movimentar
+        {   // Configura para que as animacoes de idle fiquem congruentes com o movimento
             isWalking = false;
             animator.SetBool("isWalking", false);
             animator.SetFloat("LastInputX", moveInput.x);
@@ -45,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 vector3 = Vector3.left * moveInput.x + Vector3.down * moveInput.y;
             Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
         }
-        else if (moveInput.x != 0 || moveInput.y != 0)
+        else if (moveInput.x != 0 || moveInput.y != 0) // Ainda ta apertando teclas de movimento
         {
             isWalking = true;
         }

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class EnemyDamage : MonoBehaviour
 {
-    [SerializeField] int damage = 1;
+    [SerializeField] int damage = 1; // quantidade de dano que o inimigo da no jogador
 
     private Rigidbody2D rb;
 
@@ -13,13 +13,12 @@ public class EnemyDamage : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    // Ao entrar na colisao do inimigo
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("IREI DAR DANO AGORA");
-        HeartSystem heartSystem = collision.gameObject.GetComponent<HeartSystem>();
-        if (heartSystem != null)
+        HeartSystem heartSystem = collision.gameObject.GetComponent<HeartSystem>(); // Tenta pegar o sistema de vidas do jogador
+        if (heartSystem != null) // se quem entrou na colisao nao foi um jogador
         {
-            Debug.Log("DANDO DANO");
             heartSystem.takeDamage(damage);
         }
     }
