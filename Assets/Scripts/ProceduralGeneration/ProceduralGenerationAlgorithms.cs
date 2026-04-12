@@ -4,6 +4,7 @@ using Random = UnityEngine.Random;
 
 public static class ProceduralGenerationAlgorithms
 {
+    [SerializeField] private static Vector2Int startPostion = Vector2Int.zero;
 
     /*
         Usa o algoritmo Random Walk para andar no mapa e gerando posicoes que foi andadas para gerar o mapa futuramente

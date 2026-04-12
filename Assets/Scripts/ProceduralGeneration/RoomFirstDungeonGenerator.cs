@@ -15,8 +15,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private int dungeonHeight = 20;
 
     [SerializeField] private int offset = 1;
+    [SerializeField] private int subOffset = 1;
 
     [SerializeField] private bool randomWalkRooms = false;
+    [SerializeField] private bool subBSPRooms = false;
 
     //[SerializeField] private GameObject enemyPrefab;
 
@@ -48,10 +50,20 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
         // Obtem todas posicoes das salas geradas
         var roomList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)startPostion, new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
-        
+
         // Coloca os offsets para que as salas fiquem um pouco distantes entre as outras
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
-        floor = CreateSimpleRooms(roomList);
+
+        if (subBSPRooms)
+        {
+            floor = CreateSubBSPRooms(roomList, subOffset, minRoomWidth, minRoomHeight); // deixei o offset no 0 pra ficar grudado
+        }
+        else
+        {
+            floor = CreateSimpleRooms(roomList);
+        }
+
+        //floor = CreateSimpleRooms(roomList);
 
         // Obtem o ponto central das salas
         List<Vector2Int> roomsCenters = new List<Vector2Int>();
@@ -75,6 +87,72 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     }
 
+    private HashSet<Vector2Int> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
+    {
+        HashSet<Vector2Int> floor = new HashSet<Vector2Int>(); // guarda as posicoes do chao
+        //for (int i = 0; i < roomList.Count; i++) { // percorre todas as salas menos as subs
+        //    var roomBounds = roomList[i]; // limites
+        //    var subRooms = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt(new Vector3Int(roomBounds.xMin + offset, roomBounds.yMin + offset, 0), new Vector3Int(roomBounds.size.x - offset * 2, roomBounds.size.y - offset * 2, 0)), Mathf.Max(2, minRoomWidth / 2), Mathf.Max(2, minRoomHeight / 2)); // gera as subsalas
+
+        //    foreach (var subRoom in subRooms) { // percorre as subsalas
+        //        for (int x = subRoom.xMin; x < subRoom.xMax; x++) // limites da sub-sala da posicao x
+        //        {                
+        //            for (int y = subRoom.yMin; y < subRoom.yMax; y++) // limites da sub-sala da posicao y
+        //            {
+        //                floor.Add(new Vector2Int(x, y));
+        //            }
+        //        }
+        //    }
+        //}
+        foreach (var roomBounds in roomList) // percorre todas as salas geradas pelo BSP principal
+        {
+            HashSet<Vector2Int> roomFloor = new HashSet<Vector2Int>(); // guarda as posicoes de uma unica sala para processar os cortes
+
+            // cria uma area base para a sala, com offset para nao ficar grudada nas outras salas
+            for (int x = roomBounds.xMin + offset; x < roomBounds.xMax - offset; x++) // limites da sala na posicao x
+            {
+                for (int y = roomBounds.yMin + offset; y < roomBounds.yMax - offset; y++) // limites da sala na posicao y
+                {
+                    roomFloor.Add(new Vector2Int(x, y));
+                }
+            }
+
+
+            // escolhe o tamanho dos cortes para a sala baseado no tamanho minimo
+            int cutSizeX = UnityEngine.Random.Range(1, Mathf.Max(2, minRoomWidth / 3));
+            int cutSizeY = UnityEngine.Random.Range(1, Mathf.Max(2, minRoomHeight / 3));
+
+            // lista de cantos pra remover, 0 inferior esquerdo, 1 inferior direito, 2 superior esquerdo, 3 superior direito
+            for (int i = 0; i < 4; i++) // percorre os 4 cantos da sala
+            {
+                // 50% de chance de cortar o canto para variar os formatos
+                if (UnityEngine.Random.value > 0.5f) continue;
+
+                for (int x = 0; x < cutSizeX; x++) // largura do corte
+                {
+                    for (int y = 0; y < cutSizeY; y++) // altura do corte
+                    {
+                        Vector2Int posToRemove = Vector2Int.zero;
+                        if (i == 0) posToRemove = new Vector2Int(roomBounds.xMin + offset + x, roomBounds.yMin + offset + y);
+                        if (i == 1) posToRemove = new Vector2Int(roomBounds.xMax - offset - 1 - x, roomBounds.yMin + offset + y);
+                        if (i == 2) posToRemove = new Vector2Int(roomBounds.xMin + offset + x, roomBounds.yMax - offset - 1 - y);
+                        if (i == 3) posToRemove = new Vector2Int(roomBounds.xMax - offset - 1 - x, roomBounds.yMax - offset - 1 - y);
+
+                        roomFloor.Remove(posToRemove); // remove a posicao do chao dessa sala
+                    }
+                }
+            }
+
+            // garante que o centro e os eixos principais existam evitando q a sala suma
+            Vector2Int center = (Vector2Int)Vector3Int.RoundToInt(roomBounds.center); // obtem o ponto central
+            roomFloor.Add(center); // adiciona o centro de volta caso ele tenha sido removido
+
+            floor.UnionWith(roomFloor);
+        }
+        return floor;
+    }
+
+
     private void SpawnEnemies(List<BoundsInt> roomsList)
     {
         // Nao spawna inimigos no spawn do jogador, por isso i = 1
@@ -84,8 +162,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             for (int j = 0; j < rng; j++) 
             {
                 // Posicao do inimigo a spawnar
-                int randomX = Random.Range(roomsList[i].xMin + 5, roomsList[i].xMax - 5); // +-5 para nao spawnar na parede, pensar em uma solucao melhor eh ideal
-                int randomY = Random.Range(roomsList[i].yMin + 5, roomsList[i].yMax - 5);
+                int randomX = Random.Range(roomsList[i].xMin + 10, roomsList[i].xMax - 10); // +-5 para nao spawnar na parede, pensar em uma solucao melhor eh ideal
+                int randomY = Random.Range(roomsList[i].yMin + 10, roomsList[i].yMax - 10);
 
                 Vector3 spawnPos = new Vector3(randomX, randomY, 0);
 
