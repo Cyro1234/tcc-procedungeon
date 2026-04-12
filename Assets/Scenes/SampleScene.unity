@@ -38658,8 +38658,9 @@ MonoBehaviour:
   dungeonHeight: 100
   offset: 3
   randomWalkRooms: 0
-  enemyPrefab: {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212,
-    type: 3}
+  ListenemyPrefab:
+  - {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da, type: 3}
+  - {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212, type: 3}
   maxEnemiesPerRoom: 3
 --- !u!4 &1735951947
 Transform:

@@ -18,7 +18,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     [SerializeField] private bool randomWalkRooms = false;
 
-    [SerializeField] private GameObject enemyPrefab;
+    //[SerializeField] private GameObject enemyPrefab;
+
+    [SerializeField] private List<GameObject> ListenemyPrefab;
 
     [SerializeField] private int maxEnemiesPerRoom = 3;
 
@@ -88,11 +90,18 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 Vector3 spawnPos = new Vector3(randomX, randomY, 0);
 
                 // Instancia o inimigo na posicao
-                GameObject enemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+                GameObject enemy = Instantiate(getRandomEnemy(), spawnPos, Quaternion.identity);
                 enemies.Add(enemy); // Guarda em uma lista para que possa limpar os inimigos ao concluir a fase
             }
         }
         Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
+    }
+
+    private GameObject getRandomEnemy()
+    {
+        int index = Random.Range(0, ListenemyPrefab.Count);
+        Debug.Log(index);
+        return ListenemyPrefab[index];
     }
 
     // Coloca o jogador no spawn e cria a saida da fase
