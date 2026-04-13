@@ -41,7 +41,7 @@ public static class ProceduralGenerationAlgorithms
             var room = roomsQueue.Dequeue();
             if (room.size.y >= minHeight && room.size.x >= minWidth) // Se a sala possui tamanho minimo especificado. Se nao tiver, a sala eh descartada
             {
-                if (Random.value < 0.5f) // 50% de chance
+                if (Rng.DungeonValue() < 0.5f) // 50% de chance
                 {
                     // Precisa de espaco para dividir e as duas salas criadas estejam dentro do minWidth e minHeight, por isso verifica se tem o dobro do tamanho
                     if (room.size.y >= minHeight * 2)
@@ -80,7 +80,7 @@ public static class ProceduralGenerationAlgorithms
 
     private static void SplitVertically(int minWidth, Queue<BoundsInt> roomsQueue, BoundsInt room)
     {
-        var xSplit = Random.Range(1, room.size.x);
+        var xSplit = Rng.DungeonRange(1, room.size.x);
         BoundsInt room1 = new BoundsInt(room.min, new Vector3Int(xSplit, room.size.y, room.size.z));
         BoundsInt room2 = new BoundsInt(new Vector3Int(room.min.x + xSplit, room.min.y, room.min.z), new Vector3Int(room.size.x - xSplit, room.size.y, room.size.z));
         roomsQueue.Enqueue(room1);
@@ -89,7 +89,7 @@ public static class ProceduralGenerationAlgorithms
 
     private static void SplitHorizontally(int minHeight, Queue<BoundsInt> roomsQueue, BoundsInt room)
     {
-        var ySplit = Random.Range(1, room.size.y);
+        var ySplit = Rng.DungeonRange(1, room.size.y);
         BoundsInt room1 = new BoundsInt(room.min, new Vector3Int(room.size.x, ySplit, room.size.z));
         BoundsInt room2 = new BoundsInt(new Vector3Int(room.min.x, room.min.y + ySplit, room.min.z), new Vector3Int(room.size.x, room.size.y - ySplit, room.size.z));
         roomsQueue.Enqueue(room1);
@@ -110,7 +110,7 @@ public static class Direction2D
 
     public static Vector2Int GetRandomCardinalDirection()
     {
-        return cardinalDirections[Random.Range(0, cardinalDirections.Count)];
+        return cardinalDirections[Rng.DungeonRange(0, cardinalDirections.Count)];
     }
 
 }

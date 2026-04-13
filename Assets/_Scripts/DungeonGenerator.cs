@@ -37,7 +37,7 @@ public class DungeonGenerator : MonoBehaviour
             floorPositions.UnionWith(path);
             if(startRandomlyEachIteration)
             {
-                currentPosition = floorPositions.ElementAt(Random.Range(0, floorPositions.Count));
+                currentPosition = floorPositions.ElementAt(Rng.DungeonRange(0, floorPositions.Count));
             }   
         }
         return floorPositions;

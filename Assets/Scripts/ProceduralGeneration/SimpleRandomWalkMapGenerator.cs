@@ -28,7 +28,7 @@ public class SimpleRandomWalkMapGenerator : AbstractDungeonGenerator
             floorPosition.UnionWith(path);
             if (randomWalkParameters.startRandomEachIteration)
             {
-                currentPosition = floorPosition.ElementAt(Random.Range(0, floorPosition.Count));
+                currentPosition = floorPosition.ElementAt(Rng.DungeonRange(0, floorPosition.Count));
             }
         }
         return floorPosition;

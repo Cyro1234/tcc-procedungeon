@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -26,16 +27,30 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     [SerializeField] private int maxEnemiesPerRoom = 3;
 
+    [SerializeField] private bool useRandomSeed = true;
+    [SerializeField] private int seed = 0;
+
     private List<GameObject> enemies = new List<GameObject>();
 
     protected override void RunProceduralGeneration()
     {
+        
+
         tileMapVisualizer.Clear();
         CreateRooms();
     }
 
     private void Start()
     {
+        if (useRandomSeed)
+        {
+            seed = GenerateRandomSeed();
+        }
+
+        Rng.Init(seed);
+
+        Debug.Log("SEED: " + seed);
+
         RunProceduralGeneration();
     }
 
@@ -119,14 +134,14 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
 
             // escolhe o tamanho dos cortes para a sala baseado no tamanho minimo
-            int cutSizeX = UnityEngine.Random.Range(1, Mathf.Max(2, minRoomWidth / 3));
-            int cutSizeY = UnityEngine.Random.Range(1, Mathf.Max(2, minRoomHeight / 3));
+            int cutSizeX = Rng.DungeonRange(1, Mathf.Max(2, minRoomWidth / 3));
+            int cutSizeY = Rng.DungeonRange(1, Mathf.Max(2, minRoomHeight / 3));
 
             // lista de cantos pra remover, 0 inferior esquerdo, 1 inferior direito, 2 superior esquerdo, 3 superior direito
             for (int i = 0; i < 4; i++) // percorre os 4 cantos da sala
             {
                 // 50% de chance de cortar o canto para variar os formatos
-                if (UnityEngine.Random.value > 0.5f) continue;
+                if (Rng.DungeonValue() > 0.5f) continue;
 
                 for (int x = 0; x < cutSizeX; x++) // largura do corte
                 {
@@ -158,12 +173,12 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Nao spawna inimigos no spawn do jogador, por isso i = 1
         for (int i = 1; i < roomsList.Count; i++)
         {
-            int rng = Random.Range(0, maxEnemiesPerRoom + 1); // Quantidade de inimigos na sala
+            int rng = Rng.EnemyRange(0, maxEnemiesPerRoom + 1); // Quantidade de inimigos na sala
             for (int j = 0; j < rng; j++) 
             {
                 // Posicao do inimigo a spawnar
-                int randomX = Random.Range(roomsList[i].xMin + 10, roomsList[i].xMax - 10); // +-5 para nao spawnar na parede, pensar em uma solucao melhor eh ideal
-                int randomY = Random.Range(roomsList[i].yMin + 10, roomsList[i].yMax - 10);
+                int randomX = Rng.EnemyRange(roomsList[i].xMin + 5, roomsList[i].xMax - 5); // +-5 para nao spawnar na parede, pensar em uma solucao melhor eh ideal
+                int randomY = Rng.EnemyRange(roomsList[i].yMin + 5, roomsList[i].yMax - 5);
 
                 Vector3 spawnPos = new Vector3(randomX, randomY, 0);
 
@@ -177,7 +192,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     private GameObject getRandomEnemy()
     {
-        int index = Random.Range(0, ListenemyPrefab.Count);
+        int index = Rng.EnemyRange(0, ListenemyPrefab.Count);
         Debug.Log(index);
         return ListenemyPrefab[index];
     }
@@ -198,7 +213,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     private HashSet<Vector2Int> ConnectRooms(List<Vector2Int> roomsCenters)
     {
         HashSet<Vector2Int> corridors = new HashSet<Vector2Int>();
-        var currentRoomCenter = roomsCenters[Random.Range(0, roomsCenters.Count)];
+        var currentRoomCenter = roomsCenters[Rng.DungeonRange(0, roomsCenters.Count)];
         roomsCenters.Remove(currentRoomCenter);
 
         while (roomsCenters.Count > 0)
@@ -282,5 +297,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             }
         }
         return floor;
+    }
+
+    private int GenerateRandomSeed()
+    {
+        return System.DateTime.Now.GetHashCode();
     }
 }
