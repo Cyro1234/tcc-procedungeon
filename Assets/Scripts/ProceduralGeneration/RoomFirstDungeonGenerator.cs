@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEngine.LowLevelPhysics2D.PhysicsLayers;
 using Random = UnityEngine.Random;
 
 // Utilizao o BSP para gerar as salas
 public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 {
-
-    [SerializeField] private RoomDetector roomDetector;
 
     [SerializeField] private int minRoomWidth = 4;
     [SerializeField] private int minRoomHeight = 4;
@@ -60,7 +57,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     private void CreateRooms()
     {
         // Limpa inimigos antes de tudo
-        foreach (var enemy in enemies)
+        foreach (var enemy in enemies) 
         {
             Destroy(enemy);
         }
@@ -68,8 +65,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
         // Obtem todas posicoes das salas geradas
         var roomList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)startPostion, new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
-
-        if (roomDetector != null) roomDetector.SetRooms(roomList);
 
         // Coloca os offsets para que as salas fiquem um pouco distantes entre as outras
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
