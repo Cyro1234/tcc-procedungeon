@@ -970,7 +970,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 0000000015a444f63d282b7fa15062136deda922
+  m_ApplyToSortingLayers: 0000000015a444f63d282b7fa15062136deda9229b84e922
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -1645,7 +1645,9 @@ MonoBehaviour:
   - {fileID: 1417005434}
   - {fileID: 381516147}
   - {fileID: 1900129691}
+  hasShield: 0
   hurtSound: {fileID: 8300000, guid: 5c35b80907f6b0c42949da87ca70c42b, type: 3}
+  shieldBreakSound: {fileID: 0}
 --- !u!82 &992072355
 AudioSource:
   m_ObjectHideFlags: 0
@@ -38664,8 +38666,10 @@ MonoBehaviour:
   - {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da, type: 3}
   - {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212, type: 3}
   maxEnemiesPerRoom: 3
-  useRandomSeed: 0
+  useRandomSeed: 1
   seed: 3
+  chestPrefab: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
+    type: 3}
 --- !u!4 &1735951947
 Transform:
   m_ObjectHideFlags: 0

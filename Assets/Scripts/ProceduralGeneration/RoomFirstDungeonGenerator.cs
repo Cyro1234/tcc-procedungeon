@@ -30,6 +30,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private bool useRandomSeed = true;
     [SerializeField] private int seed = 0;
 
+    [SerializeField] private GameObject chestPrefab;
+
     private List<GameObject> enemies = new List<GameObject>();
 
     protected override void RunProceduralGeneration()
@@ -203,6 +205,14 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Coloca o jogador na primeira Sala
         GameObject player = GameObject.FindWithTag("Player");
         player.transform.position = new Vector3(roomsCenters[0].x, roomsCenters[0].y, 0);
+
+        // Instancia o Baú na primeira sala (com um offset de +1 no X para não nascer em cima do jogador)
+        if (chestPrefab != null)
+        {
+            Vector3 chestPosition = new Vector3(roomsCenters[0].x + 1.5f, roomsCenters[0].y, 0);
+            Instantiate(chestPrefab, chestPosition, Quaternion.identity);
+            Debug.Log("Baú instanciado na sala inicial.");
+        }
 
         // Cria a escada da ultima sala
         tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);
