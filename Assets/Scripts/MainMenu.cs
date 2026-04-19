@@ -12,6 +12,12 @@ public class MainMenu : MonoBehaviour
 
     public void IniciarJogo()
     {
+        if (Time.timeScale == 0)
+        {
+            Time.timeScale = 1f;
+        }
+
+  
         SceneManager.LoadSceneAsync(1); // Carrega a cena no index X em Build Profiles => Scene List
     }
 
