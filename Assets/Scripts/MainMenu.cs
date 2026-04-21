@@ -3,11 +3,13 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    public GameObject mainMenu;
+    public GameObject optionsMenu;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        optionsMenu.SetActive(false);
     }
 
     public void IniciarJogo()
@@ -17,25 +19,30 @@ public class MainMenu : MonoBehaviour
             Time.timeScale = 1f;
         }
 
-  
         SceneManager.LoadSceneAsync(1); // Carrega a cena no index X em Build Profiles => Scene List
     }
 
-    public void Opcoes()
+    public void AbrirOpcoes()
     {
-        SceneManager.LoadSceneAsync(2); 
+        mainMenu.SetActive(false);
+        optionsMenu.SetActive(true);
+    }
+
+    public void RetornarMenu()
+    {
+        optionsMenu.SetActive(false);
+        mainMenu.SetActive(true);
     }
 
     public void SairJogo()
     {
         Application.Quit();
 
-    // Pra testar o quit no editor, remover os comentários
-    //#if UNITY_EDITOR
-    //   UnityEditor.EditorApplication.isPlaying = false;
-    //#else
-    //   Application.Quit();
-    //#endif
+    #if UNITY_EDITOR
+       UnityEditor.EditorApplication.isPlaying = false;
+    #else
+       Application.Quit();
+    #endif
 
     }
 
