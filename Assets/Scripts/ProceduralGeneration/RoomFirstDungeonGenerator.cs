@@ -16,6 +16,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private int dungeonHeight = 20;
 
     [SerializeField] private int offset = 1;
+    public int Offset => offset;
     [SerializeField] private int subOffset = 1;
 
     [SerializeField] private bool randomWalkRooms = false;
@@ -33,6 +34,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private RoomDetector roomDetector;
 
     private List<GameObject> enemies = new List<GameObject>();
+    private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
+    private bool salaTrancada = false;
 
     protected override void RunProceduralGeneration()
     {
@@ -58,6 +61,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     private void CreateRooms()
     {
+        roomEntrances.Clear();
+        salaTrancada = false;
         // Limpa inimigos antes de tudo
         foreach (var enemy in enemies) 
         {
@@ -68,7 +73,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Obtem todas posicoes das salas geradas
         var roomList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)startPostion, new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
 
-        if (roomDetector != null) roomDetector.SetRooms(roomList);
+        if (roomDetector != null) roomDetector.SetRooms(roomList, offset);
 
         // Coloca os offsets para que as salas fiquem um pouco distantes entre as outras
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
@@ -250,6 +255,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 position += Vector2Int.down;
             }
             corridor.Add(position);
+            CheckAndAddDoor(position);
         }
         while (position.x != destination.x) // Vai andando pros lados ate chegar no x da sala de destino
         {
@@ -262,8 +268,31 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 position += Vector2Int.left;
             }
             corridor.Add(position);
+            CheckAndAddDoor(position);
         }
         return corridor;
+    }
+
+    // Função auxiliar para identificar se a posição é uma conexão
+    private void CheckAndAddDoor(Vector2Int pos)
+    {
+        foreach (var room in roomDetector.GetRoomsList())
+        {
+            // define os limites onde as paredes da sala realmente existem (tava spawnando deslocado)
+            int left = room.xMin + offset - 1;
+            int right = room.xMax - offset;
+            int bottom = room.yMin + offset - 1;
+            int top = room.yMax - offset;
+
+            bool naBordaVertical = (pos.x == left || pos.x == right) && (pos.y >= room.yMin + offset && pos.y < room.yMax - offset);
+            bool naBordaHorizontal = (pos.y == bottom || pos.y == top) && (pos.x >= room.xMin + offset && pos.x < room.xMax - offset);
+
+            if (naBordaVertical || naBordaHorizontal)
+            {
+                roomEntrances.Add(pos);
+                // Debug.Log($"Porta registada em: {pos}");
+            }
+        }
     }
 
     // Acha a sala mais perto da sala atual. Funcao auxiliar de ConnectRooms
@@ -306,5 +335,56 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     private int GenerateRandomSeed()
     {
         return System.DateTime.Now.GetHashCode();
+    }
+
+
+    void Update()
+    {
+        if (roomDetector != null && roomDetector.jogadorSala) // verifica se o jogador esta na sala
+        {
+            if (roomDetector.inimigoSala && !salaTrancada) // se passar e tiver inimigos, tranca a sala
+            {
+                FecharPortasDaSala();
+                salaTrancada = true;
+            }
+            else if (!roomDetector.inimigoSala && salaTrancada) // se não houver inimigos e a sala estiver trancada, abre a sala
+            {
+                AbrirPortasDaSala();
+                salaTrancada = false;
+            }
+        }
+    }
+
+    private void FecharPortasDaSala()
+    {
+        BoundsInt? currentBounds = roomDetector.GetCurrentRoomBounds();
+        if (currentBounds == null) return;
+
+        foreach (var pos in roomEntrances)
+        {
+            // verifica se a posicao das salas usa o limite real das
+            if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
+                pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
+            {
+                tileMapVisualizer.PaintDoorTile(pos);
+            }
+        }
+    }
+
+    private void AbrirPortasDaSala()
+    {
+        BoundsInt? currentBounds = roomDetector.GetCurrentRoomBounds();
+        if (currentBounds == null) return;
+
+        foreach (var pos in roomEntrances)
+        {
+            // verifica se a posicao das salas usa o limite real das
+            if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
+                pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
+            {
+                tileMapVisualizer.ClearTile(pos);
+            }
+        }
+        Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
     }
 }
