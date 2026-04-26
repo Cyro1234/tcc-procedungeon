@@ -6,12 +6,10 @@ using UnityEngine;
 public class DebuffExamples : MonoBehaviour, IDebuff
 {
     private PlayerStatsHandler stats;
-    private GameObject player;
 
     public void Awake()
     {
-        stats = player.GetComponent<PlayerStatsHandler>();
-
+        stats = GetComponent<PlayerStatsHandler>();
     }
 
     public void Apply(PlayerStatsHandler stats)

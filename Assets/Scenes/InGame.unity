@@ -48274,14 +48274,18 @@ MonoBehaviour:
   subOffset: 4
   randomWalkRooms: 0
   subBSPRooms: 1
-  ListenemyPrefab:
-  - {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da, type: 3}
-  - {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212, type: 3}
-  - {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f, type: 3}
+  enemyTable:
+    items:
+    - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
+        type: 3}
+      weight: 2
+    - item: {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212,
+        type: 3}
+      weight: 3
   maxEnemiesPerRoom: 3
   useRandomSeed: 1
   seed: 3
-  roomDetector: {fileID: 1025921156}
+  roomDetector: {fileID: 0}
 --- !u!4 &1735951947
 Transform:
   m_ObjectHideFlags: 0
@@ -48951,7 +48955,6 @@ SceneRoots:
   - {fileID: 16983315}
   - {fileID: 952469147}
   - {fileID: 1735951947}
-  - {fileID: 1025921157}
   - {fileID: 235458965}
   - {fileID: 1911954803}
   - {fileID: 1690250079}
