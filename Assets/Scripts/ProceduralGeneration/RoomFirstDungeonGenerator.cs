@@ -24,7 +24,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     //[SerializeField] private GameObject enemyPrefab;
 
-    [SerializeField] private List<GameObject> ListenemyPrefab;
+    //[SerializeField] private List<GameObject> ListenemyPrefab;
+    [SerializeField] private WeightedTable<GameObject> enemyTable;
 
     [SerializeField] private int maxEnemiesPerRoom = 3;
 
@@ -199,11 +200,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
     }
 
-    private GameObject getRandomEnemy()
+    private GameObject getRandomEnemy() // TODO: USAR WEIGHTEDLIST
     {
-        int index = Rng.EnemyRange(0, ListenemyPrefab.Count);
-        Debug.Log(index);
-        return ListenemyPrefab[index];
+        return enemyTable.getRandom(Rng.enemyRng);
     }
 
     // Coloca o jogador no spawn e cria a saida da fase

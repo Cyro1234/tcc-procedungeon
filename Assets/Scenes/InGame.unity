@@ -48287,9 +48287,14 @@ MonoBehaviour:
   subOffset: 4
   randomWalkRooms: 0
   subBSPRooms: 1
-  ListenemyPrefab:
-  - {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da, type: 3}
-  - {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212, type: 3}
+  enemyTable:
+    items:
+    - item: {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212,
+        type: 3}
+      weight: 5
+    - item: {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da,
+        type: 3}
+      weight: 5
   maxEnemiesPerRoom: 3
   useRandomSeed: 0
   seed: 3
