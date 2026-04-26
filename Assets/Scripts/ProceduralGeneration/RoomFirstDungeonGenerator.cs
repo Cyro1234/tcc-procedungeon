@@ -79,9 +79,15 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Coloca os offsets para que as salas fiquem um pouco distantes entre as outras
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
 
+        List<HashSet<Vector2Int>> salas = new List<HashSet<Vector2Int>>();
+
         if (subBSPRooms)
         {
-            floor = CreateSubBSPRooms(roomList, subOffset, minRoomWidth, minRoomHeight); // deixei o offset no 0 pra ficar grudado
+            salas = CreateSubBSPRooms(roomList, subOffset, minRoomWidth, minRoomHeight); // deixei o offset no 0 pra ficar grudado
+            foreach (var sala in salas)
+            {
+                floor.UnionWith(sala);
+            }
         }
         else
         {
@@ -100,7 +106,14 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Spawn do jogador e saida. O spawn eh a primeira sala e a saida a ultima sala gerada.
         PlaceSpawnAndExit(roomsCenters);
         
-        SpawnEnemies(roomList);
+        if (subBSPRooms)
+        {
+            SpawnEnemies(salas);
+        }
+        else
+        {
+            SpawnEnemies(roomList);
+        }
 
         // Conectar salas com corredores
         HashSet<Vector2Int> corridors = ConnectRooms(roomsCenters);
@@ -112,8 +125,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     }
 
-    private HashSet<Vector2Int> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
+    private List<HashSet<Vector2Int>> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
     {
+        List<HashSet<Vector2Int>> salas = new List<HashSet<Vector2Int>>(); // lista que contem as posicoes de cada sala separadas por hash 
+
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>(); // guarda as posicoes do chao
         //for (int i = 0; i < roomList.Count; i++) { // percorre todas as salas menos as subs
         //    var roomBounds = roomList[i]; // limites
@@ -173,12 +188,55 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             roomFloor.Add(center); // adiciona o centro de volta caso ele tenha sido removido
 
             floor.UnionWith(roomFloor);
+
+            salas.Add(roomFloor);
         }
-        return floor;
+        return salas;
+    }
+
+    bool EhParede(Vector2Int pos, HashSet<Vector2Int> floor)
+    {
+        return !floor.Contains(pos + Vector2Int.up) ||
+               !floor.Contains(pos + Vector2Int.down) ||
+               !floor.Contains(pos + Vector2Int.left) ||
+               !floor.Contains(pos + Vector2Int.right);
+    }
+
+    private void SpawnEnemies(List<HashSet<Vector2Int>> roomsList) // NOVO SPAWN DE INIMIGOS PARA O SUB BSP
+    {
+        for (int i = 1; i < roomsList.Count; i++) 
+        {
+            var roomTiles = roomsList[i];
+
+            // Filtra posicoes que nao estejam na parede para impedir spawnar inimigos dentro de paredes
+            List<Vector2Int> availablePositions = new List<Vector2Int>(); 
+            foreach (var pos in roomTiles) 
+            {
+                if (!EhParede(pos, roomTiles))
+                { 
+                    availablePositions.Add(pos);
+                }
+            }
+
+            int enemyCount = Rng.EnemyRange(0, maxEnemiesPerRoom + 1); // Quantidade de inimigos na sala
+
+            for (int j = 0; j < enemyCount && availablePositions.Count > 0; j++)
+            {
+                int index = Rng.EnemyRange(0, availablePositions.Count);
+                Vector2Int pos = availablePositions[index];
+
+                availablePositions.RemoveAt(index); // evita repetir posição
+
+                GameObject enemy = Instantiate(getRandomEnemy(), new Vector3(pos.x, pos.y, 0), Quaternion.identity);
+                enemies.Add(enemy);
+            }
+        }
+        
+        Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
     }
 
 
-    private void SpawnEnemies(List<BoundsInt> roomsList)
+    private void SpawnEnemies(List<BoundsInt> roomsList) // USADO QUANDO NAO TEM SUBBSP
     {
         // Nao spawna inimigos no spawn do jogador, por isso i = 1
         for (int i = 1; i < roomsList.Count; i++)
