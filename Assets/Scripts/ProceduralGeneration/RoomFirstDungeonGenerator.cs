@@ -31,8 +31,12 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private int seed = 0;
 
     [SerializeField] private GameObject chestPrefab;
+    [SerializeField] private bool randomStartingChest = false; // Define se o baú inicial é sorteado
+    [SerializeField] private Chest.ItemType startingChestItem = Chest.ItemType.Shield; // Escolha do item manual
 
     private List<GameObject> enemies = new List<GameObject>();
+
+    private GameObject currentChest;
 
     protected override void RunProceduralGeneration()
     {
@@ -64,6 +68,12 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             Destroy(enemy);
         }
         enemies.Clear();
+
+        // Limpa o baú da fase anterior
+        if (currentChest != null)
+        {
+            Destroy(currentChest);
+        }
 
         // Obtem todas posicoes das salas geradas
         var roomList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)startPostion, new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
@@ -210,7 +220,18 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         if (chestPrefab != null)
         {
             Vector3 chestPosition = new Vector3(roomsCenters[0].x + 1.5f, roomsCenters[0].y, 0);
-            Instantiate(chestPrefab, chestPosition, Quaternion.identity);
+            currentChest = Instantiate(chestPrefab, chestPosition, Quaternion.identity);
+            // Pega o script do baú que acabou de nascer para configurá-lo
+            Chest chestScript = currentChest.GetComponent<Chest>();
+            if (chestScript != null)
+            {
+                chestScript.isRandomItem = randomStartingChest;
+                // Se não for aleatório, coloca o item que você escolheu no Inspector
+                if (!randomStartingChest)
+                {
+                    chestScript.itemInside = startingChestItem;
+                }
+            }
             Debug.Log("Baú instanciado na sala inicial.");
         }
 

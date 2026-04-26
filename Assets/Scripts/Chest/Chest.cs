@@ -2,19 +2,31 @@ using UnityEngine;
 
 public class Chest : MonoBehaviour
 {
-    private bool isOpen = false; // Controla se o baú já foi aberto
+    // Criamos a nossa lista de itens possíveis
+    public enum ItemType { Shield, LongSword, Dagger }
+
+    [Header("Configurações do Baú")]
+    public bool isRandomItem = true; // Se for true, sorteia. Se for false, usa o item abaixo.
+    public ItemType itemInside;      // Qual item está aqui dentro (aparece como menu no Unity!)
+
+    private bool isOpen = false;
     private Animator animator;
 
     void Start()
     {
-        // Pega o componente de animação que colocaremos no baú
         animator = GetComponent<Animator>();
+
+        // Se o baú for aleatório, fazemos o sorteio logo que ele nasce
+        if (isRandomItem)
+        {
+            // Pega um número aleatório de 0 até a quantidade de itens na nossa lista (3)
+            int randomIndex = Random.Range(0, System.Enum.GetValues(typeof(ItemType)).Length);
+            itemInside = (ItemType)randomIndex; // Transforma o número de volta em um ItemType
+        }
     }
 
-    // Essa função é chamada automaticamente pelo Unity quando algo entra na área de colisão (Trigger)
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Verifica se o baú está fechado e se quem encostou tem a Tag "Player"
         if (!isOpen && collision.CompareTag("Player"))
         {
             OpenChest(collision.gameObject);
@@ -23,20 +35,30 @@ public class Chest : MonoBehaviour
 
     private void OpenChest(GameObject player)
     {
-        isOpen = true; // Marca como aberto para não abrir de novo
+        isOpen = true;
 
-        // Toca a animação "Open". (Criaremos esse gatilho no Animator depois)
         if (animator != null)
         {
             animator.SetTrigger("Open");
         }
 
-        // Procura o HeartSystem no jogador e dá o escudo
-        HeartSystem heartSystem = player.GetComponent<HeartSystem>();
-        if (heartSystem != null)
+        // Verifica qual item tem dentro do baú e entrega pro jogador
+        switch (itemInside)
         {
-            heartSystem.EquipShield();
-            Debug.Log("Baú aberto! Entregou o escudo ao jogador.");
+            case ItemType.Shield:
+                HeartSystem heartSystem = player.GetComponent<HeartSystem>();
+                if (heartSystem != null) heartSystem.EquipShield();
+                break;
+
+            case ItemType.LongSword:
+                Attack attackSword = player.GetComponent<Attack>();
+                if (attackSword != null) attackSword.EquipWeapon("LongSword");
+                break;
+
+            case ItemType.Dagger:
+                Attack attackDagger = player.GetComponent<Attack>();
+                if (attackDagger != null) attackDagger.EquipWeapon("Dagger");
+                break;
         }
     }
 }
