@@ -27,4 +27,9 @@ public class GameOverManager : MonoBehaviour
         Time.timeScale = 1f; // despausa
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+
+    public void RetornarMenu()
+    {
+        SceneManager.LoadSceneAsync(0);
+    }
 }

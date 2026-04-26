@@ -15,6 +15,8 @@ public class TileMapVisualizer : MonoBehaviour
     [SerializeField] private TileBase wallTile;
     [SerializeField] private GameObject exitPrefab;
 
+    [SerializeField] private TileBase doorTile;
+
     private GameObject currentLadder;
 
     public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions)
@@ -46,6 +48,29 @@ public class TileMapVisualizer : MonoBehaviour
     internal void PaintWallTile(Vector2Int position)
     {
         PaintSingleTile(position, wallTileMap, wallTile);
+    }
+
+    public void PaintDoorTile(Vector2Int position)
+    {
+        var tilePosition = wallTileMap.WorldToCell((Vector3Int)position);
+
+        // remove o tile do chao
+        floorTileMap.SetTile(tilePosition, null);
+
+        // pinta a porta na camada de paredes
+        var tilePos = wallTileMap.WorldToCell((Vector3Int)position);
+        wallTileMap.SetTile(tilePos, doorTile);
+    }
+
+    public void ClearTile(Vector2Int position)
+    {
+        Vector3Int tilePosition = wallTileMap.WorldToCell((Vector3Int)position);
+
+        // remove a porta
+        wallTileMap.SetTile(tilePosition, null);
+
+        // pinta o chao
+        floorTileMap.SetTile(tilePosition, floorTile);
     }
 
     public void PaintExit(Vector2Int position, AbstractDungeonGenerator generator) 
