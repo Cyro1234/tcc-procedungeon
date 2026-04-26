@@ -1454,7 +1454,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bd7859e4364fcc41b79501b4d9a590e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
-  damage: 1
 --- !u!1 &952469144
 GameObject:
   m_ObjectHideFlags: 0
@@ -1743,6 +1742,43 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &992072361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992072324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da3174212ca36724d8c87e1fea6b6707, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsHandler
+--- !u!114 &992072369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992072324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 526b4811a0c8faf47a005dbbb03bdae4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DebuffExamples
+--- !u!114 &992072370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992072324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 844a0c9a87b7aab428bbe41d32e68a7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DebuffTester
+  playerStats: {fileID: 992072361}
 --- !u!1 &1128909180
 GameObject:
   m_ObjectHideFlags: 0
@@ -38657,14 +38693,15 @@ MonoBehaviour:
   dungeonWidth: 100
   dungeonHeight: 100
   offset: 3
-  subOffset: 1
+  subOffset: 4
   randomWalkRooms: 0
-  subBSPRooms: 0
+  subBSPRooms: 1
   ListenemyPrefab:
   - {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da, type: 3}
   - {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212, type: 3}
+  - {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f, type: 3}
   maxEnemiesPerRoom: 3
-  useRandomSeed: 0
+  useRandomSeed: 1
   seed: 3
 --- !u!4 &1735951947
 Transform:
@@ -39306,6 +39343,18 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 992072355}
+    - targetCorrespondingSourceObject: {fileID: 2492088174279128530, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 992072361}
+    - targetCorrespondingSourceObject: {fileID: 2492088174279128530, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 992072370}
+    - targetCorrespondingSourceObject: {fileID: 2492088174279128530, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 992072369}
   m_SourcePrefab: {fileID: 100100000, guid: abe2bb6ffaa41d1449d7952ca0c370f1, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

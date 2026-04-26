@@ -33,36 +33,40 @@ public class EnemyMovement : MonoBehaviour
     {
         target = GameObject.Find("Player").transform;
         animator = GetComponent<Animator>();
-
         health = maxHealth;
 
     }
 
-    // Update is called once per frame
     void Update() // Calcula pra onde o inimigo deve andar
     {
         if (target) // Se tiver um jogador para seguir
         {
-            if (Vector3.Distance(target.position, transform.position) < viewDistance) // Verifica se o jogador esta na distancia de visao do inimigo
-            { // Mover em direcao ao jogador
-                // Animacao walk
-                animator.SetBool("isWalking", true);
+            if (Vector3.Distance(target.position, transform.position) < viewDistance)
+            {   // Mover em direcao ao jogador
                 Vector3 direction = (target.position - transform.position).normalized;
                 moveDirection = direction;
 
-                animator.SetFloat("InputX", moveDirection.x);
-                animator.SetFloat("InputY", moveDirection.y);
+                // Se o inimigo tiver um animator, atualiza os parametros de animacao.
+                if (animator != null)
+                { 
+
+                    // Animacao walk
+                    animator.SetBool("isWalking", true);
+                    animator.SetFloat("InputX", moveDirection.x);
+                    animator.SetFloat("InputY", moveDirection.y);
+                }
             }
             else
-            { // Fica parado
-                // Animacao idle
-                animator.SetBool("isWalking", false);
-                animator.SetFloat("LastInputX", moveDirection.x);
-                animator.SetFloat("LastInputY", moveDirection.y);
+            {   // Fica parado
+                moveDirection = Vector2.zero;
 
-                Vector3 direction = Vector3.zero.normalized;
-                moveDirection = direction;
-
+                // Se o inimigo tiver um animator, atualiza os parametros de animacao.
+                if (animator != null)
+                {
+                    animator.SetBool("isWalking", false);
+                    animator.SetFloat("LastInputX", moveDirection.x);
+                    animator.SetFloat("LastInputY", moveDirection.y);
+                }
             }
 
             // Roda o inimigo. NAO UTILIZADO NESSES SPRITES
