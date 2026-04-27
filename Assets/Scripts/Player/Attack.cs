@@ -5,6 +5,7 @@ public class Attack : MonoBehaviour
 {
     public GameObject Melee;
     bool isAttacking = false;
+<<<<<<< HEAD
 
     // Deixei public para podermos ver no Inspector
     public float atkDuration = 0.3f;
@@ -21,6 +22,20 @@ public class Attack : MonoBehaviour
         // Ao iniciar, o jogo memoriza o tamanho e velocidade padrão
         originalAtkDuration = atkDuration;
         originalMeleeScale = Melee.transform.localScale;
+=======
+    bool isCooldown = false;
+    float atkDuration = 0.3f; // Podemos deixar isso no PlayerStatsHandler.cs depois, pra gente ter a possibilidade de modificar o tempo de duração do ataque com buffs e debuffs (Xicote de Alex)
+    float atkTimer = 0f;
+
+    private PlayerStatsHandler stats;
+
+
+    [SerializeField] private AudioClip swordSound;
+
+    private void Awake()
+    {
+        stats = GetComponent<PlayerStatsHandler>();
+>>>>>>> teste
     }
 
     // Update is called once per frame
@@ -31,13 +46,16 @@ public class Attack : MonoBehaviour
 
     public void OnAttack()
     {
-        if (isAttacking == false)
+        if (isCooldown == false) // Adicionei essa verificação pra que a gente tenha como controlar o tempo de recarga do ataque
         {
-            AudioSource.PlayClipAtPoint(swordSound, transform.position, 1f); // SFX do ataque
+            if (isAttacking == false)
+            {
+                AudioSource.PlayClipAtPoint(swordSound, transform.position, 1f); // SFX do ataque
 
-            Melee.SetActive(true);
-            isAttacking = true;
-            // TODO: Realizar animacao, quando tiver
+                Melee.SetActive(true);
+                isAttacking = true;
+                // TODO: Realizar animacao, quando tiver
+            }
         }
     }
 
@@ -52,6 +70,18 @@ public class Attack : MonoBehaviour
                 atkTimer = 0f;
                 isAttacking= false;
                 Melee.SetActive(false);
+                isCooldown = true; // Começa o cooldown do ataque depois que a hitbox é desativada
+            }
+        }
+
+        // Literalmente a mesma logica do de cima, obrigada augusto mitou
+        if (isCooldown) 
+        {
+            atkTimer += Time.deltaTime;
+            if (atkTimer >= stats.GetPlayerAttackCooldown()) 
+            {
+                atkTimer = 0f;
+                isCooldown = false;
             }
         }
     }

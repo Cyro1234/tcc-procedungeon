@@ -16,6 +16,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private int dungeonHeight = 20;
 
     [SerializeField] private int offset = 1;
+    public int Offset => offset;
     [SerializeField] private int subOffset = 1;
 
     [SerializeField] private bool randomWalkRooms = false;
@@ -23,18 +24,25 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     //[SerializeField] private GameObject enemyPrefab;
 
-    [SerializeField] private List<GameObject> ListenemyPrefab;
+    //[SerializeField] private List<GameObject> ListenemyPrefab;
+    [SerializeField] private WeightedTable<GameObject> enemyTable;
 
     [SerializeField] private int maxEnemiesPerRoom = 3;
 
     [SerializeField] private bool useRandomSeed = true;
     [SerializeField] private int seed = 0;
 
+<<<<<<< HEAD
     [SerializeField] private GameObject chestPrefab;
     [SerializeField] private bool randomStartingChest = false; // Define se o ba� inicial � sorteado
     [SerializeField] private Chest.ItemType startingChestItem = Chest.ItemType.Shield; // Escolha do item manual
+=======
+    [SerializeField] private RoomDetector roomDetector;
+>>>>>>> teste
 
     private List<GameObject> enemies = new List<GameObject>();
+    private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
+    private bool salaTrancada = false;
 
     private GameObject currentChest;
 
@@ -62,6 +70,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     private void CreateRooms()
     {
+        roomEntrances.Clear();
+        salaTrancada = false;
         // Limpa inimigos antes de tudo
         foreach (var enemy in enemies) 
         {
@@ -78,12 +88,20 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Obtem todas posicoes das salas geradas
         var roomList = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt((Vector3Int)startPostion, new Vector3Int(dungeonWidth, dungeonHeight, 0)), minRoomWidth, minRoomHeight);
 
+        if (roomDetector != null) roomDetector.SetRooms(roomList, offset);
+
         // Coloca os offsets para que as salas fiquem um pouco distantes entre as outras
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
 
+        List<HashSet<Vector2Int>> salas = new List<HashSet<Vector2Int>>();
+
         if (subBSPRooms)
         {
-            floor = CreateSubBSPRooms(roomList, subOffset, minRoomWidth, minRoomHeight); // deixei o offset no 0 pra ficar grudado
+            salas = CreateSubBSPRooms(roomList, subOffset, minRoomWidth, minRoomHeight); // deixei o offset no 0 pra ficar grudado
+            foreach (var sala in salas)
+            {
+                floor.UnionWith(sala);
+            }
         }
         else
         {
@@ -102,7 +120,14 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Spawn do jogador e saida. O spawn eh a primeira sala e a saida a ultima sala gerada.
         PlaceSpawnAndExit(roomsCenters);
         
-        SpawnEnemies(roomList);
+        if (subBSPRooms)
+        {
+            SpawnEnemies(salas);
+        }
+        else
+        {
+            SpawnEnemies(roomList);
+        }
 
         // Conectar salas com corredores
         HashSet<Vector2Int> corridors = ConnectRooms(roomsCenters);
@@ -114,8 +139,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     }
 
-    private HashSet<Vector2Int> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
+    private List<HashSet<Vector2Int>> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
     {
+        List<HashSet<Vector2Int>> salas = new List<HashSet<Vector2Int>>(); // lista que contem as posicoes de cada sala separadas por hash 
+
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>(); // guarda as posicoes do chao
         //for (int i = 0; i < roomList.Count; i++) { // percorre todas as salas menos as subs
         //    var roomBounds = roomList[i]; // limites
@@ -175,12 +202,55 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             roomFloor.Add(center); // adiciona o centro de volta caso ele tenha sido removido
 
             floor.UnionWith(roomFloor);
+
+            salas.Add(roomFloor);
         }
-        return floor;
+        return salas;
+    }
+
+    bool EhParede(Vector2Int pos, HashSet<Vector2Int> floor)
+    {
+        return !floor.Contains(pos + Vector2Int.up) ||
+               !floor.Contains(pos + Vector2Int.down) ||
+               !floor.Contains(pos + Vector2Int.left) ||
+               !floor.Contains(pos + Vector2Int.right);
+    }
+
+    private void SpawnEnemies(List<HashSet<Vector2Int>> roomsList) // NOVO SPAWN DE INIMIGOS PARA O SUB BSP
+    {
+        for (int i = 1; i < roomsList.Count; i++) 
+        {
+            var roomTiles = roomsList[i];
+
+            // Filtra posicoes que nao estejam na parede para impedir spawnar inimigos dentro de paredes
+            List<Vector2Int> availablePositions = new List<Vector2Int>(); 
+            foreach (var pos in roomTiles) 
+            {
+                if (!EhParede(pos, roomTiles))
+                { 
+                    availablePositions.Add(pos);
+                }
+            }
+
+            int enemyCount = Rng.EnemyRange(0, maxEnemiesPerRoom + 1); // Quantidade de inimigos na sala
+
+            for (int j = 0; j < enemyCount && availablePositions.Count > 0; j++)
+            {
+                int index = Rng.EnemyRange(0, availablePositions.Count);
+                Vector2Int pos = availablePositions[index];
+
+                availablePositions.RemoveAt(index); // evita repetir posição
+
+                GameObject enemy = Instantiate(getRandomEnemy(), new Vector3(pos.x, pos.y, 0), Quaternion.identity);
+                enemies.Add(enemy);
+            }
+        }
+        
+        Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
     }
 
 
-    private void SpawnEnemies(List<BoundsInt> roomsList)
+    private void SpawnEnemies(List<BoundsInt> roomsList) // USADO QUANDO NAO TEM SUBBSP
     {
         // Nao spawna inimigos no spawn do jogador, por isso i = 1
         for (int i = 1; i < roomsList.Count; i++)
@@ -202,11 +272,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
     }
 
-    private GameObject getRandomEnemy()
+    private GameObject getRandomEnemy() // TODO: USAR WEIGHTEDLIST
     {
-        int index = Rng.EnemyRange(0, ListenemyPrefab.Count);
-        Debug.Log(index);
-        return ListenemyPrefab[index];
+        return enemyTable.getRandom(Rng.enemyRng);
     }
 
     // Coloca o jogador no spawn e cria a saida da fase
@@ -277,6 +345,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 position += Vector2Int.down;
             }
             corridor.Add(position);
+            CheckAndAddDoor(position);
         }
         while (position.x != destination.x) // Vai andando pros lados ate chegar no x da sala de destino
         {
@@ -289,8 +358,31 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 position += Vector2Int.left;
             }
             corridor.Add(position);
+            CheckAndAddDoor(position);
         }
         return corridor;
+    }
+
+    // Função auxiliar para identificar se a posição é uma conexão
+    private void CheckAndAddDoor(Vector2Int pos)
+    {
+        foreach (var room in roomDetector.GetRoomsList())
+        {
+            // define os limites onde as paredes da sala realmente existem (tava spawnando deslocado)
+            int left = room.xMin + offset - 1;
+            int right = room.xMax - offset;
+            int bottom = room.yMin + offset - 1;
+            int top = room.yMax - offset;
+
+            bool naBordaVertical = (pos.x == left || pos.x == right) && (pos.y >= room.yMin + offset && pos.y < room.yMax - offset);
+            bool naBordaHorizontal = (pos.y == bottom || pos.y == top) && (pos.x >= room.xMin + offset && pos.x < room.xMax - offset);
+
+            if (naBordaVertical || naBordaHorizontal)
+            {
+                roomEntrances.Add(pos);
+                // Debug.Log($"Porta registada em: {pos}");
+            }
+        }
     }
 
     // Acha a sala mais perto da sala atual. Funcao auxiliar de ConnectRooms
@@ -333,5 +425,56 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     private int GenerateRandomSeed()
     {
         return System.DateTime.Now.GetHashCode();
+    }
+
+
+    void Update()
+    {
+        if (roomDetector != null && roomDetector.jogadorSala) // verifica se o jogador esta na sala
+        {
+            if (roomDetector.inimigoSala && !salaTrancada) // se passar e tiver inimigos, tranca a sala
+            {
+                FecharPortasDaSala();
+                salaTrancada = true;
+            }
+            else if (!roomDetector.inimigoSala && salaTrancada) // se não houver inimigos e a sala estiver trancada, abre a sala
+            {
+                AbrirPortasDaSala();
+                salaTrancada = false;
+            }
+        }
+    }
+
+    private void FecharPortasDaSala()
+    {
+        BoundsInt? currentBounds = roomDetector.GetCurrentRoomBounds();
+        if (currentBounds == null) return;
+
+        foreach (var pos in roomEntrances)
+        {
+            // verifica se a posicao das salas usa o limite real das
+            if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
+                pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
+            {
+                tileMapVisualizer.PaintDoorTile(pos);
+            }
+        }
+    }
+
+    private void AbrirPortasDaSala()
+    {
+        BoundsInt? currentBounds = roomDetector.GetCurrentRoomBounds();
+        if (currentBounds == null) return;
+
+        foreach (var pos in roomEntrances)
+        {
+            // verifica se a posicao das salas usa o limite real das
+            if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
+                pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
+            {
+                tileMapVisualizer.ClearTile(pos);
+            }
+        }
+        Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
     }
 }

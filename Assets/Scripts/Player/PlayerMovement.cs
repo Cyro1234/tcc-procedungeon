@@ -3,8 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private PlayerStatsHandler stats;
 
-    [SerializeField] private float moveSpeed = 5f;
     private Rigidbody2D rb;
     private Vector2 moveInput;
     private Animator animator;
@@ -18,12 +18,13 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        stats = GetComponent<PlayerStatsHandler>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        rb.linearVelocity = moveInput * moveSpeed;
+        rb.linearVelocity = moveInput * stats.GetPlayerWalkSpeed();
         if (isWalking) 
         {
             Vector3 vector3 = Vector3.left * moveInput.x + Vector3.down * moveInput.y;
@@ -57,6 +58,4 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("InputX", moveInput.x);
         animator.SetFloat("InputY", moveInput.y);
     }
-
-    
 }

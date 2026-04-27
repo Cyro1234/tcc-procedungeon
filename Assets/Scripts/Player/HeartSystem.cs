@@ -4,7 +4,8 @@ using UnityEngine.Audio;
 public class HeartSystem : MonoBehaviour
 {
     public GameObject[] hearts;
-    int life = 3;
+    private PlayerStatsHandler stats;
+    int life;
 
     // Variável para controlar se o jogador tem o escudo
     public bool hasShield = false;
@@ -18,6 +19,8 @@ public class HeartSystem : MonoBehaviour
 
     private void Start()
     {
+        stats = GetComponent<PlayerStatsHandler>();
+        life = (int)stats.GetPlayerMaxHearts();       // O jogador inicia com a vida máxima definida no PlayerStatsHandler.cs
         gameOverManager = FindFirstObjectByType<GameOverManager>();
         audioSource = GetComponent<AudioSource>();
     }
@@ -25,6 +28,7 @@ public class HeartSystem : MonoBehaviour
     void Update()
     {
         // Decrementa os containers de vida na UI
+        // Nao sei se fui eu que buguei ele mas a contagem de coração não sobe mais de 3 - isso nao impacta o jogo!!!
         for (int i = 0; i < hearts.Length; i++)
         {
             if (i < life)

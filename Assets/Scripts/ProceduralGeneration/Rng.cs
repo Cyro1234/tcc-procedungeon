@@ -4,8 +4,8 @@ public static class Rng
 {
     public static int baseSeed { get; private set; }
 
-    private static System.Random dungeonRng;
-    private static System.Random enemyRng;
+    public static System.Random dungeonRng;
+    public static System.Random enemyRng;
     
     public static void Init(int seed)
     {
