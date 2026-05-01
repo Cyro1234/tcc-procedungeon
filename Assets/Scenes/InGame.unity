@@ -2049,6 +2049,90 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DebuffTester
   playerStats: {fileID: 992072361}
+--- !u!1 &1101588029
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1101588030}
+  - component: {fileID: 1101588031}
+  - component: {fileID: 1101588032}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1101588030
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101588029}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1690250079}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1101588031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101588029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf8554aa04a3d9448d03694d7fec1bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+--- !u!114 &1101588032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1101588029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 384f9c21c721b604e98fd3e1814e69ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomFirstDungeonGenerator
+  tileMapVisualizer: {fileID: 1749136079}
+  startPosition: {x: 0, y: 0}
+  startPostion: {x: 0, y: 0}
+  randomWalkParameters: {fileID: 11400000, guid: 3d439f378900e88449d7310f3550a9a1,
+    type: 2}
+  minRoomWidth: 15
+  minRoomHeight: 15
+  dungeonWidth: 100
+  dungeonHeight: 100
+  offset: 3
+  subOffset: 4
+  subBSPRooms: 1
+  enemyTable:
+    items:
+    - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
+        type: 3}
+      weight: 10
+    - item: {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212,
+        type: 3}
+      weight: 3
+    - item: {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da,
+        type: 3}
+      weight: 2
+  maxEnemiesPerRoom: 3
+  useRandomSeed: 0
+  seed: 184408524
+  roomDetector: {fileID: 1977743734}
 --- !u!1 &1128909180
 GameObject:
   m_ObjectHideFlags: 0
@@ -48210,7 +48294,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1690250079}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: GameManagers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48230,78 +48314,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 601799898}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1735951945
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1735951947}
-  - component: {fileID: 1735951946}
-  m_Layer: 0
-  m_Name: RoomsFirstDungeonGenerator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1735951946
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1735951945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 384f9c21c721b604e98fd3e1814e69ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RoomFirstDungeonGenerator
-  tileMapVisualizer: {fileID: 1749136079}
-  startPosition: {x: 0, y: 0}
-  startPostion: {x: 0, y: 0}
-  randomWalkParameters: {fileID: 11400000, guid: 3d439f378900e88449d7310f3550a9a1,
-    type: 2}
-  minRoomWidth: 15
-  minRoomHeight: 15
-  dungeonWidth: 100
-  dungeonHeight: 100
-  offset: 3
-  subOffset: 4
-  randomWalkRooms: 0
-  subBSPRooms: 1
-  enemyTable:
-    items:
-    - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
-        type: 3}
-      weight: 10
-    - item: {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212,
-        type: 3}
-      weight: 3
-    - item: {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da,
-        type: 3}
-      weight: 2
-  maxEnemiesPerRoom: 3
-  useRandomSeed: 1
-  seed: 3
-  roomDetector: {fileID: 1977743734}
---- !u!4 &1735951947
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1735951945}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.55891, y: 2.28171, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
+  - {fileID: 1101588030}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1749136078
@@ -48340,6 +48353,30 @@ MonoBehaviour:
   wallTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
   exitPrefab: {fileID: 6965201669180963775, guid: 574df4b20857e8c4f9b676bf94d5ae78,
     type: 3}
+  floorTilesNivelBaixo:
+    items:
+    - item: {fileID: 11400000, guid: e2431512ea0b66d4688374cf9c9a4a07, type: 2}
+      weight: 2
+    - item: {fileID: 11400000, guid: f3823b3d46f8211469b70a560f22aa3d, type: 2}
+      weight: 2
+    - item: {fileID: 11400000, guid: 0ce8257b428197744bef813e5d664e5c, type: 2}
+      weight: 5
+  floorTilesNivelMedio:
+    items:
+    - item: {fileID: 11400000, guid: 8aad69644f71cdf4a941bada1775d810, type: 2}
+      weight: 2
+    - item: {fileID: 11400000, guid: 7ea3505ec6fd5d54b98bc87879aad3e7, type: 2}
+      weight: 2
+    - item: {fileID: 11400000, guid: aa5370368451d1849a3f971eb88f4acc, type: 2}
+      weight: 5
+  floorTilesNivelAlto:
+    items:
+    - item: {fileID: 11400000, guid: 164a5af489fca1e449fbefcd07485dff, type: 2}
+      weight: 5
+    - item: {fileID: 11400000, guid: 1fab6702b1c809442b19b41d048fec7a, type: 2}
+      weight: 2
+    - item: {fileID: 11400000, guid: 5e51b629efc93344c823154572f2975e, type: 2}
+      weight: 2
   doorTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
 --- !u!4 &1749136080
 Transform:
@@ -48819,7 +48856,7 @@ MonoBehaviour:
   jogadorSala: 0
   inimigoSala: 0
   virtualCamera: {fileID: 1635360952}
-  dungeonGenerator: {fileID: 1735951946}
+  dungeonGenerator: {fileID: 1101588032}
 --- !u!4 &1977743735
 Transform:
   m_ObjectHideFlags: 0
@@ -49006,7 +49043,6 @@ SceneRoots:
   - {fileID: 1749136080}
   - {fileID: 16983315}
   - {fileID: 952469147}
-  - {fileID: 1735951947}
   - {fileID: 235458965}
   - {fileID: 1911954803}
   - {fileID: 1690250079}
