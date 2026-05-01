@@ -446,7 +446,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 AbrirPortasDaSala();
                 salaTrancada = false;
             }
-            else if (!roomDetector.inimigoSala) // Se nao tiver inimigos, abre a sala. Possivel FIX para portas fechadas logo ao descer as escadas
+            else if (!roomDetector.inimigoSala) // Se nao tiver inimigos, abre a sala. FIX TEMPORARIO DAS PORTAS. TODO: ARRUMAR MELHOR
             {
                 AbrirPortasDaSala();
             }
@@ -485,6 +485,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 Debug.Log("LIMPANDO: X: " + pos.x + "  -  Y: " + pos.y);
             }
         }
-        Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
+        //Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
     }
 }

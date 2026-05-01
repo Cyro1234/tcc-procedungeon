@@ -20,6 +20,7 @@ public class PlayerStatsHandler : MonoBehaviour
 
     // Status padrão do jogador
     private int basePlayerMaxHearts = 3;
+    private int maxPossibleHealth = 5; // Vida maxima possivel do jogador. Se quiser aumentar, criar mais coracoes no canvas e adicionar no heartsystem
     private float basePlayerSpeed = 10f;
     private float basePlayerDamage = 1f;
     private float basePlayerAttackCooldown = 0f;
@@ -96,7 +97,12 @@ public class PlayerStatsHandler : MonoBehaviour
 
     public float GetPlayerMaxHearts()
     {
-        return CalculateStat(basePlayerMaxHearts, StatType.Health);
+        float hp = CalculateStat(basePlayerMaxHearts, StatType.Health);
+        if (hp > maxPossibleHealth)
+        {
+            hp = maxPossibleHealth;
+        }
+        return hp;
     }
 
     public float GetPlayerAttackCooldown()
