@@ -17,7 +17,7 @@ public class HeartSystem : MonoBehaviour
     {
         stats = GetComponent<PlayerStatsHandler>();
         life = (int)stats.GetPlayerMaxHearts();       // O jogador inicia com a vida máxima definida no PlayerStatsHandler.cs
-        gameOverManager = FindFirstObjectByType<GameOverManager>();
+        gameOverManager = FindAnyObjectByType<GameOverManager>();
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -25,6 +25,7 @@ public class HeartSystem : MonoBehaviour
     {
         // Decrementa os containers de vida na UI
         // Nao sei se fui eu que buguei ele mas a contagem de coração não sobe mais de 3 - isso nao impacta o jogo!!!
+        
         for (int i = 0; i < hearts.Length; i++)
         {
             if (i < life)
@@ -34,10 +35,15 @@ public class HeartSystem : MonoBehaviour
         }
     }
 
+    public void updateMaxLife()
+    {
+        life = (int)stats.GetPlayerMaxHearts();
+    }
+
     public void takeDamage(int damage) 
     {
-
         life -= damage;
+
         life = Mathf.Max(life, 0); // No maximo fica com 0 vidas
         Debug.Log("TOMOU DANO! LIFE: " + life + " - CONTAINERS: " + hearts.Length);
         if (life <= 0)

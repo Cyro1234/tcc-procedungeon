@@ -19,7 +19,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     public int Offset => offset;
     [SerializeField] private int subOffset = 1;
 
-    [SerializeField] private bool randomWalkRooms = false;
     [SerializeField] private bool subBSPRooms = false;
 
     //[SerializeField] private GameObject enemyPrefab;
@@ -34,20 +33,42 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     [SerializeField] private RoomDetector roomDetector;
 
+    [SerializeField] private int BaixoNivel = 1;
+    [SerializeField] private int MedioNivel = 2;
+
     private List<GameObject> enemies = new List<GameObject>();
     private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
     private bool salaTrancada = false;
 
+    private int andar = 0; // Andar que o jogador esta presente
+
     protected override void RunProceduralGeneration()
     {
-        
-
+        AbrirPortasDaSala(); // Remove as paredes antigas
+        andar++;
+        Debug.Log("ANDAR: " + andar);
         tileMapVisualizer.Clear();
         CreateRooms();
     }
 
-    private void Start()
+    //private void Start()
+    //{
+    //    Debug.Log("START RODOU");
+    //    if (useRandomSeed)
+    //    {
+    //        seed = GenerateRandomSeed();
+    //    }
+
+    //    Rng.Init(seed);
+
+    //    Debug.Log("SEED: " + seed);
+
+    //    RunProceduralGeneration();
+    //}
+
+    public override void Setup()
     {
+        andar = 0;
         if (useRandomSeed)
         {
             seed = GenerateRandomSeed();
@@ -120,9 +141,25 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         floor.UnionWith(corridors);
 
         // Coloca o chao e paredes
-        tileMapVisualizer.PaintFloorTiles(floor);
+        tileMapVisualizer.PaintFloorTiles(floor, GetNivelAtual());
         WallGenerator.CreateWalls(floor, tileMapVisualizer);
 
+    }
+
+    private TileMapVisualizer.Niveis GetNivelAtual() 
+    {
+        if (andar <= BaixoNivel)
+        {
+            return TileMapVisualizer.Niveis.Baixo;
+        }
+        else if (andar <= MedioNivel) 
+        {
+            return TileMapVisualizer.Niveis.Medio;
+        }
+        else
+        {
+            return TileMapVisualizer.Niveis.Alto;
+        }
     }
 
     private List<HashSet<Vector2Int>> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
@@ -258,7 +295,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
     }
 
-    private GameObject getRandomEnemy() // TODO: USAR WEIGHTEDLIST
+    private GameObject getRandomEnemy()
     {
         return enemyTable.getRandom(Rng.enemyRng);
     }
@@ -272,7 +309,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
         // Cria a escada da ultima sala
         tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);
-        
+       
     }
 
     // Conecta as salas com um corredor
@@ -409,6 +446,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 AbrirPortasDaSala();
                 salaTrancada = false;
             }
+            else if (!roomDetector.inimigoSala) // Se nao tiver inimigos, abre a sala. FIX TEMPORARIO DAS PORTAS. TODO: ARRUMAR MELHOR
+            {
+                AbrirPortasDaSala();
+            }
         }
     }
 
@@ -424,6 +465,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
             {
                 tileMapVisualizer.PaintDoorTile(pos);
+                Debug.Log("FECHANDO: X: " + pos.x + "  -  Y: " + pos.y);
             }
         }
     }
@@ -440,8 +482,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
             {
                 tileMapVisualizer.ClearTile(pos);
+                Debug.Log("LIMPANDO: X: " + pos.x + "  -  Y: " + pos.y);
             }
         }
-        Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
+        //Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
     }
 }
