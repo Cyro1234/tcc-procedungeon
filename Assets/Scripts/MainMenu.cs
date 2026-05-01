@@ -5,11 +5,13 @@ public class MainMenu : MonoBehaviour
 {
     public GameObject mainMenu;
     public GameObject optionsMenu;
+    public GameObject controlsMenu;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
     }
 
     public void IniciarJogo()
@@ -32,6 +34,18 @@ public class MainMenu : MonoBehaviour
     {
         optionsMenu.SetActive(false);
         mainMenu.SetActive(true);
+    }
+
+    public void AbrirControles()
+    {
+        optionsMenu.SetActive(false);
+        controlsMenu.SetActive(true);
+    }
+
+    public void RetornarConfiguracoes()
+    {
+        controlsMenu.SetActive(false);
+        optionsMenu.SetActive(true);
     }
 
     public void SairJogo()
