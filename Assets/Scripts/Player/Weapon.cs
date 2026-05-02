@@ -2,12 +2,13 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
+    private PlayerStatsHandler stats;
     private GameObject player;
-    public float damage = 5f;
 
     private void Awake()
     {
         player = transform.root.gameObject;
+        stats = player.GetComponent<PlayerStatsHandler>();
     }
 
     // Quando entra na colisao
@@ -16,8 +17,7 @@ public class Weapon : MonoBehaviour
         EnemyMovement enemy = collision.GetComponent<EnemyMovement>(); // Tenta pegar o inimigo que entrou na colisao
         if (enemy != null)  // Se foi um inimigo
         {
-            enemy.takeDamage(damage, player);
+            enemy.takeDamage(stats.GetPlayerDamage(), player);
         }
     }
-
 }

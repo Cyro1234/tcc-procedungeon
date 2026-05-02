@@ -12,7 +12,6 @@ public class EnemyMovement : MonoBehaviour
 
     [SerializeField] int viewDistance = 12;
 
-    // TODO: Colocar a vida do inimigo em um script separado para deixar mais organizado
     [SerializeField] float maxHealth = 3f;
     private float health;
 
@@ -33,36 +32,40 @@ public class EnemyMovement : MonoBehaviour
     {
         target = GameObject.Find("Player").transform;
         animator = GetComponent<Animator>();
-
         health = maxHealth;
 
     }
 
-    // Update is called once per frame
     void Update() // Calcula pra onde o inimigo deve andar
     {
         if (target) // Se tiver um jogador para seguir
         {
-            if (Vector3.Distance(target.position, transform.position) < viewDistance) // Verifica se o jogador esta na distancia de visao do inimigo
-            { // Mover em direcao ao jogador
-                // Animacao walk
-                animator.SetBool("isWalking", true);
+            if (Vector3.Distance(target.position, transform.position) < viewDistance)
+            {   // Mover em direcao ao jogador
                 Vector3 direction = (target.position - transform.position).normalized;
                 moveDirection = direction;
 
-                animator.SetFloat("InputX", moveDirection.x);
-                animator.SetFloat("InputY", moveDirection.y);
+                // Se o inimigo tiver um animator, atualiza os parametros de animacao.
+                if (animator != null)
+                { 
+
+                    // Animacao walk
+                    animator.SetBool("isWalking", true);
+                    animator.SetFloat("InputX", moveDirection.x);
+                    animator.SetFloat("InputY", moveDirection.y);
+                }
             }
             else
-            { // Fica parado
-                // Animacao idle
-                animator.SetBool("isWalking", false);
-                animator.SetFloat("LastInputX", moveDirection.x);
-                animator.SetFloat("LastInputY", moveDirection.y);
+            {   // Fica parado
+                moveDirection = Vector2.zero;
 
-                Vector3 direction = Vector3.zero.normalized;
-                moveDirection = direction;
-
+                // Se o inimigo tiver um animator, atualiza os parametros de animacao.
+                if (animator != null)
+                {
+                    animator.SetBool("isWalking", false);
+                    animator.SetFloat("LastInputX", moveDirection.x);
+                    animator.SetFloat("LastInputY", moveDirection.y);
+                }
             }
 
             // Roda o inimigo. NAO UTILIZADO NESSES SPRITES
@@ -110,5 +113,16 @@ public class EnemyMovement : MonoBehaviour
         isKnockedBack = false;
     }
 
+    public void ApplyModularStats(float speedFlat, float speedMult, float healthFlat, float healthMult, float attackFlat, float attackMult)
+    {
+        // Aplica os bonus de velocidade
+        moveSpeed = (moveSpeed + speedFlat) * speedMult;
 
+        // Aplica os bonus de vida
+        maxHealth = (maxHealth + healthFlat) * healthMult;
+        health = maxHealth; // Garante que o inimigo nasça com a vida cheia ajustada
+
+        // Aplica os bonus de ataque
+        strength = (strength + attackFlat) * attackMult;
+    }
 }

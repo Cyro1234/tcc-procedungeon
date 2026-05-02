@@ -7,6 +7,9 @@ public class GameOverManager : MonoBehaviour
     private AudioSource audioSource;
     [SerializeField] private AudioClip deathSound;
     [SerializeField] private AudioManager audioManager;
+    [SerializeField] private PlayerInputHandler playerInput;
+    [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private PauseManager pauseManager;
 
     public void Start()
     {
@@ -20,11 +23,20 @@ public class GameOverManager : MonoBehaviour
         audioSource.PlayOneShot(deathSound, 0.8f);
         gameOverPanel.SetActive(true);
         Time.timeScale = 0f; // pausa o jogo
+
+        playerInput.enabled = false;
+        playerMovement.enabled = false;
+        pauseManager.enabled = false;
     }
 
     public void RestartGame()
     {
         Time.timeScale = 1f; // despausa
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void RetornarMenu()
+    {
+        SceneManager.LoadSceneAsync(0);
     }
 }
