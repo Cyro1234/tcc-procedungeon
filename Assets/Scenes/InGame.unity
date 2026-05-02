@@ -2546,6 +2546,9 @@ MonoBehaviour:
     - item: {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da,
         type: 3}
       weight: 2
+    - item: {fileID: 1885961500774489010, guid: 24e1bf9e9a6b0304a86728bbfdf5147f,
+        type: 3}
+      weight: 100
   maxEnemiesPerRoom: 3
   useRandomSeed: 1
   seed: 184408524
