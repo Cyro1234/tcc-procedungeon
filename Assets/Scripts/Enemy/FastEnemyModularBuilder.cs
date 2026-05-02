@@ -4,7 +4,7 @@ using System.Collections.Generic;
 // Sumario: Oi galera esse arquivo que define como cada inimigo é montado! Ele é bem rudimentar só pra testar a montagem com geração procedural.
 // Por enquanto usei sprites proprios beeeeem feinhos e sem animação.
 
-public class EnemyModularBuilder : MonoBehaviour
+public class FastEnemyModularBuilder : MonoBehaviour
 {
     [Header("BodyParts Renderer")]  // Onde cada sprite vai ser renderizado
     public SpriteRenderer headRenderer;
@@ -26,7 +26,7 @@ public class EnemyModularBuilder : MonoBehaviour
         Multiplier
     }
 
-    [System.Serializable]
+    [System.Serializable]    
     public struct StatData
     {
         public float bonus;
