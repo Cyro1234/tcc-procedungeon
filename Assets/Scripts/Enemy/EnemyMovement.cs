@@ -12,7 +12,6 @@ public class EnemyMovement : MonoBehaviour
 
     [SerializeField] int viewDistance = 12;
 
-    // TODO: Colocar a vida do inimigo em um script separado para deixar mais organizado
     [SerializeField] float maxHealth = 3f;
     private float health;
 
@@ -114,5 +113,16 @@ public class EnemyMovement : MonoBehaviour
         isKnockedBack = false;
     }
 
+    public void ApplyModularStats(float speedFlat, float speedMult, float healthFlat, float healthMult, float attackFlat, float attackMult)
+    {
+        // Aplica os bonus de velocidade
+        moveSpeed = (moveSpeed + speedFlat) * speedMult;
 
+        // Aplica os bonus de vida
+        maxHealth = (maxHealth + healthFlat) * healthMult;
+        health = maxHealth; // Garante que o inimigo nasça com a vida cheia ajustada
+
+        // Aplica os bonus de ataque
+        strength = (strength + attackFlat) * attackMult;
+    }
 }

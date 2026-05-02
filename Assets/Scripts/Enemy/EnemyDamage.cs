@@ -22,4 +22,11 @@ public class EnemyDamage : MonoBehaviour
             heartSystem.takeDamage(damage);
         }
     }
+
+    public void ApplyDamageBonus(float attackFlat, float attackMult)
+    {
+        // Se o damage precisar continuar sendo um int para o HeartSystem, 
+        float finalDamage = (damage + attackFlat) * attackMult;
+        damage = Mathf.RoundToInt(finalDamage);     // Mathf.RoundToInt aqui para arredondar o resultado float de volta para int.
+    }
 }
