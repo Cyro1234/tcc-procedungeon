@@ -2547,7 +2547,7 @@ MonoBehaviour:
         type: 3}
       weight: 2
   maxEnemiesPerRoom: 3
-  useRandomSeed: 0
+  useRandomSeed: 1
   seed: 184408524
   roomDetector: {fileID: 1977743734}
   BaixoNivel: 1
@@ -48906,33 +48906,61 @@ MonoBehaviour:
   floorTileMap: {fileID: 1358794489}
   wallTileMap: {fileID: 1240858254}
   walkInFrontTileMap: {fileID: 1754510999}
-  floorTile: {fileID: 11400000, guid: 6d62ee5bebfab4543a4d42e4d00e4921, type: 2}
-  wallTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
   exitPrefab: {fileID: 6965201669180963775, guid: 574df4b20857e8c4f9b676bf94d5ae78,
     type: 3}
   floorTilesNivelBaixo:
     items:
-    - item: {fileID: 11400000, guid: e2431512ea0b66d4688374cf9c9a4a07, type: 2}
+    - item:
+      - {fileID: 11400000, guid: 0ebc6bee92a27084ba015342d613392b, type: 2}
+      - {fileID: 11400000, guid: e2e0c9ed47db33146be9c58b6c0e1528, type: 2}
       weight: 2
-    - item: {fileID: 11400000, guid: f3823b3d46f8211469b70a560f22aa3d, type: 2}
+    - item:
+      - {fileID: 11400000, guid: 17963e381b7275546868cccb5bdad068, type: 2}
+      - {fileID: 11400000, guid: fd4eba4e292a4624abab53368a784d6a, type: 2}
       weight: 2
-    - item: {fileID: 11400000, guid: 0ce8257b428197744bef813e5d664e5c, type: 2}
-      weight: 5
+    - item:
+      - {fileID: 11400000, guid: 9f10c06eba6b6f740b09d74249f7ad61, type: 2}
+      - {fileID: 11400000, guid: d7cc4726bdf90b842b14796bb75e21d0, type: 2}
+      weight: 2
+    - item:
+      - {fileID: 11400000, guid: bdb3f98bb9e3e2f48ae90fddf621ad3a, type: 2}
+      - {fileID: 11400000, guid: ed71ad15801f91749b99d568b0dffb2c, type: 2}
+      weight: 2
   floorTilesNivelMedio:
     items:
-    - item: {fileID: 11400000, guid: 8aad69644f71cdf4a941bada1775d810, type: 2}
+    - item:
+      - {fileID: 11400000, guid: b2b090db63c48d249b78df573de08d9e, type: 2}
+      - {fileID: 11400000, guid: 99219e65a103e084e81f60452afec4fe, type: 2}
       weight: 2
-    - item: {fileID: 11400000, guid: 7ea3505ec6fd5d54b98bc87879aad3e7, type: 2}
+    - item:
+      - {fileID: 11400000, guid: 2d8668247313cbf4ba6731ca0f6851cf, type: 2}
+      - {fileID: 11400000, guid: a7ad65a9a9c81e846b9a6cd705dd075a, type: 2}
       weight: 2
-    - item: {fileID: 11400000, guid: aa5370368451d1849a3f971eb88f4acc, type: 2}
+    - item:
+      - {fileID: 11400000, guid: 2931ee0ca49e74b4b837086ed1fc2133, type: 2}
+      - {fileID: 11400000, guid: e43fcc3deea0eb54c8c32ba177aa0c53, type: 2}
       weight: 5
+    - item:
+      - {fileID: 11400000, guid: 6c2a128ff42d8d24381fcacec11dfa19, type: 2}
+      - {fileID: 11400000, guid: 5c89e134aee302d4cab381fde4144ae3, type: 2}
+      weight: 2
   floorTilesNivelAlto:
     items:
-    - item: {fileID: 11400000, guid: 164a5af489fca1e449fbefcd07485dff, type: 2}
+    - item:
+      - {fileID: 11400000, guid: 25538cd0f75fcde48a3b5f2f853426eb, type: 2}
+      - {fileID: 11400000, guid: 176a368fbd0995541a9c8bf04ce9670b, type: 2}
       weight: 5
-    - item: {fileID: 11400000, guid: 1fab6702b1c809442b19b41d048fec7a, type: 2}
+    - item:
+      - {fileID: 11400000, guid: 98c6b8b27196e5c4790b3ca7a4b0323e, type: 2}
+      - {fileID: 11400000, guid: 6bfc45b44a0588440bbb1eed7da00c50, type: 2}
+      weight: 100
+    - item:
+      - {fileID: 11400000, guid: 60a4e0ab2e4aded4d8051fef79d73bba, type: 2}
+      - {fileID: 11400000, guid: bfb36cac891cbbb4eafc82d419c4e6a1, type: 2}
       weight: 2
-    - item: {fileID: 11400000, guid: 5e51b629efc93344c823154572f2975e, type: 2}
+    - item:
+      - {fileID: 11400000, guid: b047a9881a7e8f543a8e403fa999f986, type: 2}
+      - {fileID: 11400000, guid: 558ffd10bbc2e994d8b56c5bdb35611a, type: 2}
       weight: 2
   doorTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
 --- !u!4 &1749136080

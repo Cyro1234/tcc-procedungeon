@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static TileMapVisualizer;
 
 public class TileMapVisualizer : MonoBehaviour
 {
@@ -11,18 +12,20 @@ public class TileMapVisualizer : MonoBehaviour
     [SerializeField] private Tilemap wallTileMap;
     [SerializeField] private Tilemap walkInFrontTileMap;
 
-    [SerializeField] private TileBase floorTile;
-    [SerializeField] private TileBase wallTile;
     [SerializeField] private GameObject exitPrefab;
 
-    [SerializeField] private WeightedTable<TileBase> floorTilesNivelBaixo;
-    [SerializeField] private WeightedTable<TileBase> floorTilesNivelMedio;
-    [SerializeField] private WeightedTable<TileBase> floorTilesNivelAlto;
+    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelBaixo;
+    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelMedio;
+    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelAlto;
 
     [SerializeField] private TileBase doorTile;
 
+    private WeightedTable<List<TileBase>> tableTiles = null;
+    private TileBase floorTileEscolhido = null;
+    private TileBase wallTileEscolhido = null;
+
     // Usado no random walk e para criar as paredes das salas
-    
+
 
     private GameObject currentLadder;
 
@@ -33,7 +36,7 @@ public class TileMapVisualizer : MonoBehaviour
         Alto
     }
 
-    private WeightedTable<TileBase> GetTilePorNivel(Niveis nivel)
+    private WeightedTable<List<TileBase>> GetTilePorNivel(Niveis nivel)
     {
         switch(nivel) 
         {
@@ -48,11 +51,17 @@ public class TileMapVisualizer : MonoBehaviour
         }
     }
 
+    public void Setup(Niveis nivel)  // Faz as escolhas do chao e parede para pintar o nivel. CHAMAR SETUP ANTES DE PINTAR TODA VEZ QUE MUDAR DE ANDAR OU PRIMEIRO ANDAR.
+    {
+        WeightedTable<List<TileBase>> tableTiles = GetTilePorNivel(nivel);
+        var itemEscolhido = tableTiles.getRandom(Rng.dungeonRng);
+        floorTileEscolhido = itemEscolhido[0]; // CHAO
+        wallTileEscolhido = itemEscolhido[1]; // PAREDE
+        Debug.Log("SETUP CONCLUIDO");
+    }
+
     public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Niveis nivel)
     {
-        WeightedTable<TileBase> tableTiles = GetTilePorNivel(nivel);
-        TileBase floorTileEscolhido = tableTiles.getRandom(Rng.dungeonRng);
-
         PaintTiles(floorPositions, floorTileMap, floorTileEscolhido);
     }
 
@@ -79,7 +88,7 @@ public class TileMapVisualizer : MonoBehaviour
 
     internal void PaintWallTile(Vector2Int position)
     {
-        PaintSingleTile(position, wallTileMap, wallTile);
+        PaintSingleTile(position, wallTileMap, wallTileEscolhido);
     }
 
     public void PaintDoorTile(Vector2Int position)
@@ -102,7 +111,7 @@ public class TileMapVisualizer : MonoBehaviour
         wallTileMap.SetTile(tilePosition, null);
 
         // pinta o chao
-        floorTileMap.SetTile(tilePosition, floorTile);
+        floorTileMap.SetTile(tilePosition, floorTileEscolhido);
     }
 
     public void PaintExit(Vector2Int position, AbstractDungeonGenerator generator) 

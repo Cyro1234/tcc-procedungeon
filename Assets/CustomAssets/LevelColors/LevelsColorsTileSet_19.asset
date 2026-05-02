@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: LevelsColorsTileSet_19
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.Tilemaps.Tile
-  m_Sprite: {fileID: 971467775, guid: a39db6fb15ca0d24da5199c4e1cf8f55, type: 3}
+  m_Sprite: {fileID: 776723723, guid: ef1ae0138efab624fb1b22dfb6dee589, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

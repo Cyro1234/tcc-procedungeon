@@ -48,6 +48,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         andar++;
         Debug.Log("ANDAR: " + andar);
         tileMapVisualizer.Clear();
+        tileMapVisualizer.Setup(GetNivelAtual());
         CreateRooms();
     }
 
