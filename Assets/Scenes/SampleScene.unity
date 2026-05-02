@@ -1616,6 +1616,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Attack
   Melee: {fileID: 871928903}
+  atkDuration: 0.3
   swordSound: {fileID: 8300000, guid: a089cb00aef07f3489478d1f4fb87cc9, type: 3}
 --- !u!114 &992072343
 MonoBehaviour:
@@ -38670,6 +38671,8 @@ MonoBehaviour:
   seed: 3
   chestPrefab: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
     type: 3}
+  randomStartingChest: 1
+  startingChestItem: 0
 --- !u!4 &1735951947
 Transform:
   m_ObjectHideFlags: 0
