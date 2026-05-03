@@ -11,8 +11,6 @@ public class HeartSystem : MonoBehaviour
 
     private AudioSource audioSource;
 
-    [SerializeField] private AudioClip hurtSound;
-
     private void Start()
     {
         stats = GetComponent<PlayerStatsHandler>();
@@ -40,20 +38,21 @@ public class HeartSystem : MonoBehaviour
         life = (int)stats.GetPlayerMaxHearts();
     }
 
-    public void takeDamage(int damage) 
+    public void takeDamage(int damage)
     {
         life -= damage;
 
         life = Mathf.Max(life, 0); // No maximo fica com 0 vidas
         Debug.Log("TOMOU DANO! LIFE: " + life + " - CONTAINERS: " + hearts.Length);
+
         if (life <= 0)
         {
             Die();
+            AudioManager.Instance.PlaySFX("PlayerMorreu");
+            return;
         }
-        else
-        {
-            audioSource.PlayOneShot(hurtSound, 0.3f); // TODO: tirar valores hardcoded de volume em todos os campos de volume
-        }
+
+        AudioManager.Instance.PlaySFX("PlayerTomouDano");
     }
 
     private void Die()

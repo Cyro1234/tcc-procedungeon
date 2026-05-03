@@ -1,47 +1,64 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class AudioManager : MonoBehaviour
 {
-    private AudioSource musicSource;
-    [SerializeField] private AudioClip gameplayMusic;
-    [SerializeField] private AudioClip gameOverMusic;
+    public static AudioManager Instance;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public Sound[] musicSounds, sfxSounds; 
+    public AudioSource musicSource, sfxSource;
+
+    private void Awake()
     {
-        musicSource = GetComponent<AudioSource>();
-        PlayGameplayMusic();
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        PlayMusic("Fase1");
     }
 
-    // Toca musica de fundo em loop
-    public void PlayGameplayMusic()
-    {
-        if (musicSource.clip == gameplayMusic && musicSource.isPlaying) return;
 
-        musicSource.clip = gameplayMusic;
-        musicSource.loop = true;
-        musicSource.Play();
+    public void PlayMusic(string name, bool loop = true)
+    {
+        Sound s = Array.Find(musicSounds, x => x.name == name);
+
+        if (s == null)
+        {
+            Debug.Log("Music not found");
+        }
+
+        else
+        {
+            musicSource.clip = s.clip;
+            musicSource.loop = loop;
+            musicSource.Play();
+        }
     }
 
-    // Toca a musica de GameOver sem loop
-    public void PlayGameOverMusic()
+    public void PlaySFX (string name)
     {
-        if (musicSource.clip == gameOverMusic && musicSource.isPlaying) return;
+        Sound s = Array.Find (sfxSounds, x=> x.name == name);
 
-        musicSource.clip = gameOverMusic;
-        musicSource.loop = false;
-        musicSource.Play();
-    }
+        if (s == null)
+        {
+            Debug.Log("Sound not found");
+        }
 
-    // Para qualquer musica que esteja tocando
-    public void StopMusic()
-    {
-        musicSource.Stop();
+        else
+        {
+            sfxSource.PlayOneShot(s.clip);
+        }
     }
 }

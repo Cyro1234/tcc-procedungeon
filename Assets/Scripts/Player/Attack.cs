@@ -11,9 +11,6 @@ public class Attack : MonoBehaviour
 
     private PlayerStatsHandler stats;
 
-
-    [SerializeField] private AudioClip swordSound;
-
     private void Awake()
     {
         stats = GetComponent<PlayerStatsHandler>();
@@ -23,6 +20,7 @@ public class Attack : MonoBehaviour
     void Update()
     {
         checkMeleeTimer();
+
     }
 
     public void OnAttack()
@@ -31,11 +29,11 @@ public class Attack : MonoBehaviour
         {
             if (isAttacking == false)
             {
-                AudioSource.PlayClipAtPoint(swordSound, transform.position, 1f); // SFX do ataque
-
                 Melee.SetActive(true);
                 isAttacking = true;
                 // TODO: Realizar animacao, quando tiver
+                AudioManager.Instance.PlaySFX("Ataque");
+
             }
         }
     }
