@@ -2565,8 +2565,7 @@ MonoBehaviour:
   minRoomHeight: 15
   dungeonWidth: 100
   dungeonHeight: 100
-  offset: 3
-  subOffset: 4
+  offset: 4
   subBSPRooms: 1
   enemyTable:
     items:

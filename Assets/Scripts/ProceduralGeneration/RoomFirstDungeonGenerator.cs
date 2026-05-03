@@ -17,7 +17,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     [SerializeField] private int offset = 1;
     public int Offset => offset;
-    [SerializeField] private int subOffset = 1;
 
     [SerializeField] private bool subBSPRooms = false;
 
@@ -132,7 +131,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
         if (subBSPRooms)
         {
-            salas = CreateSubBSPRooms(roomList, subOffset, minRoomWidth, minRoomHeight); // deixei o offset no 0 pra ficar grudado
+            salas = CreateSubBSPRooms(roomList, offset, minRoomWidth, minRoomHeight); // deixei o offset no 0 pra ficar grudado
             foreach (var sala in salas)
             {
                 floor.UnionWith(sala);
