@@ -1518,6 +1518,7 @@ GameObject:
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
+  - component: {fileID: 519420034}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1675,6 +1676,20 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &519420034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83091b0a37d35864c8b3314b0aa59d54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _musicSlider: {fileID: 1365945739}
+  _sfxSlider: {fileID: 938948666}
 --- !u!1 &597141128
 GameObject:
   m_ObjectHideFlags: 0
@@ -2710,10 +2725,10 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: VolumeController, Assembly-CSharp
-        m_MethodName: SetMusicaVolume
-        m_Mode: 0
+      - m_Target: {fileID: 519420034}
+        m_TargetAssemblyTypeName: UIController, Assembly-CSharp
+        m_MethodName: SFXVolume
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3129,8 +3144,8 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.5
-  m_Pitch: 1
+  m_Volume: 0.25
+  m_Pitch: 0.75
   Loop: 1
   Mute: 0
   Spatialize: 0
@@ -14646,8 +14661,8 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.5
-  m_Pitch: 1
+  m_Volume: 0.25
+  m_Pitch: 0.75
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -49456,7 +49471,7 @@ GameObject:
   - component: {fileID: 1365945738}
   - component: {fileID: 1365945739}
   m_Layer: 5
-  m_Name: MusicaSlider
+  m_Name: MusicSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49536,10 +49551,10 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: VolumeController, Assembly-CSharp
-        m_MethodName: SetMusicaVolume
-        m_Mode: 0
+      - m_Target: {fileID: 519420034}
+        m_TargetAssemblyTypeName: UIController, Assembly-CSharp
+        m_MethodName: MusicVolume
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -50698,7 +50713,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0003432894, y: -355.58157}
+  m_AnchoredPosition: {x: -0.000068665, y: -341.1}
   m_SizeDelta: {x: 470, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1973403078

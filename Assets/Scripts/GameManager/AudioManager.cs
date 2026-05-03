@@ -26,7 +26,17 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
+        LoadVolume();
         PlayMusic("Fase1");
+
+        void LoadVolume()
+{
+    float musicVol = PlayerPrefs.GetFloat("MusicVolume", 1f);
+    float sfxVol = PlayerPrefs.GetFloat("SFXVolume", 1f);
+
+    musicSource.volume = musicVol;
+    sfxSource.volume = sfxVol;
+}
     }
 
 
@@ -61,4 +71,30 @@ public class AudioManager : MonoBehaviour
             sfxSource.PlayOneShot(s.clip);
         }
     }
+    
+    // adicionar toggle de music e sfx depois
+
+    // Scroller do áudio da música/sfx no menu de pause
+    public void MusicVolume(float volume)
+    {
+        musicSource.volume = volume;
+    }
+    public void SFXVolume(float volume)
+    {
+        sfxSource.volume = volume;
+    }
+
+    // salva a opção de volume do usuário toda vez que o jogo é reiniciado
+    public void SetMusicVolume(float volume)
+    {
+        musicSource.volume = volume;
+        PlayerPrefs.SetFloat("MusicVolume", volume);
+    }
+
+    public void SetSFXVolume(float volume)
+    {
+        sfxSource.volume = volume;
+        PlayerPrefs.SetFloat("SFXVolume", volume);
+    }
 }
+    
