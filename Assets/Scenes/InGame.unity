@@ -727,6 +727,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 214311524}
   m_CullTransparentMesh: 1
+--- !u!1 &227713994
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 227713995}
+  m_Layer: 0
+  m_Name: CameraTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &227713995
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 227713994}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &235458961
 GameObject:
   m_ObjectHideFlags: 0
@@ -1386,7 +1417,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 87, y: 76, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2552,9 +2583,10 @@ MonoBehaviour:
         type: 3}
       weight: 100
   maxEnemiesPerRoom: 3
-  useRandomSeed: 1
-  seed: 184408524
+  useRandomSeed: 0
+  seed: -835695793
   roomDetector: {fileID: 1977743734}
+  focarCentroSala: 1
   BaixoNivel: 1
   MedioNivel: 2
   chestPrefab: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
@@ -48819,7 +48851,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 992072327}
+    TrackingTarget: {fileID: 227713995}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -48851,7 +48883,7 @@ Transform:
   m_GameObject: {fileID: 1635360950}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 87, y: 76, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -49460,6 +49492,7 @@ MonoBehaviour:
   inimigoSala: 0
   virtualCamera: {fileID: 1635360952}
   dungeonGenerator: {fileID: 1101588032}
+  cameraTarget: {fileID: 227713995}
 --- !u!4 &1977743735
 Transform:
   m_ObjectHideFlags: 0
@@ -49663,3 +49696,4 @@ SceneRoots:
   - {fileID: 1690250079}
   - {fileID: 768723698}
   - {fileID: 1977743735}
+  - {fileID: 227713995}

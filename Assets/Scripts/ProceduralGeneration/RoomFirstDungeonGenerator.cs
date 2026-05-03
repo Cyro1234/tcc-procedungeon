@@ -32,6 +32,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private int seed = 0;
 
     [SerializeField] private RoomDetector roomDetector;
+    [SerializeField] private bool focarCentroSala = true;
+    public bool FocarCentroSala => focarCentroSala;
 
     [SerializeField] private int BaixoNivel = 1;
     [SerializeField] private int MedioNivel = 2;

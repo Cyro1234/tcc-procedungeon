@@ -18,6 +18,7 @@ public class RoomDetector : MonoBehaviour
     private int currentOffset;
 
     [SerializeField] private RoomFirstDungeonGenerator dungeonGenerator;
+    [SerializeField] private Transform cameraTarget;
 
     public List<BoundsInt> GetRoomsList()
     {
@@ -73,6 +74,14 @@ public class RoomDetector : MonoBehaviour
 
         Vector3Int playerPos = Vector3Int.FloorToInt(playerTransform.position);
 
+        bool focarCentroSala = dungeonGenerator.FocarCentroSala;
+
+        if (!focarCentroSala)
+        {
+            cameraTarget.position = playerTransform.position;
+            virtualCamera.Lens.OrthographicSize = 4f;
+        }
+
         jogadorSala = false;
         inimigoSala = false;
         inimigosNoMapa = GameObject.FindGameObjectsWithTag("Enemy");
@@ -87,7 +96,13 @@ public class RoomDetector : MonoBehaviour
                 if (currentRoom != room)
                 {
                     currentRoom = room;
-                    virtualCamera.Lens.OrthographicSize = room.size.y / 2.2f;
+
+                    if (focarCentroSala){
+                        Vector3 center = new Vector3(room.xMin + room.size.x / 2.0f, room.yMin + room.size.y / 2.0f, 0);
+                        cameraTarget.position = center;
+
+                        virtualCamera.Lens.OrthographicSize = room.size.y / 2.2f;
+                    }        
                 }
 
                 // aqui ele usa offset nos inimigos, pegando o tamanho real
@@ -120,7 +135,13 @@ public class RoomDetector : MonoBehaviour
         if (!jogadorSala && currentRoom != null)
         {
             currentRoom = null;
+            cameraTarget.position = playerTransform.position;
             virtualCamera.Lens.OrthographicSize = 4f;
+        }
+        else if (currentRoom == null)
+        {
+            // volta pro player qnd eh corredor
+            cameraTarget.position = playerTransform.position;
         }
     }
 }
