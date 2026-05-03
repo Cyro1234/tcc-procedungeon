@@ -2566,7 +2566,7 @@ MonoBehaviour:
   dungeonWidth: 100
   dungeonHeight: 100
   offset: 4
-  subBSPRooms: 1
+  subBSPRooms: 0
   enemyTable:
     items:
     - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
@@ -2586,6 +2586,8 @@ MonoBehaviour:
   seed: -835695793
   roomDetector: {fileID: 1977743734}
   focarCentroSala: 1
+  somFecharPorta: {fileID: 8300000, guid: bf2c52f4ed30c704d9595538202d9d0e, type: 3}
+  somAbrirPorta: {fileID: 8300000, guid: 847540062ba54f54bb80eb0fe29e4636, type: 3}
   BaixoNivel: 1
   MedioNivel: 2
   chestPrefab: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,

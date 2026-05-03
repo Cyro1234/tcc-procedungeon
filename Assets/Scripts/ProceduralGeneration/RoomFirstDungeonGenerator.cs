@@ -34,6 +34,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private bool focarCentroSala = true;
     public bool FocarCentroSala => focarCentroSala;
 
+    [SerializeField] private AudioClip somFecharPorta;
+    [SerializeField] private AudioClip somAbrirPorta;
+    private AudioSource audioSource;
+
     [SerializeField] private int BaixoNivel = 1;
     [SerializeField] private int MedioNivel = 2;
 
@@ -593,9 +597,25 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         }
     }
 
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+        // Se não houver um AudioSource no objeto, adiciona um automaticamente
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+    }
+
     private void FecharPortasDaSala()
     {
         if (currentBounds == null) return;
+
+        if (somFecharPorta != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(somFecharPorta, 0.3f);
+        }
 
         foreach (var pos in roomEntrances)
         {
@@ -612,6 +632,11 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     private void AbrirPortasDaSala()
     {
         if (currentBounds == null) return;
+
+        if (somAbrirPorta != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(somAbrirPorta, 0.3f);
+        }
 
         foreach (var pos in roomEntrances)
         {
