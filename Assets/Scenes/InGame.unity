@@ -2285,7 +2285,9 @@ MonoBehaviour:
   - {fileID: 1900129691}
   - {fileID: 430590271}
   - {fileID: 88811860}
+  hasShield: 0
   hurtSound: {fileID: 8300000, guid: 5c35b80907f6b0c42949da87ca70c42b, type: 3}
+  shieldBreakSound: {fileID: 0}
 --- !u!82 &992072355
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2555,6 +2557,10 @@ MonoBehaviour:
   roomDetector: {fileID: 1977743734}
   BaixoNivel: 1
   MedioNivel: 2
+  chestPrefab: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
+    type: 3}
+  randomStartingChest: 0
+  startingChestItem: 2
 --- !u!1 &1128909180
 GameObject:
   m_ObjectHideFlags: 0

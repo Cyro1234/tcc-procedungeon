@@ -39,7 +39,11 @@ public class HeartSystem : MonoBehaviour
         }
     }
 
-<<<<<<< HEAD
+    public void updateMaxLife()
+    {
+        life = (int)stats.GetPlayerMaxHearts();
+    }
+
     public void takeDamage(int damage)
     {
         // PASSO NOVO: Verifica se o jogador tem o escudo ANTES de tirar a vida
@@ -57,17 +61,7 @@ public class HeartSystem : MonoBehaviour
             return; // O 'return' faz a função parar aqui, protegendo a vida do jogador.
         }
 
-=======
-    public void updateMaxLife()
-    {
-        life = (int)stats.GetPlayerMaxHearts();
-    }
-
-    public void takeDamage(int damage) 
-    {
->>>>>>> origin/teste
         life -= damage;
-
         life = Mathf.Max(life, 0); // No maximo fica com 0 vidas
         Debug.Log("TOMOU DANO! LIFE: " + life + " - CONTAINERS: " + hearts.Length);
 

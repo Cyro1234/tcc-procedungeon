@@ -31,16 +31,14 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private bool useRandomSeed = true;
     [SerializeField] private int seed = 0;
 
-<<<<<<< HEAD
-    [SerializeField] private GameObject chestPrefab;
-    [SerializeField] private bool randomStartingChest = false; // Define se o baú inicial é sorteado
-    [SerializeField] private Chest.ItemType startingChestItem = Chest.ItemType.Shield; // Escolha do item manual
-=======
     [SerializeField] private RoomDetector roomDetector;
 
     [SerializeField] private int BaixoNivel = 1;
     [SerializeField] private int MedioNivel = 2;
->>>>>>> origin/teste
+
+    [SerializeField] private GameObject chestPrefab;
+    [SerializeField] private bool randomStartingChest = false; // Define se o baÃº inicial Ã© sorteado
+    [SerializeField] private Chest.ItemType startingChestItem = Chest.ItemType.Shield; // Escolha do item manual
 
     private List<GameObject> enemies = new List<GameObject>();
     private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
@@ -101,7 +99,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         }
         enemies.Clear();
 
-        // Limpa o baú da fase anterior
+        // Limpa o baÃº da fase anterior
         if (currentChest != null)
         {
             Destroy(currentChest);
@@ -322,23 +320,23 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         GameObject player = GameObject.FindWithTag("Player");
         player.transform.position = new Vector3(roomsCenters[0].x, roomsCenters[0].y, 0);
 
-        // Instancia o Baú na primeira sala (com um offset de +1 no X para não nascer em cima do jogador)
+        // Instancia o BaÃº na primeira sala (com um offset de +1 no X para nÃ£o nascer em cima do jogador)
         if (chestPrefab != null)
         {
             Vector3 chestPosition = new Vector3(roomsCenters[0].x + 1.5f, roomsCenters[0].y, 0);
             currentChest = Instantiate(chestPrefab, chestPosition, Quaternion.identity);
-            // Pega o script do baú que acabou de nascer para configurá-lo
+            // Pega o script do baÃº que acabou de nascer para configurÃ¡-lo
             Chest chestScript = currentChest.GetComponent<Chest>();
             if (chestScript != null)
             {
                 chestScript.isRandomItem = randomStartingChest;
-                // Se não for aleatório, coloca o item que você escolheu no Inspector
+                // Se nÃ£o for aleatÃ³rio, coloca o item que vocÃª escolheu no Inspector
                 if (!randomStartingChest)
                 {
                     chestScript.itemInside = startingChestItem;
                 }
             }
-            Debug.Log("Baú instanciado na sala inicial.");
+            Debug.Log("BaÃº instanciado na sala inicial.");
         }
 
         // Cria a escada da ultima sala

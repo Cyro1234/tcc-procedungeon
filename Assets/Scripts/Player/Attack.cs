@@ -5,24 +5,6 @@ public class Attack : MonoBehaviour
 {
     public GameObject Melee;
     bool isAttacking = false;
-<<<<<<< HEAD
-
-    // Deixei public para podermos ver no Inspector
-    public float atkDuration = 0.3f;
-    float atkTimer = 0f;
-
-    // Guardamos os valores originais para usar como base
-    private float originalAtkDuration;
-    private Vector3 originalMeleeScale;
-
-    [SerializeField] private AudioClip swordSound;
-
-    void Start()
-    {
-        // Ao iniciar, o jogo memoriza o tamanho e velocidade padrão
-        originalAtkDuration = atkDuration;
-        originalMeleeScale = Melee.transform.localScale;
-=======
     bool isCooldown = false;
     float atkDuration = 0.3f; // Podemos deixar isso no PlayerStatsHandler.cs depois, pra gente ter a possibilidade de modificar o tempo de duração do ataque com buffs e debuffs (Xicote de Alex)
     float atkTimer = 0f;
@@ -30,12 +12,22 @@ public class Attack : MonoBehaviour
     private PlayerStatsHandler stats;
 
 
+    // Guardamos os valores originais para usar como base
+    private float originalAtkDuration;
+    private Vector3 originalMeleeScale;
+
     [SerializeField] private AudioClip swordSound;
 
     private void Awake()
     {
         stats = GetComponent<PlayerStatsHandler>();
->>>>>>> origin/teste
+    }
+
+    void Start()
+    {
+        // Ao iniciar, o jogo memoriza o tamanho e velocidade padrão
+        originalAtkDuration = atkDuration;
+        originalMeleeScale = Melee.transform.localScale;
     }
 
     // Update is called once per frame
