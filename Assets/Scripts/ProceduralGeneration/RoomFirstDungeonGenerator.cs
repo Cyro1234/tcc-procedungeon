@@ -47,6 +47,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     private List<GameObject> enemies = new List<GameObject>();
     private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
     private bool salaTrancada = false;
+    private BoundsInt? currentBounds = null;
 
     private int andar = 0; // Andar que o jogador esta presente
 
@@ -56,7 +57,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     protected override void RunProceduralGeneration()
     {
-        AbrirPortasDaSala(); // Remove as paredes antigas
         andar++;
         Debug.Log("ANDAR: " + andar);
         tileMapVisualizer.Clear();
@@ -99,7 +99,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         roomEntrances.Clear();
         salaTrancada = false;
         // Limpa inimigos antes de tudo
-        foreach (var enemy in enemies) 
+        foreach (var enemy in enemies)
         {
             Destroy(enemy);
         }
@@ -152,7 +152,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
         // Spawn do jogador e saida. O spawn eh a primeira sala e a saida a ultima sala gerada.
         PlaceSpawnAndExit(roomsCenters);
-        
+
         if (subBSPRooms)
         {
             SpawnEnemies(salas);
@@ -174,13 +174,13 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     }
 
-    private TileMapVisualizer.Niveis GetNivelAtual() 
+    private TileMapVisualizer.Niveis GetNivelAtual()
     {
         if (andar <= BaixoNivel)
         {
             return TileMapVisualizer.Niveis.Baixo;
         }
-        else if (andar <= MedioNivel) 
+        else if (andar <= MedioNivel)
         {
             return TileMapVisualizer.Niveis.Medio;
         }
@@ -269,16 +269,16 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     private void SpawnEnemies(List<HashSet<Vector2Int>> roomsList) // NOVO SPAWN DE INIMIGOS PARA O SUB BSP
     {
-        for (int i = 1; i < roomsList.Count; i++) 
+        for (int i = 1; i < roomsList.Count; i++)
         {
             var roomTiles = roomsList[i];
 
             // Filtra posicoes que nao estejam na parede para impedir spawnar inimigos dentro de paredes
-            List<Vector2Int> availablePositions = new List<Vector2Int>(); 
-            foreach (var pos in roomTiles) 
+            List<Vector2Int> availablePositions = new List<Vector2Int>();
+            foreach (var pos in roomTiles)
             {
                 if (!EhParede(pos, roomTiles))
-                { 
+                {
                     availablePositions.Add(pos);
                 }
             }
@@ -296,7 +296,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 enemies.Add(enemy);
             }
         }
-        
+
         Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
     }
 
@@ -307,7 +307,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         for (int i = 1; i < roomsList.Count; i++)
         {
             int rng = Rng.EnemyRange(0, maxEnemiesPerRoom + 1); // Quantidade de inimigos na sala
-            for (int j = 0; j < rng; j++) 
+            for (int j = 0; j < rng; j++)
             {
                 // Posicao do inimigo a spawnar
                 int randomX = Rng.EnemyRange(roomsList[i].xMin + 5, roomsList[i].xMax - 5); // +-5 para nao spawnar na parede, pensar em uma solucao melhor eh ideal
@@ -450,7 +450,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
         // Cria a escada da ultima sala
         tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);
-       
+
     }
 
     // Conecta as salas com um corredor
@@ -481,11 +481,11 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // A partir da posicao inicial
         while (position.y != destination.y) // Vai subindo ou descendo ate chegar no Y da sala de destino
         {
-            if (destination.y > position.y) 
+            if (destination.y > position.y)
             {
                 position += Vector2Int.up;
             }
-            else if (destination.y < position.y) 
+            else if (destination.y < position.y)
             {
                 position += Vector2Int.down;
             }
@@ -494,7 +494,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         }
         while (position.x != destination.x) // Vai andando pros lados ate chegar no x da sala de destino
         {
-            if (destination.x > position.x) 
+            if (destination.x > position.x)
             {
                 position += Vector2Int.right;
             }
@@ -536,11 +536,11 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         Vector2Int closest = Vector2Int.zero;
         float distance = float.MaxValue;
 
-        foreach (var position in roomsCenters) 
+        foreach (var position in roomsCenters)
         {
             float currentDistance = Vector2.Distance(position, currentRoomCenter);
-            if (currentDistance < distance) 
-            { 
+            if (currentDistance < distance)
+            {
                 distance = currentDistance;
                 closest = position;
             }
@@ -555,8 +555,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
         foreach (var room in roomList)
         {
-            for (int col = offset; col < room.size.x - offset; col++) 
-            { 
+            for (int col = offset; col < room.size.x - offset; col++)
+            {
                 for (int row = offset; row < room.size.y - offset; row++)
                 {
                     Vector2Int position = (Vector2Int)room.min + new Vector2Int(col, row);
@@ -575,28 +575,25 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     void Update()
     {
-        if (roomDetector != null && roomDetector.jogadorSala) // verifica se o jogador esta na sala
+        if (roomDetector == null) return;
+
+
+        if (roomDetector.jogadorSala && roomDetector.inimigoSala && !salaTrancada) // se passar e tiver inimigos, tranca a sala
         {
-            if (roomDetector.inimigoSala && !salaTrancada) // se passar e tiver inimigos, tranca a sala
-            {
-                FecharPortasDaSala();
-                salaTrancada = true;
-            }
-            else if (!roomDetector.inimigoSala && salaTrancada) // se não houver inimigos e a sala estiver trancada, abre a sala
-            {
-                AbrirPortasDaSala();
-                salaTrancada = false;
-            }
-            else if (!roomDetector.inimigoSala) // Se nao tiver inimigos, abre a sala. FIX TEMPORARIO DAS PORTAS. TODO: ARRUMAR MELHOR
-            {
-                AbrirPortasDaSala();
-            }
+            currentBounds = roomDetector.GetCurrentRoomBounds();
+            FecharPortasDaSala();
+            salaTrancada = true;
+        }
+        else if (!roomDetector.inimigoSala && salaTrancada) // se não houver inimigos e a sala estiver trancada, abre a sala
+        {
+            AbrirPortasDaSala();
+            salaTrancada = false;
+            currentBounds = null;
         }
     }
 
     private void FecharPortasDaSala()
     {
-        BoundsInt? currentBounds = roomDetector.GetCurrentRoomBounds();
         if (currentBounds == null) return;
 
         foreach (var pos in roomEntrances)
@@ -613,7 +610,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     private void AbrirPortasDaSala()
     {
-        BoundsInt? currentBounds = roomDetector.GetCurrentRoomBounds();
         if (currentBounds == null) return;
 
         foreach (var pos in roomEntrances)
