@@ -6,8 +6,7 @@ public class Chest : MonoBehaviour
     public enum ItemType { Shield, LongSword, Dagger }
 
     [Header("Configurações do Baú")]
-    public bool isRandomItem = true; // Se for true, sorteia. Se for false, usa o item abaixo.
-    public ItemType itemInside;      // Qual item está aqui dentro (aparece como menu no Unity!)
+    public ItemType itemInside;      // Qual item está aqui dentro
 
     private bool isOpen = false;
     private Animator animator;
@@ -15,14 +14,12 @@ public class Chest : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
+    }
 
-        // Se o baú for aleatório, fazemos o sorteio logo que ele nasce
-        if (isRandomItem)
-        {
-            // Pega um número aleatório de 0 até a quantidade de itens na nossa lista (3)
-            int randomIndex = Random.Range(0, System.Enum.GetValues(typeof(ItemType)).Length);
-            itemInside = (ItemType)randomIndex; // Transforma o número de volta em um ItemType
-        }
+    // NOVA FUNÇÃO: O Gerador de Dungeon chama essa função para colocar o item sorteado aqui dentro
+    public void ConfigurarItem(ItemType item)
+    {
+        itemInside = item;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

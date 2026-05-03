@@ -2559,8 +2559,16 @@ MonoBehaviour:
   MedioNivel: 2
   chestPrefab: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
     type: 3}
-  randomStartingChest: 0
+  randomStartingChest: 1
   startingChestItem: 2
+  itemTable:
+    items:
+    - item: 0
+      weight: 70
+    - item: 2
+      weight: 10
+    - item: 1
+      weight: 20
 --- !u!1 &1128909180
 GameObject:
   m_ObjectHideFlags: 0
