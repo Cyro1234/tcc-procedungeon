@@ -77,24 +77,37 @@ public class AudioManager : MonoBehaviour
     // Scroller do áudio da música/sfx no menu de pause
     public void MusicVolume(float volume)
     {
-        musicSource.volume = volume;
+        if (musicSource != null)
+        {
+            musicSource.volume = volume;
+        }
     }
+
     public void SFXVolume(float volume)
     {
-        sfxSource.volume = volume;
+        if (sfxSource != null)
+        {
+            sfxSource.volume = volume;
+        }
     }
 
     // salva a opção de volume do usuário toda vez que o jogo é reiniciado
     public void SetMusicVolume(float volume)
     {
-        musicSource.volume = volume;
-        PlayerPrefs.SetFloat("MusicVolume", volume);
+        if (musicSource != null)
+        {
+            musicSource.volume = volume;
+            PlayerPrefs.SetFloat("MusicVolume", volume);
+        }
     }
 
     public void SetSFXVolume(float volume)
     {
-        sfxSource.volume = volume;
-        PlayerPrefs.SetFloat("SFXVolume", volume);
+        if (sfxSource != null)
+        {
+            sfxSource.volume = volume;
+            PlayerPrefs.SetFloat("SFXVolume", volume);
+        }
     }
 }
     

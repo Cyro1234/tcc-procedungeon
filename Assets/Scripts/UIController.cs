@@ -17,18 +17,29 @@ public class UIController : MonoBehaviour
         _musicSlider.value = musicVol;
         _sfxSlider.value = sfxVol;
 
-        // aplica no áudio
-        AudioManager.Instance.SetMusicVolume(musicVol);
-        AudioManager.Instance.SetSFXVolume(sfxVol);
+        // aplica no áudio e faz verificação de segurança
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetMusicVolume(musicVol);
+            AudioManager.Instance.SetSFXVolume(sfxVol);
+        }
     }
 
     public void MusicVolume()
     {
-        AudioManager.Instance.SetMusicVolume(_musicSlider.value);
+        // verifica se o AudioManager existe antes de tentar mudar o volume
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetMusicVolume(_musicSlider.value);
+        }
     }
 
     public void SFXVolume()
     {
-        AudioManager.Instance.SetSFXVolume(_sfxSlider.value);
+        // mesma coisa para os efeitos sonoros
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetSFXVolume(_sfxSlider.value);
+        }
     }
 }
