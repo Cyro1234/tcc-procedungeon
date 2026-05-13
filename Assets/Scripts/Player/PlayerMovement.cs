@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
     // Movimentacao do jogador
     public void Move(InputAction.CallbackContext context)
     {
+        
         animator.SetBool("isWalking", true);
 
         if (context.canceled) // Parou de andar. Soltou as teclas de movimentar
