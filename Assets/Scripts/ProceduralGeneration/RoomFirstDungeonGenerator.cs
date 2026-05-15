@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -29,6 +30,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     [SerializeField] private bool useRandomSeed = true;
     [SerializeField] private int seed = 0;
+
+    [SerializeField] private TMP_Text seedText;
 
     [SerializeField] private RoomDetector roomDetector;
     [SerializeField] private bool focarCentroSala = true;
@@ -95,6 +98,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         Rng.Init(seed);
 
         Debug.Log("SEED: " + seed);
+        seedText.text = "" + seed;
 
         RunProceduralGeneration();
     }
