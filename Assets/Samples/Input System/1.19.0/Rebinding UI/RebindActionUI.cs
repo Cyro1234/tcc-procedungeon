@@ -230,6 +230,8 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             if (!ResolveActionAndBinding(out var action, out var bindingIndex))
                 return;
 
+            ResetBinding(action, bindingIndex);
+
             /*if (action.bindings[bindingIndex].isComposite)
             {
                 // It's a composite. Remove overrides from part bindings.
@@ -243,15 +245,46 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             UpdateBindingDisplay();
         }
 
-        /*private void ResetBinding(InputAction action, int bindingIndex)
+        private void ResetBinding(InputAction action, int bindingIndex)
         {
-            InputBinding newBinding = action.bindings[bindingIndex];
-            string oldOverridePath = newBinding.overridePath;
+            InputBinding targetBinding = action.bindings[bindingIndex];
 
+            string defaultPath = targetBinding.path;
+
+            // tecla que estava configurada antes de clicar em Reset para poder fazer a troca
+            string oldOverridePath = targetBinding.effectivePath;
+
+            // remove a sobreposição da binding atual, voltando para a tecla padrão
             action.RemoveBindingOverride(bindingIndex);
 
-            foreach (InputAction otherAction in action.actionMap.actions)
-        }*/
+            // verifica todas as outras actions para garantir que nenhuma fica duplicada
+            foreach (InputAction mapAction in action.actionMap.actions)
+            {
+                for (int i = 0; i < mapAction.bindings.Count; i++)
+                {
+                    InputBinding mapBinding = mapAction.bindings[i];
+             
+                    if (mapAction == action && i == bindingIndex)
+                        continue;
+
+                    if (mapBinding.isComposite)
+                        continue;
+
+                    if (mapBinding.effectivePath == defaultPath)
+                    {
+
+                        if (!string.IsNullOrEmpty(oldOverridePath) && oldOverridePath != defaultPath)
+                        {
+                            mapAction.ApplyBindingOverride(i, oldOverridePath);
+                        }
+                        else
+                        {
+                            mapAction.RemoveBindingOverride(i);
+                        }
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Attempts to swap associated binding of this instance with another instance.
@@ -396,9 +429,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             m_RebindOverlay?.SetActive(true);
             if (m_RebindText != null)
             {
-                var text = !string.IsNullOrEmpty(m_RebindOperation.expectedControlType)
-                    ? $"{partName}Waiting for {m_RebindOperation.expectedControlType} input..."
-                    : $"{partName}Waiting for input...";
+                var text = "Pressione uma tecla...";
                 m_RebindText.text = text;
             }
 
@@ -430,32 +461,23 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         {
             InputBinding newBinding = action.bindings[bindingIndex];
 
+            if (string.IsNullOrEmpty(newBinding.effectivePath))
+                return false;
+
             foreach (InputBinding binding in action.actionMap.bindings)
             {
-                if (binding.action == newBinding.action)
-                {
+                if (binding.id == newBinding.id)
                     continue;
-                }
+
+                if (binding.isComposite)
+                    continue;
 
                 if (binding.effectivePath == newBinding.effectivePath)
                 {
-                    Debug.Log("Bind duplicada detectada: " + newBinding.effectivePath);
+                    Debug.Log($"Bind duplicada detectada: {newBinding.effectivePath} já está em uso na action {binding.action}");
                     return true;
                 }
             }
-
-            if (allCompositeParts)
-            {
-                for (int i = 0; i < bindingIndex; i++)
-                {
-                    if (action.bindings[i].effectivePath == newBinding.overridePath)
-                    {
-                        Debug.Log("Bind duplicada detectada: " + newBinding.effectivePath);
-                        return true;
-                    }
-                }
-            }
-
             return false;
         }
 
