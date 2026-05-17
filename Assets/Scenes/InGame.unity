@@ -2584,7 +2584,7 @@ MonoBehaviour:
       weight: 100
   maxEnemiesPerRoom: 3
   useRandomSeed: 1
-  seed: -1186850651
+  seed: 320741161
   seedText: {fileID: 1645939861}
   roomDetector: {fileID: 1977743734}
   focarCentroSala: 1

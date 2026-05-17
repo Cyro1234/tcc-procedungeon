@@ -231,44 +231,58 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 }
             }
 
+            // calcula o tamanho real do chao da sala para definir os cortes, considerando o offset
+            int larguraUtil = roomBounds.size.x - (offset * 2);
+            int alturaUtil = roomBounds.size.y - (offset * 2);
 
-            // escolhe o tamanho dos cortes para a sala baseado no tamanho minimo
-            int cutSizeX = Rng.DungeonRange(1, Mathf.Max(2, minRoomWidth / 3));
-            int cutSizeY = Rng.DungeonRange(1, Mathf.Max(2, minRoomHeight / 3));
 
-            // lista de cantos pra remover, 0 inferior esquerdo, 1 inferior direito, 2 superior esquerdo, 3 superior direito
-            for (int i = 0; i < 4; i++) // percorre os 4 cantos da sala
+            // se a sala for muito pequena, nao aplica os cortes de canto para evitar que a sala suma ou fique muito estranha. O corte é baseado em 1/3 do tamanho util da sala, mas só é aplicado se a sala tiver pelo menos 3 tiles de largura e altura util para garantir que o corte faça sentido
+            int maxCutX = larguraUtil >= 3 ? larguraUtil / 3 : 0;
+            int maxCutY = alturaUtil >= 3 ? alturaUtil / 3 : 0;
+
+            // Só aplicamos os cortes de canto se a sala útil for maior que 10x10 tiles
+            if (maxCutX > 0 && maxCutY > 0)
             {
-                // 50% de chance de cortar o canto para variar os formatos
-                if (Rng.DungeonValue() > 0.5f) continue;
 
-                for (int x = 0; x < cutSizeX; x++) // largura do corte
+                // escolhe o tamanho dos cortes para a sala baseado no tamanho minimo
+                int cutSizeX = Rng.DungeonRange(1, maxCutX + 1);
+                int cutSizeY = Rng.DungeonRange(1, maxCutY + 1);
+
+                // lista de cantos pra remover, 0 inferior esquerdo, 1 inferior direito, 2 superior esquerdo, 3 superior direito
+                for (int i = 0; i < 4; i++) // percorre os 4 cantos da sala
                 {
-                    for (int y = 0; y < cutSizeY; y++) // altura do corte
-                    {
-                        Vector2Int posToRemove = Vector2Int.zero;
-                        if (i == 0) posToRemove = new Vector2Int(roomBounds.xMin + offset + x, roomBounds.yMin + offset + y);
-                        if (i == 1) posToRemove = new Vector2Int(roomBounds.xMax - offset - 1 - x, roomBounds.yMin + offset + y);
-                        if (i == 2) posToRemove = new Vector2Int(roomBounds.xMin + offset + x, roomBounds.yMax - offset - 1 - y);
-                        if (i == 3) posToRemove = new Vector2Int(roomBounds.xMax - offset - 1 - x, roomBounds.yMax - offset - 1 - y);
+                    // 50% de chance de cortar o canto para variar os formatos
+                    if (Rng.DungeonValue() > 0.5f) continue;
 
-                        roomFloor.Remove(posToRemove); // remove a posicao do chao dessa sala
+                    for (int x = 0; x < cutSizeX; x++) // largura do corte
+                    {
+                        for (int y = 0; y < cutSizeY; y++) // altura do corte
+                        {
+                            Vector2Int posToRemove = Vector2Int.zero;
+                            if (i == 0) posToRemove = new Vector2Int(roomBounds.xMin + offset + x, roomBounds.yMin + offset + y);
+                            if (i == 1) posToRemove = new Vector2Int(roomBounds.xMax - offset - 1 - x, roomBounds.yMin + offset + y);
+                            if (i == 2) posToRemove = new Vector2Int(roomBounds.xMin + offset + x, roomBounds.yMax - offset - 1 - y);
+                            if (i == 3) posToRemove = new Vector2Int(roomBounds.xMax - offset - 1 - x, roomBounds.yMax - offset - 1 - y);
+
+                            roomFloor.Remove(posToRemove); // remove a posicao do chao dessa sala
+                        }
                     }
                 }
+                }
+
+                // garante que o centro e os eixos principais existam evitando q a sala suma
+                Vector2Int center = (Vector2Int)Vector3Int.RoundToInt(roomBounds.center); // obtem o ponto central
+                roomFloor.Add(center); // adiciona o centro de volta caso ele tenha sido removido
+
+                floor.UnionWith(roomFloor);
+
+                salas.Add(roomFloor);
             }
-
-            // garante que o centro e os eixos principais existam evitando q a sala suma
-            Vector2Int center = (Vector2Int)Vector3Int.RoundToInt(roomBounds.center); // obtem o ponto central
-            roomFloor.Add(center); // adiciona o centro de volta caso ele tenha sido removido
-
-            floor.UnionWith(roomFloor);
-
-            salas.Add(roomFloor);
+            return salas;
         }
-        return salas;
-    }
+        
 
-    bool EhParede(Vector2Int pos, HashSet<Vector2Int> floor)
+        bool EhParede(Vector2Int pos, HashSet<Vector2Int> floor)
     {
         return !floor.Contains(pos + Vector2Int.up) ||
                !floor.Contains(pos + Vector2Int.down) ||
