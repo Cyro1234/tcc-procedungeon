@@ -8,7 +8,10 @@ public class HeartSystem : MonoBehaviour
     int life;
 
     // Variável para controlar se o jogador tem o escudo
-    public bool hasShield = false;
+    //public bool hasShield = false;
+
+    //Instancia da vida do escudo inicial
+    public int shieldHealth = 0;
 
     private GameOverManager gameOverManager;
     private AudioSource audioSource;
@@ -47,21 +50,48 @@ public class HeartSystem : MonoBehaviour
     public void takeDamage(int damage)
     {
         // PASSO NOVO: Verifica se o jogador tem o escudo ANTES de tirar a vida
-        if (hasShield)
+        //if (hasShield)
+        //{
+        //    hasShield = false; // O escudo quebra
+        //    Debug.Log("O Escudo absorveu o dano!");
+
+        //    if (shieldBreakSound != null)
+        //    {
+        //        audioSource.PlayOneShot(shieldBreakSound, 0.5f);
+        //    }
+
+        //    // Opcional: Aqui você pode colocar um código para atualizar a UI do Escudo no futuro
+        //    return; // O 'return' faz a função parar aqui, protegendo a vida do jogador.
+        //}
+
+        if (shieldHealth > 0)
         {
-            hasShield = false; // O escudo quebra
-            Debug.Log("O Escudo absorveu o dano!");
+            shieldHealth -= damage;
+            Debug.Log("O Escudo absorveu o dano! Resistência restante: " + shieldHealth);
 
             if (shieldBreakSound != null)
             {
                 audioSource.PlayOneShot(shieldBreakSound, 0.5f);
             }
 
-            // Opcional: Aqui você pode colocar um código para atualizar a UI do Escudo no futuro
-            return; // O 'return' faz a função parar aqui, protegendo a vida do jogador.
+            if (shieldHealth < 0)
+            {
+                // O dano quebrou o escudo e sobrou um pouco. Subtrai a sobra da vida.
+                life += shieldHealth; // shieldHealth ficou negativo, então isso subtrai da vida
+                shieldHealth = 0;
+                Debug.Log("O escudo quebrou e o jogador sofreu o impacto!");
+            }
+            else
+            {
+                return; // O escudo aguentou todo o impacto. Fim da função.
+            }
+        }
+        else
+        {
+            // Se não tinha escudo, tira da vida normalmente
+            life -= damage;
         }
 
-        life -= damage;
         life = Mathf.Max(life, 0); // No maximo fica com 0 vidas
         Debug.Log("TOMOU DANO! LIFE: " + life + " - CONTAINERS: " + hearts.Length);
 
@@ -76,10 +106,12 @@ public class HeartSystem : MonoBehaviour
     }
 
     // Função que será chamada pelo Baú para dar o escudo
-    public void EquipShield()
+    public void EquipShield(int shieldAmount)
     {
-        hasShield = true;
-        Debug.Log("Escudo Equipado! Você tem uma vida extra.");
+        shieldHealth = shieldAmount;
+        Debug.Log($"Escudo Equipado! Proteção total: {shieldHealth} de dano.");
+        //hasShield = true;
+        //Debug.Log("Escudo Equipado! Você tem uma vida extra.");
         // Opcional: Atualizar a UI para mostrar o icone do escudo na tela
     }
 

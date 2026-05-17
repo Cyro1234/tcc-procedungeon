@@ -44,13 +44,17 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private int BaixoNivel = 1;
     [SerializeField] private int MedioNivel = 2;
 
-    [Header("Chest Settings")]
-    [SerializeField] private GameObject chestPrefab;
-    [SerializeField] private bool randomStartingChest = false; // Define se o baú inicial é sorteado
-    [SerializeField] private Chest.ItemType startingChestItem = Chest.ItemType.Shield; // Escolha do item manual
+    //Baús com pesos de raridades diferentes baseados no nivel do andar
+    [Header("Chest Settings (Probabilidade por Nível)")]
+    [SerializeField] private WeightedTable<GameObject> chestTableBaixo;
+    [SerializeField] private WeightedTable<GameObject> chestTableMedio;
+    [SerializeField] private WeightedTable<GameObject> chestTableAlto;
 
-    //Tabela de pesos para os itens do baú
-    [SerializeField] private WeightedTable<Chest.ItemType> itemTable;
+    [Header("Starting Chest Settings")]
+    [SerializeField] private bool randomStartingChest = false;
+    [SerializeField] private GameObject manualStartingChestPrefab; // Escolhe qual Prefab de baú aparece na sala 1
+    [SerializeField] private bool forceStartingItem = true;
+    [SerializeField] private Chest.ItemType startingChestItem = Chest.ItemType.LongSword;
 
     private List<GameObject> enemies = new List<GameObject>();
     private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
@@ -199,6 +203,18 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         }
     }
 
+    // NOVO: Função para pegar a tabela de baús correta dependendo do andar
+    private WeightedTable<GameObject> GetChestTablePorNivel(TileMapVisualizer.Niveis nivel)
+    {
+        switch (nivel)
+        {
+            case TileMapVisualizer.Niveis.Baixo: return chestTableBaixo;
+            case TileMapVisualizer.Niveis.Medio: return chestTableMedio;
+            case TileMapVisualizer.Niveis.Alto: return chestTableAlto;
+            default: return chestTableBaixo;
+        }
+    }
+
     private List<HashSet<Vector2Int>> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
     {
         List<HashSet<Vector2Int>> salas = new List<HashSet<Vector2Int>>(); // lista que contem as posicoes de cada sala separadas por hash 
@@ -341,18 +357,19 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     // Usado quando está gerando com SubBSP
     private void SpawnProceduralChests(List<HashSet<Vector2Int>> roomsList)
     {
-        if (roomsList.Count <= 1 || chestPrefab == null) return; // Só tem a sala inicial ou falta prefab
+        // Pega a tabela de acordo com o nível atual
+        var chestTable = GetChestTablePorNivel(GetNivelAtual());
 
-        int qtdBaus = Rng.DungeonRange(0, 3); // Decide se terá 0, 1 ou 2 baús espalhados
-        System.Random chestRng = new System.Random(seed + andar); // Semente para a tabela de pesos
+        if (roomsList.Count <= 1 || chestTable.items.Count == 0) return;
+
+        int qtdBaus = Rng.DungeonRange(0, 3);
+        System.Random chestRng = new System.Random(seed + andar);
 
         for (int i = 0; i < qtdBaus; i++)
         {
-            // Escolhe uma sala aleatória (começa do 1 para ignorar a sala de Spawn)
             int roomIndex = Rng.DungeonRange(1, roomsList.Count);
             var roomTiles = roomsList[roomIndex];
 
-            // Filtra posicoes que não sejam paredes
             List<Vector2Int> availablePositions = new List<Vector2Int>();
             foreach (var pos in roomTiles)
             {
@@ -364,17 +381,13 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 int posIndex = Rng.DungeonRange(0, availablePositions.Count);
                 Vector2Int pos = availablePositions[posIndex];
 
-                GameObject chest = Instantiate(chestPrefab, new Vector3(pos.x, pos.y, 0), Quaternion.identity);
-                Chest chestScript = chest.GetComponent<Chest>();
-
-                if (chestScript != null && itemTable.items.Count > 0)
+                // Sorteia o Prefab do baú e instancia
+                GameObject prefabToSpawn = chestTable.getRandom(chestRng);
+                if (prefabToSpawn != null)
                 {
-                    // Rola o dado na tabela de pesos e injeta o item no baú!
-                    Chest.ItemType sortedItem = itemTable.getRandom(chestRng);
-                    chestScript.ConfigurarItem(sortedItem);
+                    GameObject chest = Instantiate(prefabToSpawn, new Vector3(pos.x, pos.y, 0), Quaternion.identity);
+                    spawnedChests.Add(chest);
                 }
-
-                spawnedChests.Add(chest); // Registra para destruir depois
             }
         }
     }
@@ -382,9 +395,11 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     // Usado quando NÃO está gerando com SubBSP (Salas Simples)
     private void SpawnProceduralChests(List<BoundsInt> roomsList)
     {
-        if (roomsList.Count <= 1 || chestPrefab == null) return;
+        var chestTable = GetChestTablePorNivel(GetNivelAtual());
 
-        int qtdBaus = Rng.DungeonRange(0, 3); // 0, 1 ou 2
+        if (roomsList.Count <= 1 || chestTable.items.Count == 0) return;
+
+        int qtdBaus = Rng.DungeonRange(0, 3);
         System.Random chestRng = new System.Random(seed + andar);
 
         for (int i = 0; i < qtdBaus; i++)
@@ -392,21 +407,16 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             int roomIndex = Rng.DungeonRange(1, roomsList.Count);
             BoundsInt room = roomsList[roomIndex];
 
-            // Garante que o baú não nasce colado na parede (+2 e -2 de margem)
             int randomX = Rng.DungeonRange(room.xMin + 2, room.xMax - 2);
             int randomY = Rng.DungeonRange(room.yMin + 2, room.yMax - 2);
             Vector3 spawnPos = new Vector3(randomX, randomY, 0);
 
-            GameObject chest = Instantiate(chestPrefab, spawnPos, Quaternion.identity);
-            Chest chestScript = chest.GetComponent<Chest>();
-
-            if (chestScript != null && itemTable.items.Count > 0)
+            GameObject prefabToSpawn = chestTable.getRandom(chestRng);
+            if (prefabToSpawn != null)
             {
-                Chest.ItemType sortedItem = itemTable.getRandom(chestRng);
-                chestScript.ConfigurarItem(sortedItem);
+                GameObject chest = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
+                spawnedChests.Add(chest);
             }
-
-            spawnedChests.Add(chest);
         }
     }
 
@@ -418,44 +428,68 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         player.transform.position = new Vector3(roomsCenters[0].x, roomsCenters[0].y, 0);
 
         // Instancia o Baú na primeira sala (com um offset de +1 no X para não nascer em cima do jogador)
-        if (chestPrefab != null)
+        // Decide se usa uma tabela sorteada ou o prefab manual
+        GameObject prefabToSpawn = manualStartingChestPrefab;
+        if (randomStartingChest)
+        {
+            var chestTable = GetChestTablePorNivel(GetNivelAtual());
+            if (chestTable.items.Count > 0)
+            {
+                prefabToSpawn = chestTable.getRandom(new System.Random(seed + andar));
+            }
+        }
+
+        if (prefabToSpawn != null)
         {
             Vector3 chestPosition = new Vector3(roomsCenters[0].x + 1.5f, roomsCenters[0].y, 0);
-            //currentChest = Instantiate(chestPrefab, chestPosition, Quaternion.identity);
-            GameObject initialChest = Instantiate(chestPrefab, chestPosition, Quaternion.identity);
-
-            // Pega o script do baú que acabou de nascer para configurá-lo
-            //Chest chestScript = initialChest.GetComponent<Chest>();
-            //if (chestScript != null)
-            //{
-            //    chestScript.isRandomItem = randomStartingChest;
-            //    // Se não for aleatório, coloca o item que você escolheu no Inspector
-            //    if (!randomStartingChest)
-            //    {
-            //        chestScript.itemInside = startingChestItem;
-            //    }
-            //}
-            //Debug.Log("Baú instanciado na sala inicial.");
-
+            GameObject initialChest = Instantiate(prefabToSpawn, chestPosition, Quaternion.identity);
+            // Força o item escolhido se a opção estiver marcada
             Chest chestScript = initialChest.GetComponent<Chest>();
-            if (chestScript != null)
+            if (chestScript != null && forceStartingItem)
             {
-                if (!randomStartingChest)
-                {
-                    chestScript.ConfigurarItem(startingChestItem); // Item Manual
-                }
-                else if (itemTable.items.Count > 0)
-                {
-                    // Item Sorteado pela Tabela de Pesos!
-                    System.Random rng = new System.Random(seed + andar);
-                    chestScript.ConfigurarItem(itemTable.getRandom(rng));
-                }
+                chestScript.ConfigurarItem(startingChestItem);
             }
-
-            spawnedChests.Add(initialChest); // Adiciona na lista de limpeza
+            spawnedChests.Add(initialChest);
             Debug.Log("Baú instanciado na sala inicial.");
-
         }
+        //if (chestPrefab != null)
+        //{
+        //    Vector3 chestPosition = new Vector3(roomsCenters[0].x + 1.5f, roomsCenters[0].y, 0);
+        //    //currentChest = Instantiate(chestPrefab, chestPosition, Quaternion.identity);
+        //    GameObject initialChest = Instantiate(chestPrefab, chestPosition, Quaternion.identity);
+
+        //    // Pega o script do baú que acabou de nascer para configurá-lo
+        //    //Chest chestScript = initialChest.GetComponent<Chest>();
+        //    //if (chestScript != null)
+        //    //{
+        //    //    chestScript.isRandomItem = randomStartingChest;
+        //    //    // Se não for aleatório, coloca o item que você escolheu no Inspector
+        //    //    if (!randomStartingChest)
+        //    //    {
+        //    //        chestScript.itemInside = startingChestItem;
+        //    //    }
+        //    //}
+        //    //Debug.Log("Baú instanciado na sala inicial.");
+
+        //    Chest chestScript = initialChest.GetComponent<Chest>();
+        //    if (chestScript != null)
+        //    {
+        //        if (!randomStartingChest)
+        //        {
+        //            chestScript.ConfigurarItem(startingChestItem); // Item Manual
+        //        }
+        //        else if (itemTable.items.Count > 0)
+        //        {
+        //            // Item Sorteado pela Tabela de Pesos!
+        //            System.Random rng = new System.Random(seed + andar);
+        //            chestScript.ConfigurarItem(itemTable.getRandom(rng));
+        //        }
+        //    }
+
+        //    spawnedChests.Add(initialChest); // Adiciona na lista de limpeza
+        //    Debug.Log("Baú instanciado na sala inicial.");
+
+        //}
 
         // Cria a escada da ultima sala
         tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);

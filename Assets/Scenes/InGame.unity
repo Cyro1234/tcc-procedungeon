@@ -2317,7 +2317,7 @@ MonoBehaviour:
   - {fileID: 1900129691}
   - {fileID: 430590271}
   - {fileID: 88811860}
-  hasShield: 0
+  shieldHealth: 0
   hurtSound: {fileID: 8300000, guid: 5c35b80907f6b0c42949da87ca70c42b, type: 3}
   shieldBreakSound: {fileID: 0}
 --- !u!82 &992072355
@@ -2584,7 +2584,7 @@ MonoBehaviour:
       weight: 100
   maxEnemiesPerRoom: 3
   useRandomSeed: 1
-  seed: -1186850651
+  seed: -330951210
   seedText: {fileID: 1645939861}
   roomDetector: {fileID: 1977743734}
   focarCentroSala: 1
@@ -2592,18 +2592,44 @@ MonoBehaviour:
   somAbrirPorta: {fileID: 8300000, guid: 847540062ba54f54bb80eb0fe29e4636, type: 3}
   BaixoNivel: 1
   MedioNivel: 2
-  chestPrefab: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
-    type: 3}
-  randomStartingChest: 1
-  startingChestItem: 2
-  itemTable:
+  chestTableBaixo:
     items:
-    - item: 0
-      weight: 70
-    - item: 2
-      weight: 10
-    - item: 1
-      weight: 20
+    - item: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
+        type: 3}
+      weight: 60
+    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
+        type: 3}
+      weight: 40
+  chestTableMedio:
+    items:
+    - item: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
+        type: 3}
+      weight: 24
+    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
+        type: 3}
+      weight: 50
+    - item: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
+        type: 3}
+      weight: 25
+    - item: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
+        type: 3}
+      weight: 1
+  chestTableAlto:
+    items:
+    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
+        type: 3}
+      weight: 45
+    - item: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
+        type: 3}
+      weight: 50
+    - item: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
+        type: 3}
+      weight: 5
+  randomStartingChest: 1
+  manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
+    type: 3}
+  forceStartingItem: 0
+  startingChestItem: 3
 --- !u!1 &1128909180
 GameObject:
   m_ObjectHideFlags: 0

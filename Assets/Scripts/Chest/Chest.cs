@@ -2,24 +2,43 @@ using UnityEngine;
 
 public class Chest : MonoBehaviour
 {
-    // Criamos a nossa lista de itens possíveis
-    public enum ItemType { Shield, LongSword, Dagger }
+    // NOVO: Tipos de itens atualizados com as qualidades dos escudos
+    public enum ItemType { ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger }
 
     [Header("Configurações do Baú")]
-    public ItemType itemInside;      // Qual item está aqui dentro
+    // Cada Prefab de baú terá sua própria tabela de loot configurada no Inspector
+    [SerializeField] private WeightedTable<ItemType> itemTable;
+
+    [Header("Apenas para depuração (Não alterar)")]
+    public ItemType itemInside;
 
     private bool isOpen = false;
     private Animator animator;
 
+    private bool itemPreConfigurado = false; // NOVO: Trava para não sobrescrever o item manual
+
     void Start()
     {
         animator = GetComponent<Animator>();
+
+        // O próprio baú sorteia o item de sua tabela assim que é instanciado
+        // Só sorteia se o Gerador da Masmorra não tiver forçado um item antes!
+        if (!itemPreConfigurado && itemTable != null && itemTable.items.Count > 0)
+        {
+            System.Random rng = new System.Random(System.Guid.NewGuid().GetHashCode());
+            itemInside = itemTable.getRandom(rng);
+        }
+        //if (itemTable != null && itemTable.items.Count > 0)
+        //{
+        //    System.Random rng = new System.Random(System.Guid.NewGuid().GetHashCode());
+        //    itemInside = itemTable.getRandom(rng);
+        //}
     }
 
-    // NOVA FUNÇÃO: O Gerador de Dungeon chama essa função para colocar o item sorteado aqui dentro
     public void ConfigurarItem(ItemType item)
     {
         itemInside = item;
+        itemPreConfigurado = true; // Ativa a trava
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -39,22 +58,26 @@ public class Chest : MonoBehaviour
             animator.SetTrigger("Open");
         }
 
-        // Verifica qual item tem dentro do baú e entrega pro jogador
+        // Entrega o item sorteado com os respectivos atributos
         switch (itemInside)
         {
-            case ItemType.Shield:
-                HeartSystem heartSystem = player.GetComponent<HeartSystem>();
-                if (heartSystem != null) heartSystem.EquipShield();
+            case ItemType.ShieldSmall:
+                player.GetComponent<HeartSystem>()?.EquipShield(1);
                 break;
-
+            case ItemType.ShieldMedium:
+                player.GetComponent<HeartSystem>()?.EquipShield(3);
+                break;
+            case ItemType.ShieldLarge:
+                player.GetComponent<HeartSystem>()?.EquipShield(5);
+                break;
+            case ItemType.ShieldLegendary:
+                player.GetComponent<HeartSystem>()?.EquipShield(10);
+                break;
             case ItemType.LongSword:
-                Attack attackSword = player.GetComponent<Attack>();
-                if (attackSword != null) attackSword.EquipWeapon("LongSword");
+                player.GetComponent<Attack>()?.EquipWeapon("LongSword");
                 break;
-
             case ItemType.Dagger:
-                Attack attackDagger = player.GetComponent<Attack>();
-                if (attackDagger != null) attackDagger.EquipWeapon("Dagger");
+                player.GetComponent<Attack>()?.EquipWeapon("Dagger");
                 break;
         }
     }

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 896005281407797099}
   - component: {fileID: 8772076686668154384}
   m_Layer: 0
-  m_Name: Chest
+  m_Name: Chest_Legendary
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -85,7 +85,8 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 1669584768, guid: 6dca9b1b42c27a84a9c42b70b91f5559, type: 3}
+  m_Sprite: {fileID: 8921494043752156921, guid: 67e6f0345f09ffb4c9342200815e0010,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -153,6 +154,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c8e5ac3c595efc41b8e16d5c0ab15c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Chest
+  itemTable:
+    items:
+    - item: 3
+      weight: 100
+  itemInside: 0
 --- !u!95 &896005281407797099
 Animator:
   serializedVersion: 7
@@ -163,7 +169,7 @@ Animator:
   m_GameObject: {fileID: 3527452723843563021}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 81ef50d7dfa6d73459ac83c28867d29f, type: 2}
+  m_Controller: {fileID: 9100000, guid: a2dfeff34a7b6d64b9ba6fd35701500d, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
