@@ -18,9 +18,15 @@ public class TileMapVisualizer : MonoBehaviour
     // LISTA DE TILES DE CADA DIFICULDADE.
     // tile[0] eh o chao
     // tile[1] eh a parede
-    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelBaixo;
-    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelMedio;
-    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelAlto;
+
+    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelFloresta;
+    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelDeserto;
+    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelCaverna;
+    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelAbismo;
+
+    [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelInfinito;
+
+    private Biomas biomaAtual = Biomas.Infinito;
 
     // Tile da porta quando fecha. Se quiser usar o mesmo da parede do nivel, usar wallTileEscolhido
     [SerializeField] private TileBase doorTile;
@@ -30,7 +36,7 @@ public class TileMapVisualizer : MonoBehaviour
     private TileBase floorTileEscolhido = null;
     private TileBase wallTileEscolhido = null;
 
-    
+
     private GameObject currentLadder;
 
     // Dificuldade de cada nivel. Se quiser adicionar mais, completar na funcao GetTilePorNivel e adicionar mais WeightedTable<List<TileBase>>
@@ -41,33 +47,60 @@ public class TileMapVisualizer : MonoBehaviour
         Alto
     }
 
-    // Pega os possiveis Tiles do nivel atual
-    private WeightedTable<List<TileBase>> GetTilePorNivel(Niveis nivel)
+    public enum Biomas
     {
-        switch(nivel) 
+        Deserto,
+        Floresta,
+        Caverna,
+        Abismo,
+        Infinito // Endless. Usado quando passou por todos os outros biomas
+    }
+
+    private WeightedTable<List<TileBase>> GetTilePorBioma(Biomas bioma)
+    {
+        switch (bioma)
         {
-            case Niveis.Baixo:
-                return floorTilesNivelBaixo;
-            case Niveis.Medio:
-                return floorTilesNivelMedio;
-            case Niveis.Alto:
-                return floorTilesNivelAlto;
+            case Biomas.Deserto:
+                return floorTilesNivelDeserto;
+            case Biomas.Floresta:
+                return floorTilesNivelFloresta;
+            case Biomas.Caverna:
+                return floorTilesNivelCaverna;
+            case Biomas.Abismo:
+                return floorTilesNivelAbismo;
             default:
-                return floorTilesNivelBaixo; // NAO DEVERIA ACONTECER MAS POR SEGURANCA
+                return floorTilesNivelInfinito; // NAO DEVERIA ACONTECER MAS POR SEGURANCA
         }
     }
 
-    public void Setup(Niveis nivel)  // Faz as escolhas do chao e parede para pintar o nivel. CHAMAR SETUP ANTES DE PINTAR TODA VEZ QUE MUDAR DE ANDAR OU PRIMEIRO ANDAR.
+    //// Pega os possiveis Tiles do nivel atual
+    //private WeightedTable<List<TileBase>> GetTilePorNivel(Niveis nivel)
+    //{
+    //    switch(nivel) 
+    //    {
+    //        case Niveis.Baixo:
+    //            return floorTilesNivelBaixo;
+    //        case Niveis.Medio:
+    //            return floorTilesNivelMedio;
+    //        case Niveis.Alto:
+    //            return floorTilesNivelAlto;
+    //        default:
+    //            return floorTilesNivelBaixo; // NAO DEVERIA ACONTECER MAS POR SEGURANCA
+    //    }
+    //}
+
+    public void Setup(Biomas bioma)  // Faz as escolhas do chao e parede para pintar o nivel. CHAMAR SETUP ANTES DE PINTAR TODA VEZ QUE MUDAR DE ANDAR OU PRIMEIRO ANDAR.
     {
-        tableTiles = GetTilePorNivel(nivel);
+
+        tableTiles = GetTilePorBioma(bioma);
         List<TileBase> itemEscolhido = tableTiles.getRandom(Rng.dungeonRng);
         floorTileEscolhido = itemEscolhido[0]; // CHAO
-        wallTileEscolhido = itemEscolhido[1]; // PAREDE
-        Debug.Log("SETUP CONCLUIDO");
+        wallTileEscolhido = itemEscolhido[1]; // PAREDE    
     }
 
+
     // Pinta o chao inteiro
-    public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Niveis nivel)
+    public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Biomas bioma)
     {
         PaintTiles(floorPositions, floorTileMap, floorTileEscolhido);
     }

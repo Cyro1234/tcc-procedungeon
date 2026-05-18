@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using static TileMapVisualizer;
 using Random = UnityEngine.Random;
 
 // Utilizao o BSP para gerar as salas
@@ -63,6 +64,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     private int andar = 0; // Andar que o jogador esta presente
 
+    private List<TileMapVisualizer.Biomas> listaBiomas = null;
+    private TileMapVisualizer.Biomas biomaAtual = TileMapVisualizer.Biomas.Infinito;
+
     //private GameObject currentChest;
     //Lista para guardar e limpar todos os baús do andar
     private List<GameObject> spawnedChests = new List<GameObject>();
@@ -70,9 +74,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     protected override void RunProceduralGeneration()
     {
         andar++;
+        biomaAtual = GetBioma();
         Debug.Log("ANDAR: " + andar);
         tileMapVisualizer.Clear();
-        tileMapVisualizer.Setup(GetNivelAtual());
+        tileMapVisualizer.Setup(biomaAtual);
         CreateRooms();
     }
 
@@ -103,6 +108,15 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
         Debug.Log("SEED: " + seed);
         seedText.text = "" + seed;
+
+
+        // Para chao e parede dos biomas
+        listaBiomas = new List<TileMapVisualizer.Biomas>();
+        listaBiomas.Add(TileMapVisualizer.Biomas.Floresta);
+        listaBiomas.Add(TileMapVisualizer.Biomas.Deserto);
+        listaBiomas.Add(TileMapVisualizer.Biomas.Caverna);
+        listaBiomas.Add(TileMapVisualizer.Biomas.Abismo);
+        Shuffle(listaBiomas);
 
         RunProceduralGeneration();
     }
@@ -182,7 +196,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         floor.UnionWith(corridors);
 
         // Coloca o chao e paredes
-        tileMapVisualizer.PaintFloorTiles(floor, GetNivelAtual());
+        tileMapVisualizer.PaintFloorTiles(floor, biomaAtual);
         WallGenerator.CreateWalls(floor, tileMapVisualizer);
 
     }
@@ -201,6 +215,30 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         {
             return TileMapVisualizer.Niveis.Alto;
         }
+    }
+
+    private void Shuffle<T>(IList<T> ts) // Shuffle na lista
+    {
+        var count = ts.Count;
+        var last = count - 1;
+        for (var i = 0; i < last; ++i)
+        {
+            var r = Rng.DungeonRange(i, count);
+            var tmp = ts[i];
+            ts[i] = ts[r];
+            ts[r] = tmp;
+        }
+    }
+
+    private TileMapVisualizer.Biomas GetBioma()
+    {
+        if (listaBiomas.Count > 0)
+        {
+            TileMapVisualizer.Biomas biomaSelecionado = listaBiomas[0]; // Ja esta embaralhado
+            listaBiomas.RemoveAt(0); // Remove pra nao repitir o bioma
+            return biomaSelecionado;
+        }
+        return TileMapVisualizer.Biomas.Infinito;
     }
 
     // NOVO: Função para pegar a tabela de baús correta dependendo do andar

@@ -2584,7 +2584,7 @@ MonoBehaviour:
       weight: 100
   maxEnemiesPerRoom: 3
   useRandomSeed: 1
-  seed: -330951210
+  seed: -474729751
   seedText: {fileID: 1645939861}
   roomDetector: {fileID: 1977743734}
   focarCentroSala: 1
@@ -49123,60 +49123,36 @@ MonoBehaviour:
   walkInFrontTileMap: {fileID: 1754510999}
   exitPrefab: {fileID: 6965201669180963775, guid: 574df4b20857e8c4f9b676bf94d5ae78,
     type: 3}
-  floorTilesNivelBaixo:
+  floorTilesNivelFloresta:
     items:
     - item:
-      - {fileID: 11400000, guid: 0ebc6bee92a27084ba015342d613392b, type: 2}
-      - {fileID: 11400000, guid: e2e0c9ed47db33146be9c58b6c0e1528, type: 2}
-      weight: 2
-    - item:
-      - {fileID: 11400000, guid: 17963e381b7275546868cccb5bdad068, type: 2}
-      - {fileID: 11400000, guid: fd4eba4e292a4624abab53368a784d6a, type: 2}
-      weight: 2
-    - item:
-      - {fileID: 11400000, guid: 9f10c06eba6b6f740b09d74249f7ad61, type: 2}
-      - {fileID: 11400000, guid: d7cc4726bdf90b842b14796bb75e21d0, type: 2}
-      weight: 2
-    - item:
-      - {fileID: 11400000, guid: bdb3f98bb9e3e2f48ae90fddf621ad3a, type: 2}
-      - {fileID: 11400000, guid: ed71ad15801f91749b99d568b0dffb2c, type: 2}
-      weight: 2
-  floorTilesNivelMedio:
+      - {fileID: 11400000, guid: bbee5444adcb1254585a7f2c6312cf6a, type: 2}
+      - {fileID: 11400000, guid: 2190098611db1094394887409245ecb7, type: 2}
+      weight: 0
+  floorTilesNivelDeserto:
     items:
     - item:
-      - {fileID: 11400000, guid: b2b090db63c48d249b78df573de08d9e, type: 2}
-      - {fileID: 11400000, guid: 99219e65a103e084e81f60452afec4fe, type: 2}
-      weight: 2
-    - item:
-      - {fileID: 11400000, guid: 2d8668247313cbf4ba6731ca0f6851cf, type: 2}
-      - {fileID: 11400000, guid: a7ad65a9a9c81e846b9a6cd705dd075a, type: 2}
-      weight: 2
-    - item:
-      - {fileID: 11400000, guid: 2931ee0ca49e74b4b837086ed1fc2133, type: 2}
-      - {fileID: 11400000, guid: e43fcc3deea0eb54c8c32ba177aa0c53, type: 2}
-      weight: 5
-    - item:
-      - {fileID: 11400000, guid: 6c2a128ff42d8d24381fcacec11dfa19, type: 2}
-      - {fileID: 11400000, guid: 5c89e134aee302d4cab381fde4144ae3, type: 2}
-      weight: 2
-  floorTilesNivelAlto:
+      - {fileID: 11400000, guid: fad85f5bd83ca1642a566ecb5dc14615, type: 2}
+      - {fileID: 11400000, guid: b946cb6384afe5d4ab4fd713ea1c6083, type: 2}
+      weight: 0
+  floorTilesNivelCaverna:
     items:
     - item:
-      - {fileID: 11400000, guid: 25538cd0f75fcde48a3b5f2f853426eb, type: 2}
-      - {fileID: 11400000, guid: 176a368fbd0995541a9c8bf04ce9670b, type: 2}
-      weight: 5
+      - {fileID: 11400000, guid: 7743d6b81a30dcc49a4cbec1d38cb315, type: 2}
+      - {fileID: 11400000, guid: b2725c723467bd648bfa9de55cc481dd, type: 2}
+      weight: 0
+  floorTilesNivelAbismo:
+    items:
     - item:
-      - {fileID: 11400000, guid: 98c6b8b27196e5c4790b3ca7a4b0323e, type: 2}
-      - {fileID: 11400000, guid: 6bfc45b44a0588440bbb1eed7da00c50, type: 2}
-      weight: 100
+      - {fileID: 11400000, guid: 3acd0ee9dff5949468a3fc254c679ed5, type: 2}
+      - {fileID: 11400000, guid: 784e04d9a22ec7c44ad2dff106965bd2, type: 2}
+      weight: 0
+  floorTilesNivelInfinito:
+    items:
     - item:
-      - {fileID: 11400000, guid: 60a4e0ab2e4aded4d8051fef79d73bba, type: 2}
-      - {fileID: 11400000, guid: bfb36cac891cbbb4eafc82d419c4e6a1, type: 2}
-      weight: 2
-    - item:
-      - {fileID: 11400000, guid: b047a9881a7e8f543a8e403fa999f986, type: 2}
-      - {fileID: 11400000, guid: 558ffd10bbc2e994d8b56c5bdb35611a, type: 2}
-      weight: 2
+      - {fileID: 11400000, guid: 90acef64dea5400489012c164b6361d2, type: 2}
+      - {fileID: 11400000, guid: c378287d2d0c92e48bf18384b7482e54, type: 2}
+      weight: 0
   doorTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
 --- !u!4 &1749136080
 Transform:
