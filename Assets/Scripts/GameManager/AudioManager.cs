@@ -1,47 +1,113 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class AudioManager : MonoBehaviour
 {
-    private AudioSource musicSource;
-    [SerializeField] private AudioClip gameplayMusic;
-    [SerializeField] private AudioClip gameOverMusic;
+    public static AudioManager Instance;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public Sound[] musicSounds, sfxSounds; 
+    public AudioSource musicSource, sfxSource;
+
+    private void Awake()
     {
-        musicSource = GetComponent<AudioSource>();
-        PlayGameplayMusic();
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        LoadVolume();
+        PlayMusic("Fase1");
+
+        void LoadVolume()
+{
+    float musicVol = PlayerPrefs.GetFloat("MusicVolume", 1f);
+    float sfxVol = PlayerPrefs.GetFloat("SFXVolume", 1f);
+
+    musicSource.volume = musicVol;
+    sfxSource.volume = sfxVol;
+}
     }
 
-    // Toca musica de fundo em loop
-    public void PlayGameplayMusic()
-    {
-        if (musicSource.clip == gameplayMusic && musicSource.isPlaying) return;
 
-        musicSource.clip = gameplayMusic;
-        musicSource.loop = true;
-        musicSource.Play();
+    public void PlayMusic(string name, bool loop = true)
+    {
+        Sound s = Array.Find(musicSounds, x => x.name == name);
+
+        if (s == null)
+        {
+            Debug.Log("Music not found");
+        }
+
+        else
+        {
+            musicSource.clip = s.clip;
+            musicSource.loop = loop;
+            musicSource.Play();
+        }
     }
 
-    // Toca a musica de GameOver sem loop
-    public void PlayGameOverMusic()
+    public void PlaySFX (string name)
     {
-        if (musicSource.clip == gameOverMusic && musicSource.isPlaying) return;
+        Sound s = Array.Find (sfxSounds, x=> x.name == name);
 
-        musicSource.clip = gameOverMusic;
-        musicSource.loop = false;
-        musicSource.Play();
+        if (s == null)
+        {
+            Debug.Log("Sound not found");
+        }
+
+        else
+        {
+            sfxSource.PlayOneShot(s.clip);
+        }
+    }
+    
+    // adicionar toggle de music e sfx depois
+
+    // Scroller do áudio da música/sfx no menu de pause
+    public void MusicVolume(float volume)
+    {
+        if (musicSource != null)
+        {
+            musicSource.volume = volume;
+        }
     }
 
-    // Para qualquer musica que esteja tocando
-    public void StopMusic()
+    public void SFXVolume(float volume)
     {
-        musicSource.Stop();
+        if (sfxSource != null)
+        {
+            sfxSource.volume = volume;
+        }
+    }
+
+    // salva a opção de volume do usuário toda vez que o jogo é reiniciado
+    public void SetMusicVolume(float volume)
+    {
+        if (musicSource != null)
+        {
+            musicSource.volume = volume;
+            PlayerPrefs.SetFloat("MusicVolume", volume);
+        }
+    }
+
+    public void SetSFXVolume(float volume)
+    {
+        if (sfxSource != null)
+        {
+            sfxSource.volume = volume;
+            PlayerPrefs.SetFloat("SFXVolume", volume);
+        }
     }
 }
+    

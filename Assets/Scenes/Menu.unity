@@ -2668,7 +2668,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 609861928}
         m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
-        m_MethodName: AbrirControles
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2886,8 +2886,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1813924841}
-  - {fileID: 500171474}
   - {fileID: 1327913725}
+  - {fileID: 500171474}
   m_Father: {fileID: 959081093}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3853,7 +3853,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Controles
+  m_text: Controles (WIP)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}

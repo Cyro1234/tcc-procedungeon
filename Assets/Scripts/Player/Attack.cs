@@ -6,7 +6,7 @@ public class Attack : MonoBehaviour
     public GameObject Melee;
     bool isAttacking = false;
     bool isCooldown = false;
-    float atkDuration = 0.3f; // Podemos deixar isso no PlayerStatsHandler.cs depois, pra gente ter a possibilidade de modificar o tempo de duraÁ„o do ataque com buffs e debuffs (Xicote de Alex)
+    float atkDuration = 0.3f; // Podemos deixar isso no PlayerStatsHandler.cs depois, pra gente ter a possibilidade de modificar o tempo de dura√ß√£o do ataque com buffs e debuffs (Xicote de Alex)
     float atkTimer = 0f;
 
     private PlayerStatsHandler stats;
@@ -25,7 +25,7 @@ public class Attack : MonoBehaviour
 
     void Start()
     {
-        // Ao iniciar, o jogo memoriza o tamanho e velocidade padr„o
+        // Ao iniciar, o jogo memoriza o tamanho e velocidade padr√£o
         originalAtkDuration = atkDuration;
         originalMeleeScale = Melee.transform.localScale;
     }
@@ -38,11 +38,12 @@ public class Attack : MonoBehaviour
 
     public void OnAttack()
     {
-        if (isCooldown == false) // Adicionei essa verificaÁ„o pra que a gente tenha como controlar o tempo de recarga do ataque
+        if (isCooldown == false) // Adicionei essa verifica√ß√£o pra que a gente tenha como controlar o tempo de recarga do ataque
         {
             if (isAttacking == false)
             {
-                AudioSource.PlayClipAtPoint(swordSound, transform.position, 1f); // SFX do ataque
+
+                AudioManager.Instance.PlaySFX("Ataque"); // som de ataque
 
                 Melee.SetActive(true);
                 isAttacking = true;
@@ -62,7 +63,7 @@ public class Attack : MonoBehaviour
                 atkTimer = 0f;
                 isAttacking= false;
                 Melee.SetActive(false);
-                isCooldown = true; // ComeÁa o cooldown do ataque depois que a hitbox È desativada
+                isCooldown = true; // Come√ßa o cooldown do ataque depois que a hitbox √© desativada
             }
         }
 
@@ -78,7 +79,7 @@ public class Attack : MonoBehaviour
         }
     }
 
-    // NOVA FUN«√O: Chamada pelo ba˙ para trocar a arma
+    // NOVA FUN√á√ÉO: Chamada pelo ba√∫ para trocar a arma
     public void EquipWeapon(string weaponType)
     {
         if (weaponType == "LongSword")
@@ -86,14 +87,14 @@ public class Attack : MonoBehaviour
             // Espada Longa: 50% maior, mas demora o dobro do tempo na tela (ataque mais lento)
             Melee.transform.localScale = originalMeleeScale * 1.5f;
             atkDuration = originalAtkDuration * 2.0f;
-            Debug.Log("Equipou Espada Longa! ¡rea MAIOR, ataque mais LENTO.");
+            Debug.Log("Equipou Espada Longa! √Årea MAIOR, ataque mais LENTO.");
         }
         else if (weaponType == "Dagger")
         {
-            // Adaga: 30% menor, mas some da tela bem mais r·pido (ataque mais r·pido)
+            // Adaga: 30% menor, mas some da tela bem mais r√°pido (ataque mais r√°pido)
             Melee.transform.localScale = originalMeleeScale * 0.7f;
             atkDuration = originalAtkDuration * 0.5f;
-            Debug.Log("Equipou Adaga! ¡rea MENOR, ataque mais R¡PIDO.");
+            Debug.Log("Equipou Adaga! √Årea MENOR, ataque mais R√ÅPIDO.");
         }
     }
 }

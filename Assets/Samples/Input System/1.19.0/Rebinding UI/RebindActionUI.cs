@@ -55,7 +55,10 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         /// <summary>
         /// Text component that receives the name of the action. Optional.
         /// </summary>
-        public Text actionLabel
+        /// 
+
+        // utilizando TMPro.TextMeshProUGUI para não ter que usar o Text normal do unity, mesmo vale pra bindingText e rebindPrompt
+        public TMPro.TextMeshProUGUI actionLabel
         {
             get => m_ActionLabel;
             set
@@ -69,7 +72,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         /// Text component that receives the display string of the binding. Can be <c>null</c> in which
         /// case the component entirely relies on <see cref="updateBindingUIEvent"/>.
         /// </summary>
-        public Text bindingText
+        public TMPro.TextMeshProUGUI bindingText
         {
             get => m_BindingText;
             set
@@ -84,7 +87,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         /// </summary>
         /// <seealso cref="startRebindEvent"/>
         /// <seealso cref="rebindOverlay"/>
-        public Text rebindPrompt
+        public TMPro.TextMeshProUGUI rebindPrompt
         {
             get => m_RebindText;
             set => m_RebindText = value;
@@ -227,7 +230,9 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             if (!ResolveActionAndBinding(out var action, out var bindingIndex))
                 return;
 
-            if (action.bindings[bindingIndex].isComposite)
+            ResetBinding(action, bindingIndex);
+
+            /*if (action.bindings[bindingIndex].isComposite)
             {
                 // It's a composite. Remove overrides from part bindings.
                 for (var i = bindingIndex + 1; i < action.bindings.Count && action.bindings[i].isPartOfComposite; ++i)
@@ -236,8 +241,49 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             else
             {
                 action.RemoveBindingOverride(bindingIndex);
-            }
+            }*/
             UpdateBindingDisplay();
+        }
+
+        private void ResetBinding(InputAction action, int bindingIndex)
+        {
+            InputBinding targetBinding = action.bindings[bindingIndex];
+
+            string defaultPath = targetBinding.path;
+
+            // tecla que estava configurada antes de clicar em Reset para poder fazer a troca
+            string oldOverridePath = targetBinding.effectivePath;
+
+            // remove a sobreposição da binding atual, voltando para a tecla padrão
+            action.RemoveBindingOverride(bindingIndex);
+
+            // verifica todas as outras actions para garantir que nenhuma fica duplicada
+            foreach (InputAction mapAction in action.actionMap.actions)
+            {
+                for (int i = 0; i < mapAction.bindings.Count; i++)
+                {
+                    InputBinding mapBinding = mapAction.bindings[i];
+             
+                    if (mapAction == action && i == bindingIndex)
+                        continue;
+
+                    if (mapBinding.isComposite)
+                        continue;
+
+                    if (mapBinding.effectivePath == defaultPath)
+                    {
+
+                        if (!string.IsNullOrEmpty(oldOverridePath) && oldOverridePath != defaultPath)
+                        {
+                            mapAction.ApplyBindingOverride(i, oldOverridePath);
+                        }
+                        else
+                        {
+                            mapAction.RemoveBindingOverride(i);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -307,6 +353,9 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                     action.actionMap.Enable();
             }
 
+            // desativa a ação para evitar erros
+            action.Disable();
+
             // An "InvalidOperationException: Cannot rebind action x while it is enabled" will
             // be thrown if rebinding is attempted on an action that is enabled.
             //
@@ -325,6 +374,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                 .OnCancel(
                     operation =>
                     {
+                        action.Enable();
                         m_RebindStopEvent?.Invoke(this, operation);
                         if (m_RebindOverlay != null)
                             m_RebindOverlay.SetActive(false);
@@ -342,9 +392,21 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
                 .OnComplete(
                     operation =>
                     {
+                        action.Enable();
                         if (m_RebindOverlay != null)
                             m_RebindOverlay.SetActive(false);
                         m_RebindStopEvent?.Invoke(this, operation);
+
+                        if (CheckDuplicateBindings(action, bindingIndex, allCompositeParts))
+                        {
+                            action.RemoveBindingOverride(bindingIndex);
+                            CleanUp();
+                            PerformInteractiveRebind(action, bindingIndex, allCompositeParts);
+                            return;
+                        }
+
+
+
                         UpdateBindingDisplay();
                         CleanUp();
 
@@ -367,9 +429,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             m_RebindOverlay?.SetActive(true);
             if (m_RebindText != null)
             {
-                var text = !string.IsNullOrEmpty(m_RebindOperation.expectedControlType)
-                    ? $"{partName}Waiting for {m_RebindOperation.expectedControlType} input..."
-                    : $"{partName}Waiting for input...";
+                var text = "Pressione uma tecla...";
                 m_RebindText.text = text;
             }
 
@@ -395,6 +455,30 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
             m_RebindStartEvent?.Invoke(this, m_RebindOperation);
 
             m_RebindOperation.Start();
+        }
+
+        private bool CheckDuplicateBindings(InputAction action, int bindingIndex, bool allCompositeParts = false)
+        {
+            InputBinding newBinding = action.bindings[bindingIndex];
+
+            if (string.IsNullOrEmpty(newBinding.effectivePath))
+                return false;
+
+            foreach (InputBinding binding in action.actionMap.bindings)
+            {
+                if (binding.id == newBinding.id)
+                    continue;
+
+                if (binding.isComposite)
+                    continue;
+
+                if (binding.effectivePath == newBinding.effectivePath)
+                {
+                    Debug.Log($"Bind duplicada detectada: {newBinding.effectivePath} já está em uso na action {binding.action}");
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void UpdateRebindInfo(double now)
@@ -489,11 +573,11 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
         [Tooltip("Text label that will receive the name of the action. Optional. Set to None to have the "
             + "rebind UI not show a label for the action.")]
         [SerializeField]
-        private Text m_ActionLabel;
+        private TMPro.TextMeshProUGUI m_ActionLabel;
 
         [Tooltip("Text label that will receive the current, formatted binding string.")]
         [SerializeField]
-        private Text m_BindingText;
+        private TMPro.TextMeshProUGUI m_BindingText;
 
         [Tooltip("Optional UI that will be shown while a rebind is in progress.")]
         [SerializeField]
@@ -501,7 +585,7 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
 
         [Tooltip("Optional text label that will be updated with prompt for user input.")]
         [SerializeField]
-        private Text m_RebindText;
+        private TMPro.TextMeshProUGUI m_RebindText;
 
         [Tooltip("Optional text label that will be updated with relevant information during rebinding.")]
         [SerializeField]
