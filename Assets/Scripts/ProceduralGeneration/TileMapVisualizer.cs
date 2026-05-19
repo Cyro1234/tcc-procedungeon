@@ -26,8 +26,6 @@ public class TileMapVisualizer : MonoBehaviour
 
     [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelInfinito;
 
-    private Biomas biomaAtual = Biomas.Infinito;
-
     // Tile da porta quando fecha. Se quiser usar o mesmo da parede do nivel, usar wallTileEscolhido
     [SerializeField] private TileBase doorTile;
 
