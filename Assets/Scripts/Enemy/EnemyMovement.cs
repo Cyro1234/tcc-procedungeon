@@ -20,9 +20,6 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] float strength = 4f;
     [SerializeField] float knockbackDuration = 0.15f;
 
-    [SerializeField] private AudioClip damageSound;
-
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -88,9 +85,7 @@ public class EnemyMovement : MonoBehaviour
     {
         health -= damage;
         StartCoroutine(Knockback(sender));
-
-        // Som
-        AudioSource.PlayClipAtPoint(damageSound, transform.position, 1f);
+        AudioManager.Instance.PlaySFX("InimigoTomouDano");
 
         if (health <= 0)
         {

@@ -4,29 +4,25 @@ using UnityEngine.SceneManagement;
 public class GameOverManager : MonoBehaviour
 {
     [SerializeField] private GameObject gameOverPanel;
-    private AudioSource audioSource;
-    [SerializeField] private AudioClip deathSound;
-    [SerializeField] private AudioManager audioManager;
     [SerializeField] private PlayerInputHandler playerInput;
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private PauseManager pauseManager;
 
     public void Start()
     {
-        audioSource = GetComponent<AudioSource>();
+
     }
 
-    // Mostra a tela de gameover e pausa o jogo
+    // Mostra a tela de game over e pausa o jogo
     public void ShowGameOver()
     {
-        audioManager.PlayGameOverMusic();
-        audioSource.PlayOneShot(deathSound, 0.8f);
         gameOverPanel.SetActive(true);
         Time.timeScale = 0f; // pausa o jogo
 
         playerInput.enabled = false;
         playerMovement.enabled = false;
         pauseManager.enabled = false;
+        AudioManager.Instance.PlayMusic("GameOver", false);
     }
 
     public void RestartGame()
