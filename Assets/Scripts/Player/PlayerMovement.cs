@@ -10,8 +10,6 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
 
     public Transform Aim;
-    bool isWalking = false;
-
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -24,39 +22,41 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        rb.linearVelocity = moveInput * stats.GetPlayerWalkSpeed();
-        if (isWalking) 
+        if (Time.timeScale == 0f)
         {
-            Vector3 vector3 = Vector3.left * moveInput.x + Vector3.down * moveInput.y;
-            Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
+            rb.linearVelocity = Vector2.zero;
+            return;
         }
-    }
 
-    // Movimentacao do jogador
-    public void Move(InputAction.CallbackContext context)
-    {
-        
-        animator.SetBool("isWalking", true);
+        rb.linearVelocity = moveInput * stats.GetPlayerWalkSpeed();
 
-        if (context.canceled) // Parou de andar. Soltou as teclas de movimentar
-        {   // Configura para que as animacoes de idle fiquem congruentes com o movimento
-            isWalking = false;
-            animator.SetBool("isWalking", false);
+        if (moveInput != Vector2.zero)
+        {
+            animator.SetBool("isWalking", true);
+            animator.SetFloat("InputX", moveInput.x);
+            animator.SetFloat("InputY", moveInput.y);
+
             animator.SetFloat("LastInputX", moveInput.x);
             animator.SetFloat("LastInputY", moveInput.y);
 
             Vector3 vector3 = Vector3.left * moveInput.x + Vector3.down * moveInput.y;
             Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
         }
-        else if (moveInput.x != 0 || moveInput.y != 0) // Ainda ta apertando teclas de movimento
+        else
         {
-            isWalking = true;
+            animator.SetBool("isWalking", false);
         }
+    }
 
+    // Movimentacao do jogador
+    public void Move(InputAction.CallbackContext context)
+    {
         moveInput = context.ReadValue<Vector2>();
-
-
-        animator.SetFloat("InputX", moveInput.x);
-        animator.SetFloat("InputY", moveInput.y);
+    }
+    public void ForcarParada()
+    {
+        moveInput = Vector2.zero;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (animator != null) animator.SetBool("isWalking", false);
     }
 }

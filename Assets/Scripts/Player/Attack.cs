@@ -38,16 +38,15 @@ public class Attack : MonoBehaviour
 
     public void OnAttack()
     {
-        if (isCooldown == false) // Adicionei essa verificação pra que a gente tenha como controlar o tempo de recarga do ataque
+        if (Time.timeScale == 0f) return;
+
+        if (isCooldown == false)
         {
             if (isAttacking == false)
             {
-
-                AudioManager.Instance.PlaySFX("Ataque"); // som de ataque
-
+                AudioManager.Instance.PlaySFX("Ataque");
                 Melee.SetActive(true);
                 isAttacking = true;
-                // TODO: Realizar animacao, quando tiver
             }
         }
     }

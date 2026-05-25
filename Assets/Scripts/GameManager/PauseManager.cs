@@ -9,6 +9,8 @@ public class PauseManager : MonoBehaviour
     public GameObject optionsPanel;
     public GameObject controlsPanel;
 
+    [SerializeField] private PlayerMovement playerMovement;
+
     public static bool pausado = false;
     private static int i = 1;
 
@@ -19,6 +21,9 @@ public class PauseManager : MonoBehaviour
 
         // Garante que o tempo do jogo comece normal, caso retornar pro menu com o jogo pausado
         Time.timeScale = 1f;
+
+        if (playerMovement == null)
+            playerMovement = Object.FindAnyObjectByType<PlayerMovement>();
     }
 
     // Ao apertar a tecla ESC, o jogo pausa/despausa e exibe/oculta o menu de pausa
@@ -45,6 +50,8 @@ public class PauseManager : MonoBehaviour
         optionsPanel.SetActive(false);
         controlsPanel.SetActive(false);
 
+        if (playerMovement != null) playerMovement.ForcarParada();
+
         Time.timeScale = 0;
         pausado = true;
     }
@@ -54,6 +61,8 @@ public class PauseManager : MonoBehaviour
         pausePanel.SetActive(false);
         optionsPanel.SetActive(false);
         controlsPanel.SetActive(false);
+
+        if (playerMovement != null) playerMovement.ForcarParada();
 
         Time.timeScale = 1;
         pausado = false;

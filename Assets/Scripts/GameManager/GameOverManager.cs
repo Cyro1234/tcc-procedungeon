@@ -19,6 +19,8 @@ public class GameOverManager : MonoBehaviour
         gameOverPanel.SetActive(true);
         Time.timeScale = 0f; // pausa o jogo
 
+        if (playerMovement != null) playerMovement.ForcarParada();
+
         playerInput.enabled = false;
         playerMovement.enabled = false;
         pauseManager.enabled = false;
