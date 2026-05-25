@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 171fe4b14aa55bd4499b06335d366565
+guid: a122bbf0f3559de4eb2903b4d6d785de
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7708685128804594151
-    second: TilemapPlaceholder_0
+      213: 6994334515435022553
+    second: TileFloorWall_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: TilemapPlaceholder_0
+      name: TileFloorWall_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,14 +115,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 91e044cb7bf350590800000000000000
-      internalID: -7708685128804594151
+      spriteID: 9d822c82f2ed01160800000000000000
+      internalID: 6994334515435022553
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_1
+      name: TileFloorWall_1
       rect:
         serializedVersion: 2
         x: 64
@@ -137,14 +137,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2de0f27fa16558e46ad418a2af5e7ae0
-      internalID: -1850708828
+      spriteID: fe8f63a73e9acb5488cab0c784e95dda
+      internalID: -1954637216
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_2
+      name: TileFloorWall_2
       rect:
         serializedVersion: 2
         x: 128
@@ -159,14 +159,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 04f87840e3773bb4f8b636e90b31909a
-      internalID: -1542427675
+      spriteID: 284349d98735cd147b1f6a9e77967da9
+      internalID: 103925662
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_3
+      name: TileFloorWall_3
       rect:
         serializedVersion: 2
         x: 192
@@ -181,14 +181,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f0b8374ef159adf44ae82ce13c6099d8
-      internalID: -152650325
+      spriteID: 9edbdb3d88fb49a48bde7d76b45bb1a3
+      internalID: -82596154
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_4
+      name: TileFloorWall_4
       rect:
         serializedVersion: 2
         x: 256
@@ -203,14 +203,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2300dfbabdce67e45acf72547667868f
-      internalID: -879344961
+      spriteID: 9d78c0fa170a39648af84d29cf40be87
+      internalID: -220819808
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_5
+      name: TileFloorWall_5
       rect:
         serializedVersion: 2
         x: 320
@@ -225,14 +225,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 98393ae15eb62624381e31515fef0db2
-      internalID: 1560622018
+      spriteID: 1ff34e4e518c63049bed9c7c4f5b6632
+      internalID: -882505719
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_6
+      name: TileFloorWall_6
       rect:
         serializedVersion: 2
         x: 384
@@ -247,14 +247,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cf60f1953a6a3c54c9d1d7a77112399e
-      internalID: 1228551716
+      spriteID: a1a99b07a4982144ab9c1c232862c385
+      internalID: 285432856
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_7
+      name: TileFloorWall_7
       rect:
         serializedVersion: 2
         x: 448
@@ -269,14 +269,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 88d01feb8e2da654f9b6754d54fb8100
-      internalID: -1337498666
+      spriteID: 8e0825787896a794a9b1a3555b880754
+      internalID: 366402928
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_8
+      name: TileFloorWall_8
       rect:
         serializedVersion: 2
         x: 512
@@ -291,14 +291,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c28f683ca619fd44ba5a674c448e4701
-      internalID: -1705303371
+      spriteID: 494a87400885fa44382c38b89bd43a35
+      internalID: 381670770
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: TilemapPlaceholder_9
+      name: TileFloorWall_9
       rect:
         serializedVersion: 2
         x: 576
@@ -313,8 +313,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 141a58fce3579a14d9459911986f3b9c
-      internalID: 257006667
+      spriteID: 1bf26162780b3854fb523d0730b27d25
+      internalID: 2112350762
       vertices: []
       indices: 
       edges: []
@@ -323,7 +323,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 9f77a721f14e1604b829a28db787d5ef
+    spriteID: e42ea93a035c6c94b9cac2feefdec93a
     internalID: 0
     vertices: []
     indices: 
@@ -335,16 +335,16 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      TilemapPlaceholder_0: -7708685128804594151
-      TilemapPlaceholder_1: -1850708828
-      TilemapPlaceholder_2: -1542427675
-      TilemapPlaceholder_3: -152650325
-      TilemapPlaceholder_4: -879344961
-      TilemapPlaceholder_5: 1560622018
-      TilemapPlaceholder_6: 1228551716
-      TilemapPlaceholder_7: -1337498666
-      TilemapPlaceholder_8: -1705303371
-      TilemapPlaceholder_9: 257006667
+      TileFloorWall_0: 6994334515435022553
+      TileFloorWall_1: -1954637216
+      TileFloorWall_2: 103925662
+      TileFloorWall_3: -82596154
+      TileFloorWall_4: -220819808
+      TileFloorWall_5: -882505719
+      TileFloorWall_6: 285432856
+      TileFloorWall_7: 366402928
+      TileFloorWall_8: 381670770
+      TileFloorWall_9: 2112350762
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

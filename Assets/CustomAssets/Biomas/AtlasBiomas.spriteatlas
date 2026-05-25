@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: AtlasBiomas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 0
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 0
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 6994334515435022553, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: -1954637216, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: 103925662, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: -82596154, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: -220819808, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: -882505719, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: 285432856, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: 366402928, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: 381670770, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    - {fileID: 2112350762, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - a122bbf0f3559de4eb2903b4d6d785de: 381670770
+    - a122bbf0f3559de4eb2903b4d6d785de: 2112350762
+    - a122bbf0f3559de4eb2903b4d6d785de: 103925662
+    - a122bbf0f3559de4eb2903b4d6d785de: -82596154
+    - a122bbf0f3559de4eb2903b4d6d785de: 6994334515435022553
+    - a122bbf0f3559de4eb2903b4d6d785de: -1954637216
+    - a122bbf0f3559de4eb2903b4d6d785de: 285432856
+    - a122bbf0f3559de4eb2903b4d6d785de: 366402928
+    - a122bbf0f3559de4eb2903b4d6d785de: -220819808
+    - a122bbf0f3559de4eb2903b4d6d785de: -882505719
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 381670770, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: 2112350762, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: 103925662, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: -82596154, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: 6994334515435022553, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: -1954637216, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: 285432856, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: 366402928, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: -220819808, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  - {fileID: -882505719, guid: a122bbf0f3559de4eb2903b4d6d785de, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - TileFloorWall_8
+  - TileFloorWall_9
+  - TileFloorWall_2
+  - TileFloorWall_3
+  - TileFloorWall_0
+  - TileFloorWall_1
+  - TileFloorWall_6
+  - TileFloorWall_7
+  - TileFloorWall_4
+  - TileFloorWall_5
+  m_RenderDataMap: {}
+  m_Tag: AtlasBiomas
+  m_IsVariant: 0

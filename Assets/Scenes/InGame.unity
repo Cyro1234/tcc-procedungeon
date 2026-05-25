@@ -56290,32 +56290,32 @@ MonoBehaviour:
   floorTilesNivelFloresta:
     items:
     - item:
-      - {fileID: 11400000, guid: bbee5444adcb1254585a7f2c6312cf6a, type: 2}
-      - {fileID: 11400000, guid: 2190098611db1094394887409245ecb7, type: 2}
+      - {fileID: 11400000, guid: 0636274bf05e11943b3ef31ef95f7c9e, type: 2}
+      - {fileID: 11400000, guid: eb9608aa38b5ca3409c2c94b4206941e, type: 2}
       weight: 0
   floorTilesNivelDeserto:
     items:
     - item:
-      - {fileID: 11400000, guid: fad85f5bd83ca1642a566ecb5dc14615, type: 2}
-      - {fileID: 11400000, guid: b946cb6384afe5d4ab4fd713ea1c6083, type: 2}
+      - {fileID: 11400000, guid: bbd453d4ae404d54a86bcd40ff97e467, type: 2}
+      - {fileID: 11400000, guid: 51eca2cf91f60c94baab3a809dd8ffd2, type: 2}
       weight: 0
   floorTilesNivelCaverna:
     items:
     - item:
-      - {fileID: 11400000, guid: 7743d6b81a30dcc49a4cbec1d38cb315, type: 2}
-      - {fileID: 11400000, guid: b2725c723467bd648bfa9de55cc481dd, type: 2}
+      - {fileID: 11400000, guid: 9c3f8dcd794689d4e80f252f99c88b13, type: 2}
+      - {fileID: 11400000, guid: 463f4fd94c2132344a28fa27dd2b996c, type: 2}
       weight: 0
   floorTilesNivelAbismo:
     items:
     - item:
-      - {fileID: 11400000, guid: 3acd0ee9dff5949468a3fc254c679ed5, type: 2}
-      - {fileID: 11400000, guid: 784e04d9a22ec7c44ad2dff106965bd2, type: 2}
+      - {fileID: 11400000, guid: 9264af4831ed8354d90189b963f68f14, type: 2}
+      - {fileID: 11400000, guid: 6deece1c2cf30c54c8d1d3e08cd0d8d3, type: 2}
       weight: 0
   floorTilesNivelInfinito:
     items:
     - item:
-      - {fileID: 11400000, guid: 90acef64dea5400489012c164b6361d2, type: 2}
-      - {fileID: 11400000, guid: c378287d2d0c92e48bf18384b7482e54, type: 2}
+      - {fileID: 11400000, guid: 0446bdd4e44979d4e81e2bf7c9f8659c, type: 2}
+      - {fileID: 11400000, guid: c23960acbebc7e048a9f5b8869d6c0f8, type: 2}
       weight: 0
   doorTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
 --- !u!4 &1749136080
