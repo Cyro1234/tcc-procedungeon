@@ -45,6 +45,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private int BaixoNivel = 1;
     [SerializeField] private int MedioNivel = 2;
 
+    //[SerializeField] private GameObject smokePrefab;
+
     //Baús com pesos de raridades diferentes baseados no nivel do andar
     [Header("Chest Settings (Probabilidade por Nível)")]
     [SerializeField] private WeightedTable<GameObject> chestTableBaixo;
@@ -59,7 +61,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     private List<GameObject> enemies = new List<GameObject>();
     private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
-    private bool salaTrancada = false;
+    public bool salaTrancada = false;
     private BoundsInt? currentBounds = null;
 
     private int andar = 0; // Andar que o jogador esta presente
@@ -370,8 +372,19 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 availablePositions.RemoveAt(index); // evita repetir posição
 
                 GameObject enemy = Instantiate(getRandomEnemy(), new Vector3(pos.x, pos.y, 0), Quaternion.identity);
+                //enemy.SetActive(false);
+                if (enemy != null)
+                {
+                    enemy.GetComponent<EnemyMovement>().enabled = false;
+                    enemy.GetComponent<BoxCollider2D>().enabled = false;
+                    enemy.transform.Find("DamageHitbox").GetComponent<BoxCollider2D>().enabled = false;
+                    foreach (SpriteRenderer sprite in enemy.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        sprite.enabled = false;
+                    }
+                }
                 enemies.Add(enemy);
-            }
+            }  // TODO: fazer inimigos nao spawnarem perto das portas 
         }
 
         Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
@@ -394,8 +407,19 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
                 // Instancia o inimigo na posicao
                 GameObject enemy = Instantiate(getRandomEnemy(), spawnPos, Quaternion.identity);
+                //enemy.SetActive(false);
+                if (enemy != null)
+                {
+                    enemy.GetComponent<EnemyMovement>().enabled = false;
+                    enemy.GetComponent<BoxCollider2D>().enabled = false;
+                    enemy.transform.Find("DamageHitbox").GetComponent<BoxCollider2D>().enabled = false;
+                    foreach (SpriteRenderer sprite in enemy.GetComponentsInChildren<SpriteRenderer>())
+                    {
+                        sprite.enabled = false;
+                    }
+                }
                 enemies.Add(enemy); // Guarda em uma lista para que possa limpar os inimigos ao concluir a fase
-            }
+            }  // TODO: fazer inimigos nao spawnarem perto das portas 
         }
         Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
     }
@@ -678,6 +702,26 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             currentBounds = roomDetector.GetCurrentRoomBounds();
             FecharPortasDaSala();
             salaTrancada = true;
+
+            if (salaTrancada)
+            {
+                GameObject[] todosInimigos = GameObject.FindGameObjectsWithTag("Enemy");
+                foreach (GameObject inimigo in todosInimigos)
+                {
+                    if (inimigo == null) continue;
+
+                    Vector3Int enemyPos = Vector3Int.FloorToInt(inimigo.transform.position);
+
+                    if (enemyPos.x >= currentBounds.Value.xMin + offset && enemyPos.x < currentBounds.Value.xMax - offset &&
+                        enemyPos.y >= currentBounds.Value.yMin + offset && enemyPos.y < currentBounds.Value.yMax - offset)
+                    {
+                        inimigo.transform.Find("Smoke").gameObject.SetActive(true);
+                        inimigo.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
+                        roomDetector.StartCoroutine(roomDetector.HabilitarInimigos(inimigo, 3f));
+                    }
+                }
+            }
+
         }
         else if (!roomDetector.inimigoSala && salaTrancada) // se não houver inimigos e a sala estiver trancada, abre a sala
         {

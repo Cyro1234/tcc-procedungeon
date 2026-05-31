@@ -6052,6 +6052,7 @@ MonoBehaviour:
   pausePanel: {fileID: 920776115}
   optionsPanel: {fileID: 1909128271}
   controlsPanel: {fileID: 1260074971}
+  playerMovement: {fileID: 0}
 --- !u!1 &1069344450
 GameObject:
   m_ObjectHideFlags: 0
@@ -6344,8 +6345,8 @@ MonoBehaviour:
         type: 3}
       weight: 100
   maxEnemiesPerRoom: 3
-  useRandomSeed: 1
-  seed: -474729751
+  useRandomSeed: 0
+  seed: -2036592314
   seedText: {fileID: 1645939861}
   roomDetector: {fileID: 1977743734}
   focarCentroSala: 1
@@ -6391,6 +6392,7 @@ MonoBehaviour:
     type: 3}
   forceStartingItem: 0
   startingChestItem: 3
+  salaTrancada: 0
 --- !u!1 &1102669962
 GameObject:
   m_ObjectHideFlags: 0
@@ -57853,6 +57855,8 @@ MonoBehaviour:
   virtualCamera: {fileID: 1635360952}
   dungeonGenerator: {fileID: 1101588032}
   cameraTarget: {fileID: 227713995}
+  smokePrefab: {fileID: 6078554444888669849, guid: 282c3c6f6e8b007439843a88646a1fe6,
+    type: 3}
 --- !u!4 &1977743735
 Transform:
   m_ObjectHideFlags: 0

@@ -1,7 +1,8 @@
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Cinemachine;
+using UnityEngine;
 
 public class RoomDetector : MonoBehaviour
 {
@@ -66,60 +67,80 @@ public class RoomDetector : MonoBehaviour
         }
     }
 
+
+    public IEnumerator HabilitarInimigos(GameObject enemy, float delay)
+    {
+
+        yield return new WaitForSeconds(delay);
+
+        if (enemy != null)
+        {
+            enemy.GetComponent<EnemyMovement>().enabled = true;
+            enemy.GetComponent<BoxCollider2D>().enabled = true;
+            enemy.transform.Find("DamageHitbox").GetComponent<BoxCollider2D>().enabled = true;
+            enemy.transform.Find("Smoke").gameObject.SetActive(false);
+            enemy.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePosition;
+            foreach (SpriteRenderer sprite in enemy.GetComponentsInChildren<SpriteRenderer>())
+            {
+                sprite.enabled = true;
+            }
+        }
+    }
+
     // Update is called once per frame
     void Update()
+{
+    int offset = dungeonGenerator.Offset;
+    if (roomsList == null || playerTransform == null) return;
+
+    Vector3Int playerPos = Vector3Int.FloorToInt(playerTransform.position);
+
+    bool focarCentroSala = dungeonGenerator.FocarCentroSala;
+
+    if (!focarCentroSala)
     {
-        int offset = dungeonGenerator.Offset;
-        if (roomsList == null || playerTransform == null) return;
+        cameraTarget.position = playerTransform.position;
+        virtualCamera.Lens.OrthographicSize = 4f;
+    }
 
-        Vector3Int playerPos = Vector3Int.FloorToInt(playerTransform.position);
+    jogadorSala = false;
+    inimigoSala = false;
+    inimigosNoMapa = GameObject.FindGameObjectsWithTag("Enemy");
 
-        bool focarCentroSala = dungeonGenerator.FocarCentroSala;
-
-        if (!focarCentroSala)
+    foreach (var room in roomsList)
+    {
+        // area do jogador para detectar a sala (sem offset) para garantir q ele n acesse um pixel randomico e abra a sala
+        if (playerPos.x >= room.xMin && playerPos.x < room.xMax &&
+            playerPos.y >= room.yMin && playerPos.y < room.yMax)
         {
-            cameraTarget.position = playerTransform.position;
-            virtualCamera.Lens.OrthographicSize = 4f;
-        }
-
-        jogadorSala = false;
-        inimigoSala = false;
-        inimigosNoMapa = GameObject.FindGameObjectsWithTag("Enemy");
-
-        foreach (var room in roomsList)
-        {
-            // area do jogador para detectar a sala (sem offset) para garantir q ele n acesse um pixel randomico e abra a sala
-            if (playerPos.x >= room.xMin && playerPos.x < room.xMax &&
-                playerPos.y >= room.yMin && playerPos.y < room.yMax)
+            // Define a sala atual para a câmera e referências
+            if (currentRoom != room)
             {
-                // Define a sala atual para a câmera e referências
-                if (currentRoom != room)
+                currentRoom = room;
+
+                if (focarCentroSala){
+                    Vector3 center = new Vector3(room.xMin + room.size.x / 2.0f, room.yMin + room.size.y / 2.0f, 0);
+                    cameraTarget.position = center;
+
+                    virtualCamera.Lens.OrthographicSize = room.size.y / 2.2f;
+                }        
+            }
+
+            // aqui ele usa offset nos inimigos, pegando o tamanho real
+            foreach (GameObject inimigo in inimigosNoMapa)
+            {
+                if (inimigo == null) continue;
+                Vector3Int enemyPos = Vector3Int.FloorToInt(inimigo.transform.position);
+                if (enemyPos.x >= room.xMin + offset && enemyPos.x < room.xMax - offset &&
+                    enemyPos.y >= room.yMin + offset && enemyPos.y < room.yMax - offset)
                 {
-                    currentRoom = room;
+                    inimigoSala = true;
+                    break;
+                }         
+            }
 
-                    if (focarCentroSala){
-                        Vector3 center = new Vector3(room.xMin + room.size.x / 2.0f, room.yMin + room.size.y / 2.0f, 0);
-                        cameraTarget.position = center;
-
-                        virtualCamera.Lens.OrthographicSize = room.size.y / 2.2f;
-                    }        
-                }
-
-                // aqui ele usa offset nos inimigos, pegando o tamanho real
-                foreach (GameObject inimigo in inimigosNoMapa)
-                {
-                    if (inimigo == null) continue;
-                    Vector3Int enemyPos = Vector3Int.FloorToInt(inimigo.transform.position);
-                    if (enemyPos.x >= room.xMin + offset && enemyPos.x < room.xMax - offset &&
-                        enemyPos.y >= room.yMin + offset && enemyPos.y < room.yMax - offset)
-                    {
-                        inimigoSala = true;
-                        break;
-                    }
-                }
-
-                jogadorSala = (playerPos.x >= room.xMin + offset && playerPos.x < room.xMax - offset &&
-                               playerPos.y >= room.yMin + offset && playerPos.y < room.yMax - offset);
+            jogadorSala = (playerPos.x >= room.xMin + offset && playerPos.x < room.xMax - offset &&
+                           playerPos.y >= room.yMin + offset && playerPos.y < room.yMax - offset);
 
                 if (inimigoSala != statusInimigoAnterior)
                 {
@@ -127,9 +148,9 @@ public class RoomDetector : MonoBehaviour
                     if (inimigoSala) Debug.Log($"Inimigos detectados!");
                     else Debug.Log("Sala limpa!");
                 }
-                return;
-            }
+                return;        
         }
+    }
 
         // Se saiu da área total da sala
         if (!jogadorSala && currentRoom != null)
