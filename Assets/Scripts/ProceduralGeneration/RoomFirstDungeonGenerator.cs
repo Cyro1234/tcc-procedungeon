@@ -34,33 +34,25 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     private AudioSource audioSource;
 
-    [SerializeField] private int BaixoNivel = 1;
-    [SerializeField] private int MedioNivel = 2;
-
+    [SerializeField] private LevelManager levelManager;
 
     // SPAWNERS
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private ChestSpawner chestSpawner;
     [SerializeField] private DoorSpawner doorSpawner;
 
-    private int andar = 0; // Andar que o jogador esta presente
-
-    private List<TileMapVisualizer.Biomas> listaBiomas = null;
-    private TileMapVisualizer.Biomas biomaAtual = TileMapVisualizer.Biomas.Infinito;
-
     protected override void RunProceduralGeneration()
     {
-        andar++;
-        biomaAtual = GetBioma();
-        Debug.Log("ANDAR: " + andar);
+        levelManager.passarAndar();
+        Debug.Log("ANDAR: " + levelManager.GetAndar());
         tileMapVisualizer.Clear();
-        tileMapVisualizer.Setup(biomaAtual);
+        tileMapVisualizer.Setup(levelManager.GetBioma());
         CreateRooms();
     }
 
     public override void Setup()
     {
-        andar = 0;
+        levelManager.CleanAndar();
         if (useRandomSeed)
         {
             seed = GenerateRandomSeed();
@@ -71,17 +63,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         Debug.Log("SEED: " + seed);
         seedText.text = "" + seed;
 
-
-        // Para chao e parede dos biomas
-        listaBiomas = new List<TileMapVisualizer.Biomas>();
-        listaBiomas.Add(TileMapVisualizer.Biomas.Floresta);
-        listaBiomas.Add(TileMapVisualizer.Biomas.Deserto);
-        listaBiomas.Add(TileMapVisualizer.Biomas.Caverna);
-        listaBiomas.Add(TileMapVisualizer.Biomas.Abismo);
-        Shuffle(listaBiomas);
-
         doorSpawner.setAudioSource(audioSource);
-
+        levelManager.setup();
         RunProceduralGeneration();
     }
 
@@ -131,12 +114,12 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         if (subBSPRooms)
         {
             enemySpawner.SpawnEnemies(salas);
-            chestSpawner.SpawnProceduralChests(salas, GetNivelAtual(), andar, seed);
+            chestSpawner.SpawnProceduralChests(salas, levelManager.GetNivelAtual(), levelManager.GetAndar(), seed);
         }
         else
         {
             enemySpawner.SpawnEnemies(roomList);
-            chestSpawner.SpawnProceduralChests(roomList, GetNivelAtual(), andar, seed);
+            chestSpawner.SpawnProceduralChests(roomList, levelManager.GetNivelAtual(), levelManager.GetAndar(), seed);
         }
 
         // Conectar salas com corredores
@@ -144,49 +127,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         floor.UnionWith(corridors);
 
         // Coloca o chao e paredes
-        tileMapVisualizer.PaintFloorTiles(floor, biomaAtual);
+        tileMapVisualizer.PaintFloorTiles(floor, levelManager.GetBiomaAtual());
         WallGenerator.CreateWalls(floor, tileMapVisualizer);
 
-    }
-
-    private TileMapVisualizer.Niveis GetNivelAtual()
-    {
-        if (andar <= BaixoNivel)
-        {
-            return TileMapVisualizer.Niveis.Baixo;
-        }
-        else if (andar <= MedioNivel)
-        {
-            return TileMapVisualizer.Niveis.Medio;
-        }
-        else
-        {
-            return TileMapVisualizer.Niveis.Alto;
-        }
-    }
-
-    private void Shuffle<T>(IList<T> ts) // Shuffle na lista
-    {
-        var count = ts.Count;
-        var last = count - 1;
-        for (var i = 0; i < last; ++i)
-        {
-            var r = Rng.DungeonRange(i, count);
-            var tmp = ts[i];
-            ts[i] = ts[r];
-            ts[r] = tmp;
-        }
-    }
-
-    private TileMapVisualizer.Biomas GetBioma()
-    {
-        if (listaBiomas.Count > 0)
-        {
-            TileMapVisualizer.Biomas biomaSelecionado = listaBiomas[0]; // Ja esta embaralhado
-            listaBiomas.RemoveAt(0); // Remove pra nao repitir o bioma
-            return biomaSelecionado;
-        }
-        return TileMapVisualizer.Biomas.Infinito;
     }
 
     private List<HashSet<Vector2Int>> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
@@ -278,7 +221,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         GameObject player = GameObject.FindWithTag("Player");
         player.transform.position = new Vector3(roomsCenters[0].x, roomsCenters[0].y, 0);
 
-        chestSpawner.SpawnaBauInicial(GetNivelAtual(), andar, seed, roomsCenters);
+        chestSpawner.SpawnaBauInicial(levelManager.GetNivelAtual(), levelManager.GetAndar(), seed, roomsCenters);
 
         // Cria a escada da ultima sala
         tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);

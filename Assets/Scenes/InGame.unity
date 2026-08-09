@@ -2801,6 +2801,52 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!1 &523713985
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 523713986}
+  - component: {fileID: 523713987}
+  m_Layer: 0
+  m_Name: LevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &523713986
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 523713985}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1690250079}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &523713987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 523713985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7960883349a49a245ba6e1c32e961d57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelManager
+  BaixoNivel: 1
+  MedioNivel: 2
 --- !u!1 &537762971
 GameObject:
   m_ObjectHideFlags: 0
@@ -6469,14 +6515,13 @@ MonoBehaviour:
   dungeonHeight: 100
   offset: 4
   subBSPRooms: 1
-  enemySpawner: {fileID: 265426990}
   useRandomSeed: 1
   seed: -474729751
   seedText: {fileID: 1645939861}
   roomDetector: {fileID: 1977743734}
   focarCentroSala: 1
-  BaixoNivel: 1
-  MedioNivel: 2
+  levelManager: {fileID: 523713987}
+  enemySpawner: {fileID: 265426990}
   chestSpawner: {fileID: 1942525112}
   doorSpawner: {fileID: 913200453}
 --- !u!1 &1102669962
@@ -56303,6 +56348,7 @@ Transform:
   - {fileID: 1027947508}
   - {fileID: 765502917}
   - {fileID: 601799898}
+  - {fileID: 523713986}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1707600057
