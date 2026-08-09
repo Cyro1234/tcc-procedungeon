@@ -1614,6 +1614,61 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 246162344}
   m_CullTransparentMesh: 1
+--- !u!1 &265426989
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 265426991}
+  - component: {fileID: 265426990}
+  m_Layer: 0
+  m_Name: EnemySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &265426990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 265426989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 708aef10692d1d945bec4a427a2b5e85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
+  maxEnemiesPerRoom: 3
+  enemies:
+  - {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212, type: 3}
+  enemyTable:
+    items:
+    - item: {fileID: 1885961500774489010, guid: 24e1bf9e9a6b0304a86728bbfdf5147f,
+        type: 3}
+      weight: 1
+    - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
+        type: 3}
+      weight: 5
+--- !u!4 &265426991
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 265426989}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 52.33955, y: 28.92589, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &268673142
 GameObject:
   m_ObjectHideFlags: 0
@@ -6052,6 +6107,7 @@ MonoBehaviour:
   pausePanel: {fileID: 920776115}
   optionsPanel: {fileID: 1909128271}
   controlsPanel: {fileID: 1260074971}
+  playerMovement: {fileID: 0}
 --- !u!1 &1069344450
 GameObject:
   m_ObjectHideFlags: 0
@@ -6329,21 +6385,7 @@ MonoBehaviour:
   dungeonHeight: 100
   offset: 4
   subBSPRooms: 1
-  enemyTable:
-    items:
-    - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
-        type: 3}
-      weight: 10
-    - item: {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212,
-        type: 3}
-      weight: 3
-    - item: {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da,
-        type: 3}
-      weight: 2
-    - item: {fileID: 1885961500774489010, guid: 24e1bf9e9a6b0304a86728bbfdf5147f,
-        type: 3}
-      weight: 100
-  maxEnemiesPerRoom: 3
+  enemySpawner: {fileID: 265426990}
   useRandomSeed: 1
   seed: -474729751
   seedText: {fileID: 1645939861}
@@ -6353,44 +6395,7 @@ MonoBehaviour:
   somAbrirPorta: {fileID: 8300000, guid: 847540062ba54f54bb80eb0fe29e4636, type: 3}
   BaixoNivel: 1
   MedioNivel: 2
-  chestTableBaixo:
-    items:
-    - item: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
-        type: 3}
-      weight: 60
-    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
-        type: 3}
-      weight: 40
-  chestTableMedio:
-    items:
-    - item: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
-        type: 3}
-      weight: 24
-    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
-        type: 3}
-      weight: 50
-    - item: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
-        type: 3}
-      weight: 25
-    - item: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
-        type: 3}
-      weight: 1
-  chestTableAlto:
-    items:
-    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
-        type: 3}
-      weight: 45
-    - item: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
-        type: 3}
-      weight: 50
-    - item: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
-        type: 3}
-      weight: 5
-  randomStartingChest: 1
-  manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
-    type: 3}
-  forceStartingItem: 0
-  startingChestItem: 3
+  chestSpawner: {fileID: 0}
 --- !u!1 &1102669962
 GameObject:
   m_ObjectHideFlags: 0
@@ -57684,6 +57689,88 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1942457251}
   m_CullTransparentMesh: 1
+--- !u!1 &1942525111
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1942525113}
+  - component: {fileID: 1942525112}
+  m_Layer: 0
+  m_Name: ChestSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1942525112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942525111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0317fc2bf74629944bb767751a6ed4c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ChestSpawner
+  chestTableBaixo:
+    items:
+    - item: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
+        type: 3}
+      weight: 60
+    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
+        type: 3}
+      weight: 40
+  chestTableMedio:
+    items:
+    - item: {fileID: 3527452723843563021, guid: 72152bcf3d3e9854e93aa583d18e1b49,
+        type: 3}
+      weight: 24
+    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
+        type: 3}
+      weight: 50
+    - item: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
+        type: 3}
+      weight: 25
+    - item: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
+        type: 3}
+      weight: 1
+  chestTableAlto:
+    items:
+    - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
+        type: 3}
+      weight: 45
+    - item: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
+        type: 3}
+      weight: 50
+    - item: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
+        type: 3}
+      weight: 5
+  randomStartingChest: 1
+  manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
+    type: 3}
+  forceStartingItem: 0
+  startingChestItem: 4
+--- !u!4 &1942525113
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942525111}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 54.16293, y: 32.52141, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1947487363
 GameObject:
   m_ObjectHideFlags: 0
@@ -58786,3 +58873,5 @@ SceneRoots:
   - {fileID: 1690250079}
   - {fileID: 1977743735}
   - {fileID: 227713995}
+  - {fileID: 265426991}
+  - {fileID: 1942525113}
