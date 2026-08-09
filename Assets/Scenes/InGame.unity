@@ -1644,16 +1644,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   maxEnemiesPerRoom: 3
-  enemies:
-  - {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212, type: 3}
   enemyTable:
     items:
-    - item: {fileID: 1885961500774489010, guid: 24e1bf9e9a6b0304a86728bbfdf5147f,
-        type: 3}
-      weight: 1
     - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
         type: 3}
-      weight: 5
+      weight: 10
+    - item: {fileID: 5987317494093279129, guid: 821ff5fb214a46b4db70c5f2031e6212,
+        type: 3}
+      weight: 3
+    - item: {fileID: 1736036295292349377, guid: 8421d67824c139046904c49f12fd12da,
+        type: 3}
+      weight: 2
+    - item: {fileID: 1885961500774489010, guid: 24e1bf9e9a6b0304a86728bbfdf5147f,
+        type: 3}
+      weight: 100
 --- !u!4 &265426991
 Transform:
   m_ObjectHideFlags: 0
@@ -6395,7 +6399,7 @@ MonoBehaviour:
   somAbrirPorta: {fileID: 8300000, guid: 847540062ba54f54bb80eb0fe29e4636, type: 3}
   BaixoNivel: 1
   MedioNivel: 2
-  chestSpawner: {fileID: 0}
+  chestSpawner: {fileID: 1942525112}
 --- !u!1 &1102669962
 GameObject:
   m_ObjectHideFlags: 0
