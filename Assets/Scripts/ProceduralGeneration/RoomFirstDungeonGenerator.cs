@@ -34,18 +34,19 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private bool focarCentroSala = true;
     public bool FocarCentroSala => focarCentroSala;
 
-    [SerializeField] private AudioClip somFecharPorta;
-    [SerializeField] private AudioClip somAbrirPorta;
+    //[SerializeField] private AudioClip somFecharPorta;
+    //[SerializeField] private AudioClip somAbrirPorta;
     private AudioSource audioSource;
 
     [SerializeField] private int BaixoNivel = 1;
     [SerializeField] private int MedioNivel = 2;
 
     [SerializeField] private ChestSpawner chestSpawner;
+    [SerializeField] private DoorSpawner doorSpawner;
 
-    private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
-    private bool salaTrancada = false;
-    private BoundsInt? currentBounds = null;
+    //private HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
+    //private bool salaTrancada = false;
+    //private BoundsInt? currentBounds = null;
 
     private int andar = 0; // Andar que o jogador esta presente
 
@@ -84,14 +85,15 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         listaBiomas.Add(TileMapVisualizer.Biomas.Abismo);
         Shuffle(listaBiomas);
 
+        doorSpawner.setAudioSource(audioSource);
+
         RunProceduralGeneration();
     }
 
     private void CreateRooms()
     {
         // Limpeza
-        roomEntrances.Clear();
-        salaTrancada = false;
+        doorSpawner.CleanDoor();
         enemySpawner.ClearEnemies();
         chestSpawner.CleanChest();
 
@@ -334,7 +336,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 position += Vector2Int.down;
             }
             corridor.Add(position);
-            CheckAndAddDoor(position);
+            doorSpawner.CheckAndAddDoor(position, roomDetector);
         }
         while (position.x != destination.x) // Vai andando pros lados ate chegar no x da sala de destino
         {
@@ -347,32 +349,32 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                 position += Vector2Int.left;
             }
             corridor.Add(position);
-            CheckAndAddDoor(position);
+            doorSpawner.CheckAndAddDoor(position, roomDetector);
         }
         return corridor;
     }
 
     // Função auxiliar para identificar se a posição é uma conexão
-    private void CheckAndAddDoor(Vector2Int pos)
-    {
-        foreach (var room in roomDetector.GetRoomsList())
-        {
-            // define os limites onde as paredes da sala realmente existem (tava spawnando deslocado)
-            int left = room.xMin + offset - 1;
-            int right = room.xMax - offset;
-            int bottom = room.yMin + offset - 1;
-            int top = room.yMax - offset;
+    //private void CheckAndAddDoor(Vector2Int pos)
+    //{
+    //    foreach (var room in roomDetector.GetRoomsList())
+    //    {
+    //        // define os limites onde as paredes da sala realmente existem (tava spawnando deslocado)
+    //        int left = room.xMin + offset - 1;
+    //        int right = room.xMax - offset;
+    //        int bottom = room.yMin + offset - 1;
+    //        int top = room.yMax - offset;
 
-            bool naBordaVertical = (pos.x == left || pos.x == right) && (pos.y >= room.yMin + offset && pos.y < room.yMax - offset);
-            bool naBordaHorizontal = (pos.y == bottom || pos.y == top) && (pos.x >= room.xMin + offset && pos.x < room.xMax - offset);
+    //        bool naBordaVertical = (pos.x == left || pos.x == right) && (pos.y >= room.yMin + offset && pos.y < room.yMax - offset);
+    //        bool naBordaHorizontal = (pos.y == bottom || pos.y == top) && (pos.x >= room.xMin + offset && pos.x < room.xMax - offset);
 
-            if (naBordaVertical || naBordaHorizontal)
-            {
-                roomEntrances.Add(pos);
-                // Debug.Log($"Porta registada em: {pos}");
-            }
-        }
-    }
+    //        if (naBordaVertical || naBordaHorizontal)
+    //        {
+    //            roomEntrances.Add(pos);
+    //            // Debug.Log($"Porta registada em: {pos}");
+    //        }
+    //    }
+    //}
 
     // Acha a sala mais perto da sala atual. Funcao auxiliar de ConnectRooms
     private Vector2Int FindClosestPointTo(Vector2Int currentRoomCenter, List<Vector2Int> roomsCenters)
@@ -417,22 +419,23 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     }
 
 
+    // REFATORAR PARA NAO TER O UPDATE PQ EH RUIM E LENTO E TALS
     void Update()
     {
         if (roomDetector == null) return;
 
 
-        if (roomDetector.jogadorSala && roomDetector.inimigoSala && !salaTrancada) // se passar e tiver inimigos, tranca a sala
+        if (roomDetector.jogadorSala && roomDetector.inimigoSala && !doorSpawner.getSalaTrancada()) // se passar e tiver inimigos, tranca a sala
         {
-            currentBounds = roomDetector.GetCurrentRoomBounds();
-            FecharPortasDaSala();
-            salaTrancada = true;
+            doorSpawner.setCurrentBounds(roomDetector.GetCurrentRoomBounds());
+            doorSpawner.FecharPortasDaSala(tileMapVisualizer);
+            doorSpawner.setSalaTrancada(true);
         }
-        else if (!roomDetector.inimigoSala && salaTrancada) // se não houver inimigos e a sala estiver trancada, abre a sala
+        else if (!roomDetector.inimigoSala && doorSpawner.getSalaTrancada()) // se não houver inimigos e a sala estiver trancada, abre a sala
         {
-            AbrirPortasDaSala();
-            salaTrancada = false;
-            currentBounds = null;
+            doorSpawner.AbrirPortasDaSala(tileMapVisualizer);
+            doorSpawner.setSalaTrancada(false);
+            doorSpawner.setCurrentBounds(null);
         }
     }
 
@@ -447,46 +450,46 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         }
     }
 
-    private void FecharPortasDaSala()
-    {
-        if (currentBounds == null) return;
+    //private void FecharPortasDaSala()
+    //{
+    //    if (currentBounds == null) return;
 
-        if (somFecharPorta != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(somFecharPorta, 0.3f);
-        }
+    //    if (somFecharPorta != null && audioSource != null)
+    //    {
+    //        audioSource.PlayOneShot(somFecharPorta, 0.3f);
+    //    }
 
-        foreach (var pos in roomEntrances)
-        {
-            // verifica se a posicao das salas usa o limite real das
-            if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
-                pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
-            {
-                tileMapVisualizer.PaintDoorTile(pos);
-                Debug.Log("FECHANDO: X: " + pos.x + "  -  Y: " + pos.y);
-            }
-        }
-    }
+    //    foreach (var pos in roomEntrances)
+    //    {
+    //        // verifica se a posicao das salas usa o limite real das
+    //        if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
+    //            pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
+    //        {
+    //            tileMapVisualizer.PaintDoorTile(pos);
+    //            Debug.Log("FECHANDO: X: " + pos.x + "  -  Y: " + pos.y);
+    //        }
+    //    }
+    //}
 
-    private void AbrirPortasDaSala()
-    {
-        if (currentBounds == null) return;
+    //private void AbrirPortasDaSala()
+    //{
+    //    if (currentBounds == null) return;
 
-        if (somAbrirPorta != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(somAbrirPorta, 0.3f);
-        }
+    //    if (somAbrirPorta != null && audioSource != null)
+    //    {
+    //        audioSource.PlayOneShot(somAbrirPorta, 0.3f);
+    //    }
 
-        foreach (var pos in roomEntrances)
-        {
-            // verifica se a posicao das salas usa o limite real das
-            if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
-                pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
-            {
-                tileMapVisualizer.ClearTile(pos);
-                //Debug.Log("LIMPANDO: X: " + pos.x + "  -  Y: " + pos.y);
-            }
-        }
-        //Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
-    }
+    //    foreach (var pos in roomEntrances)
+    //    {
+    //        // verifica se a posicao das salas usa o limite real das
+    //        if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
+    //            pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
+    //        {
+    //            tileMapVisualizer.ClearTile(pos);
+    //            //Debug.Log("LIMPANDO: X: " + pos.x + "  -  Y: " + pos.y);
+    //        }
+    //    }
+    //    //Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
+    //}
 }
