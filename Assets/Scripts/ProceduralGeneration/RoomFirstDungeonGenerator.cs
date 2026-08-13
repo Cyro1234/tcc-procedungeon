@@ -104,7 +104,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         }
 
         // Conectar salas com corredores
-        HashSet<Vector2Int> corridors = ConnectRooms(roomsCenters);
+        HashSet<Vector2Int> corridors = CorridorGenerator.ConnectRooms(roomsCenters, doorSpawner, roomDetector);
         floor.UnionWith(corridors);
 
         // Coloca o chao e paredes
@@ -193,80 +193,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Cria a escada da ultima sala
         tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);
 
-    }
-
-    // Conecta as salas com um corredor
-    private HashSet<Vector2Int> ConnectRooms(List<Vector2Int> roomsCenters)
-    {
-        HashSet<Vector2Int> corridors = new HashSet<Vector2Int>();
-        var currentRoomCenter = roomsCenters[Rng.DungeonRange(0, roomsCenters.Count)];
-        roomsCenters.Remove(currentRoomCenter);
-
-        while (roomsCenters.Count > 0)
-        {
-            Vector2Int closest = FindClosestPointTo(currentRoomCenter, roomsCenters);
-            roomsCenters.Remove(closest);
-            HashSet<Vector2Int> newCorridor = CreateCorridor(currentRoomCenter, closest);
-            currentRoomCenter = closest;
-            corridors.UnionWith(newCorridor);
-        }
-        return corridors;
-    }
-
-    // Cria o corredor entre as salas. Funcao auxiliar de ConnectRooms
-    private HashSet<Vector2Int> CreateCorridor(Vector2Int currentRoomCenter, Vector2Int destination)
-    {
-        HashSet<Vector2Int> corridor = new HashSet<Vector2Int>();
-        var position = currentRoomCenter;
-        corridor.Add(position);
-
-        // A partir da posicao inicial
-        while (position.y != destination.y) // Vai subindo ou descendo ate chegar no Y da sala de destino
-        {
-            if (destination.y > position.y)
-            {
-                position += Vector2Int.up;
-            }
-            else if (destination.y < position.y)
-            {
-                position += Vector2Int.down;
-            }
-            corridor.Add(position);
-            doorSpawner.CheckAndAddDoor(position, roomDetector);
-        }
-        while (position.x != destination.x) // Vai andando pros lados ate chegar no x da sala de destino
-        {
-            if (destination.x > position.x)
-            {
-                position += Vector2Int.right;
-            }
-            else if (destination.x < position.x)
-            {
-                position += Vector2Int.left;
-            }
-            corridor.Add(position);
-            doorSpawner.CheckAndAddDoor(position, roomDetector);
-        }
-        return corridor;
-    }
-
-    // Acha a sala mais perto da sala atual. Funcao auxiliar de ConnectRooms
-    private Vector2Int FindClosestPointTo(Vector2Int currentRoomCenter, List<Vector2Int> roomsCenters)
-    {
-        Vector2Int closest = Vector2Int.zero;
-        float distance = float.MaxValue;
-
-        foreach (var position in roomsCenters)
-        {
-            float currentDistance = Vector2.Distance(position, currentRoomCenter);
-            if (currentDistance < distance)
-            {
-                distance = currentDistance;
-                closest = position;
-            }
-        }
-
-        return closest;
     }
 
     // Coloca os offsets das salas para nao ficar todas coladas
