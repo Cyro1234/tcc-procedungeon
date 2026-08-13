@@ -4,9 +4,7 @@ using TMPro;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
-using static TileMapVisualizer;
-using Random = UnityEngine.Random;
-using static EnemySpawner;
+
 
 // Utilizao o BSP para gerar as salas
 public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
@@ -26,8 +24,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private RoomDetector roomDetector;
     [SerializeField] private bool focarCentroSala = true;
     public bool FocarCentroSala => focarCentroSala;
-
-    private AudioSource audioSource;
 
     [SerializeField] private LevelManager levelManager;
 
