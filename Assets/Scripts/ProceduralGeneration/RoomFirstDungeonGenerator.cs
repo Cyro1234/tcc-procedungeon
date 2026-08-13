@@ -23,11 +23,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     [SerializeField] private bool subBSPRooms = false;
 
-    [SerializeField] private bool useRandomSeed = true;
-    [SerializeField] private int seed = 0;
-
-    [SerializeField] private TMP_Text seedText;
-
     [SerializeField] private RoomDetector roomDetector;
     [SerializeField] private bool focarCentroSala = true;
     public bool FocarCentroSala => focarCentroSala;
@@ -41,6 +36,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private ChestSpawner chestSpawner;
     [SerializeField] private DoorSpawner doorSpawner;
 
+
+    private int seed;
+
     protected override void RunProceduralGeneration()
     {
         levelManager.passarAndar();
@@ -50,19 +48,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         CreateRooms();
     }
 
-    public override void Setup()
+    public void Setup(int seed)
     {
-        levelManager.CleanAndar();
-        if (useRandomSeed)
-        {
-            seed = GenerateRandomSeed();
-        }
-
         Rng.Init(seed);
-
-        Debug.Log("SEED: " + seed);
-        seedText.text = "" + seed;
-
         levelManager.setup();
         RunProceduralGeneration();
     }
@@ -322,16 +310,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     private int GenerateRandomSeed()
     {
         return System.DateTime.Now.GetHashCode();
-    }
-
-    private void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-        // Se não houver um AudioSource no objeto, adiciona um automaticamente
-        if (audioSource == null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-        }
     }
 
 }

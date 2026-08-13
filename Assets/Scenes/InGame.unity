@@ -6494,6 +6494,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbf8554aa04a3d9448d03694d7fec1bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  seedText: {fileID: 1645939861}
+  useRandomSeed: 1
+  seed: 0
 --- !u!114 &1101588032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6517,9 +6520,6 @@ MonoBehaviour:
   dungeonHeight: 100
   offset: 4
   subBSPRooms: 1
-  useRandomSeed: 1
-  seed: -474729751
-  seedText: {fileID: 1645939861}
   roomDetector: {fileID: 1977743734}
   focarCentroSala: 1
   levelManager: {fileID: 523713987}
