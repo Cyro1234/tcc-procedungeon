@@ -5,13 +5,40 @@ using UnityEngine.Audio;
 public class DoorSpawner : MonoBehaviour
 {
 
+    // Setup
+    [SerializeField] private RoomDetector roomDetector;
+    [SerializeField] private TileMapVisualizer tileMapVisualizer;
+
     [SerializeField] private AudioClip somFecharPorta;
     [SerializeField] private AudioClip somAbrirPorta;
     private int offset = 1;
     private AudioSource audioSource;
 
+    public void Setup(AudioSource newAudioSource)
+    {
+        audioSource = newAudioSource;
+    }
+
+    // Inscreve no evento do room detector
+    private void OnEnable()
+    {
+        if (roomDetector != null)
+        {
+            roomDetector.AoEntrarNaSalaComInimigos += FecharPortasDaSala;
+            roomDetector.AoLimparSala += AbrirPortasDaSala;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (roomDetector != null)
+        {
+            roomDetector.AoEntrarNaSalaComInimigos -= FecharPortasDaSala;
+            roomDetector.AoLimparSala -= AbrirPortasDaSala;
+        }
+    }
+
     public void setOffset(int newOffset) {  offset = newOffset; }
-    public void setAudioSource(AudioSource newAudioSource) {  audioSource = newAudioSource; }
 
     public HashSet<Vector2Int> roomEntrances = new HashSet<Vector2Int>(); // guarda a posicao das entradas da sala
     private bool salaTrancada = false;
@@ -22,9 +49,12 @@ public class DoorSpawner : MonoBehaviour
     public BoundsInt? getCurrentBounds() { return currentBounds; }
     public void setCurrentBounds(BoundsInt? newCurrentBounds) { currentBounds = newCurrentBounds; }
 
-    public void FecharPortasDaSala(TileMapVisualizer tileMapVisualizer)
+    private void FecharPortasDaSala(BoundsInt bounds)
     {
-        if (currentBounds == null) return;
+        if (salaTrancada) return; // Se já tá trancada, ignora
+
+        currentBounds = bounds;
+        salaTrancada = true;
 
         if (somFecharPorta != null && audioSource != null)
         {
@@ -33,19 +63,17 @@ public class DoorSpawner : MonoBehaviour
 
         foreach (var pos in roomEntrances)
         {
-            // verifica se a posicao das salas usa o limite real das
             if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
                 pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
             {
                 tileMapVisualizer.PaintDoorTile(pos);
-                Debug.Log("FECHANDO: X: " + pos.x + "  -  Y: " + pos.y);
             }
         }
     }
 
-    public void AbrirPortasDaSala(TileMapVisualizer tileMapVisualizer)
+    private void AbrirPortasDaSala()
     {
-        if (currentBounds == null) return;
+        if (!salaTrancada || currentBounds == null) return;
 
         if (somAbrirPorta != null && audioSource != null)
         {
@@ -54,15 +82,15 @@ public class DoorSpawner : MonoBehaviour
 
         foreach (var pos in roomEntrances)
         {
-            // verifica se a posicao das salas usa o limite real das
             if (pos.x >= currentBounds.Value.xMin && pos.x < currentBounds.Value.xMax &&
                 pos.y >= currentBounds.Value.yMin && pos.y < currentBounds.Value.yMax)
             {
                 tileMapVisualizer.ClearTile(pos);
-                //Debug.Log("LIMPANDO: X: " + pos.x + "  -  Y: " + pos.y);
             }
         }
-        //Debug.Log("Sala limpa! Portas removidas e chão restaurado.");
+
+        salaTrancada = false;
+        currentBounds = null; // Limpa a sala atual
     }
 
 

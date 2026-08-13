@@ -2,9 +2,13 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
+using System;
 
 public class RoomDetector : MonoBehaviour
 {
+    // Eventos
+    public event Action<BoundsInt> AoEntrarNaSalaComInimigos;
+    public event Action AoLimparSala;
 
     private List<BoundsInt> roomsList;
     private BoundsInt? currentRoom = null;
@@ -121,11 +125,21 @@ public class RoomDetector : MonoBehaviour
                 jogadorSala = (playerPos.x >= room.xMin + offset && playerPos.x < room.xMax - offset &&
                                playerPos.y >= room.yMin + offset && playerPos.y < room.yMax - offset);
 
-                if (inimigoSala != statusInimigoAnterior)
+                // Checa se o jogador E o inimigo estao na sala
+                bool condicaoTrancar = jogadorSala && inimigoSala;
+
+                if (condicaoTrancar != statusInimigoAnterior)
                 {
-                    statusInimigoAnterior = inimigoSala;
-                    if (inimigoSala) Debug.Log($"Inimigos detectados!");
-                    else Debug.Log("Sala limpa!");
+                    statusInimigoAnterior = condicaoTrancar;
+
+                    if (condicaoTrancar)
+                    {
+                        if (currentRoom.HasValue) AoEntrarNaSalaComInimigos?.Invoke(currentRoom.Value);
+                    }
+                    else // Sala limpa
+                    {
+                        AoLimparSala?.Invoke();
+                    }
                 }
                 return;
             }

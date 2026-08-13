@@ -5441,6 +5441,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66d40385b867b0e439a4c9744b64656b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorSpawner
+  roomDetector: {fileID: 1977743734}
+  tileMapVisualizer: {fileID: 1749136079}
   somFecharPorta: {fileID: 8300000, guid: bf2c52f4ed30c704d9595538202d9d0e, type: 3}
   somAbrirPorta: {fileID: 8300000, guid: 847540062ba54f54bb80eb0fe29e4636, type: 3}
 --- !u!1 &920776115

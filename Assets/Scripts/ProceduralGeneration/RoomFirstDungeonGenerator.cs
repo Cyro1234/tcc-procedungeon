@@ -63,7 +63,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         Debug.Log("SEED: " + seed);
         seedText.text = "" + seed;
 
-        doorSpawner.setAudioSource(audioSource);
+        doorSpawner.Setup(audioSource);
         levelManager.setup();
         RunProceduralGeneration();
     }
@@ -324,28 +324,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     {
         return System.DateTime.Now.GetHashCode();
     }
-
-
-    // REFATORAR PARA NAO TER O UPDATE PQ EH RUIM E LENTO E TALS
-    void Update()
-    {
-        if (roomDetector == null) return;
-
-
-        if (roomDetector.jogadorSala && roomDetector.inimigoSala && !doorSpawner.getSalaTrancada()) // se passar e tiver inimigos, tranca a sala
-        {
-            doorSpawner.setCurrentBounds(roomDetector.GetCurrentRoomBounds());
-            doorSpawner.FecharPortasDaSala(tileMapVisualizer);
-            doorSpawner.setSalaTrancada(true);
-        }
-        else if (!roomDetector.inimigoSala && doorSpawner.getSalaTrancada()) // se não houver inimigos e a sala estiver trancada, abre a sala
-        {
-            doorSpawner.AbrirPortasDaSala(tileMapVisualizer);
-            doorSpawner.setSalaTrancada(false);
-            doorSpawner.setCurrentBounds(null);
-        }
-    }
-
 
     private void Awake()
     {
