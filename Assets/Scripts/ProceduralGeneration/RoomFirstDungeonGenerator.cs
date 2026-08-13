@@ -63,7 +63,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         Debug.Log("SEED: " + seed);
         seedText.text = "" + seed;
 
-        doorSpawner.Setup(audioSource);
         levelManager.setup();
         RunProceduralGeneration();
     }

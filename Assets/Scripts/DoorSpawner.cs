@@ -14,9 +14,10 @@ public class DoorSpawner : MonoBehaviour
     private int offset = 1;
     private AudioSource audioSource;
 
-    public void Setup(AudioSource newAudioSource)
+    private void Awake()
     {
-        audioSource = newAudioSource;
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
     }
 
     // Inscreve no evento do room detector
