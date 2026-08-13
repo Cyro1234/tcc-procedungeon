@@ -51,12 +51,11 @@ public class ChestSpawner : MonoBehaviour
 
         if (roomsList.Count <= 1 || chestTable.items.Count == 0) return;
 
-        int qtdBaus = Rng.DungeonRange(0, 3);
-        System.Random chestRng = new System.Random(seed + andar);
+        int qtdBaus = Rng.ChestRange(0, 3);
 
         for (int i = 0; i < qtdBaus; i++)
         {
-            int roomIndex = Rng.DungeonRange(1, roomsList.Count);
+            int roomIndex = Rng.ChestRange(1, roomsList.Count);
             var roomTiles = roomsList[roomIndex];
 
             List<Vector2Int> availablePositions = new List<Vector2Int>();
@@ -67,11 +66,11 @@ public class ChestSpawner : MonoBehaviour
 
             if (availablePositions.Count > 0)
             {
-                int posIndex = Rng.DungeonRange(0, availablePositions.Count);
+                int posIndex = Rng.ChestRange(0, availablePositions.Count);
                 Vector2Int pos = availablePositions[posIndex];
 
                 // Sorteia o Prefab do baú e instancia
-                GameObject prefabToSpawn = chestTable.getRandom(chestRng);
+                GameObject prefabToSpawn = chestTable.getRandom(Rng.chestRng);
                 if (prefabToSpawn != null)
                 {
                     GameObject chest = Instantiate(prefabToSpawn, new Vector3(pos.x, pos.y, 0), Quaternion.identity);
@@ -89,19 +88,18 @@ public class ChestSpawner : MonoBehaviour
 
         if (roomsList.Count <= 1 || chestTable.items.Count == 0) return;
 
-        int qtdBaus = Rng.DungeonRange(0, 3);
-        System.Random chestRng = new System.Random(seed + andar);
+        int qtdBaus = Rng.ChestRange(0, 3);
 
         for (int i = 0; i < qtdBaus; i++)
         {
-            int roomIndex = Rng.DungeonRange(1, roomsList.Count);
+            int roomIndex = Rng.ChestRange(1, roomsList.Count);
             BoundsInt room = roomsList[roomIndex];
 
-            int randomX = Rng.DungeonRange(room.xMin + 2, room.xMax - 2);
-            int randomY = Rng.DungeonRange(room.yMin + 2, room.yMax - 2);
+            int randomX = Rng.ChestRange(room.xMin + 2, room.xMax - 2);
+            int randomY = Rng.ChestRange(room.yMin + 2, room.yMax - 2);
             Vector3 spawnPos = new Vector3(randomX, randomY, 0);
 
-            GameObject prefabToSpawn = chestTable.getRandom(chestRng);
+            GameObject prefabToSpawn = chestTable.getRandom(Rng.chestRng);
             if (prefabToSpawn != null)
             {
                 GameObject chest = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
@@ -118,7 +116,7 @@ public class ChestSpawner : MonoBehaviour
     }
 
 
-    public void SpawnaBauInicial(TileMapVisualizer.Niveis nivelAtual, int andar, int seed, List<Vector2Int> roomsCenters)
+    public void SpawnaBauInicial(TileMapVisualizer.Niveis nivelAtual, int andar, List<Vector2Int> roomsCenters)
     {
         // Instancia o Baú na primeira sala (com um offset de +1 no X para não nascer em cima do jogador)
         // Decide se usa uma tabela sorteada ou o prefab manual
@@ -128,7 +126,7 @@ public class ChestSpawner : MonoBehaviour
             var chestTable = GetChestTablePorNivel(nivelAtual);
             if (chestTable.items.Count > 0)
             {
-                prefabToSpawn = chestTable.getRandom(new System.Random(seed + andar));
+                prefabToSpawn = chestTable.getRandom(Rng.chestRng);
             }
         }
 

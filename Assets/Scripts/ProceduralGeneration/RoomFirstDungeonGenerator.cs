@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using TMPro;
-using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -31,6 +27,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private ChestSpawner chestSpawner;
     [SerializeField] private DoorSpawner doorSpawner;
+
+    [SerializeField] private Transform playerTransform;
 
 
     private int seed;
@@ -120,20 +118,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         List<HashSet<Vector2Int>> salas = new List<HashSet<Vector2Int>>(); // lista que contem as posicoes de cada sala separadas por hash 
 
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>(); // guarda as posicoes do chao
-        //for (int i = 0; i < roomList.Count; i++) { // percorre todas as salas menos as subs
-        //    var roomBounds = roomList[i]; // limites
-        //    var subRooms = ProceduralGenerationAlgorithms.BinarySpacePartitioning(new BoundsInt(new Vector3Int(roomBounds.xMin + offset, roomBounds.yMin + offset, 0), new Vector3Int(roomBounds.size.x - offset * 2, roomBounds.size.y - offset * 2, 0)), Mathf.Max(2, minRoomWidth / 2), Mathf.Max(2, minRoomHeight / 2)); // gera as subsalas
 
-        //    foreach (var subRoom in subRooms) { // percorre as subsalas
-        //        for (int x = subRoom.xMin; x < subRoom.xMax; x++) // limites da sub-sala da posicao x
-        //        {                
-        //            for (int y = subRoom.yMin; y < subRoom.yMax; y++) // limites da sub-sala da posicao y
-        //            {
-        //                floor.Add(new Vector2Int(x, y));
-        //            }
-        //        }
-        //    }
-        //}
         foreach (var roomBounds in roomList) // percorre todas as salas geradas pelo BSP principal
         {
             HashSet<Vector2Int> roomFloor = new HashSet<Vector2Int>(); // guarda as posicoes de uma unica sala para processar os cortes
@@ -201,10 +186,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     private void PlaceSpawnAndExit(List<Vector2Int> roomsCenters)
     {
         // Coloca o jogador na primeira Sala
-        GameObject player = GameObject.FindWithTag("Player");
-        player.transform.position = new Vector3(roomsCenters[0].x, roomsCenters[0].y, 0);
+        playerTransform.position = new Vector3(roomsCenters[0].x, roomsCenters[0].y, 0);
 
-        chestSpawner.SpawnaBauInicial(levelManager.GetNivelAtual(), levelManager.GetAndar(), seed, roomsCenters);
+        chestSpawner.SpawnaBauInicial(levelManager.GetNivelAtual(), levelManager.GetAndar(), roomsCenters);
 
         // Cria a escada da ultima sala
         tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);
@@ -301,11 +285,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             }
         }
         return floor;
-    }
-
-    private int GenerateRandomSeed()
-    {
-        return System.DateTime.Now.GetHashCode();
     }
 
 }

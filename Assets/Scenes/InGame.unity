@@ -6526,6 +6526,7 @@ MonoBehaviour:
   enemySpawner: {fileID: 265426990}
   chestSpawner: {fileID: 1942525112}
   doorSpawner: {fileID: 913200453}
+  playerTransform: {fileID: 992072327}
 --- !u!1 &1102669962
 GameObject:
   m_ObjectHideFlags: 0
