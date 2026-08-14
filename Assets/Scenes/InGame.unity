@@ -6495,8 +6495,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   seedText: {fileID: 1645939861}
-  useRandomSeed: 1
-  seed: 0
+  useRandomSeed: 0
+  seed: 715354674
 --- !u!114 &1101588032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56427,9 +56427,25 @@ MonoBehaviour:
   floorTilesNivelFloresta:
     items:
     - item:
-      - {fileID: 11400000, guid: 0636274bf05e11943b3ef31ef95f7c9e, type: 2}
-      - {fileID: 11400000, guid: eb9608aa38b5ca3409c2c94b4206941e, type: 2}
-      weight: 0
+      - {fileID: -7942678235459547240, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -7237579563219009222, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -4082448425085094437, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -3374904232736287636, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: 1223437496676702423, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -8512039482131431500, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: 6590881980403337161, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -8040613530383699631, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -5063656737855288178, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: 138930247578347445, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -8102561430109383131, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: 9012645884552122671, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: 1987884972215469404, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -1508163525642394963, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: 6799168382096846618, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: -6930047037888061336, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: 1770135048197879216, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      - {fileID: 4797042923660400354, guid: 29cba6f2bb01eaf42a75aa3d10f245be, type: 3}
+      weight: 1
   floorTilesNivelDeserto:
     items:
     - item:
@@ -56455,6 +56471,8 @@ MonoBehaviour:
       - {fileID: 11400000, guid: c23960acbebc7e048a9f5b8869d6c0f8, type: 2}
       weight: 0
   doorTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
+  noiseScale: 8
+  noiseThreshold: 0.5
 --- !u!4 &1749136080
 Transform:
   m_ObjectHideFlags: 0
