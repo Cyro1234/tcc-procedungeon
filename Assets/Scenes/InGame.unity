@@ -5903,8 +5903,8 @@ BoxCollider2D:
   m_Offset: {x: 0.000013679266, y: -0.035669632}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.32, y: 0.32}
+    pivot: {x: 0.5, y: 0.61904764}
+    oldSize: {x: 0.16, y: 0.21}
     newSize: {x: 0.32, y: 0.32}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -6495,7 +6495,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   seedText: {fileID: 1645939861}
-  useRandomSeed: 0
+  useRandomSeed: 1
   seed: 715354674
 --- !u!114 &1101588032
 MonoBehaviour:
@@ -56461,8 +56461,8 @@ MonoBehaviour:
   floorTilesNivelAbismo:
     items:
     - item:
-      - {fileID: 11400000, guid: 9264af4831ed8354d90189b963f68f14, type: 2}
-      - {fileID: 11400000, guid: 6deece1c2cf30c54c8d1d3e08cd0d8d3, type: 2}
+      - {fileID: 5876453611139150040, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
+      - {fileID: 2924956474026983373, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
       weight: 0
   floorTilesNivelInfinito:
     items:
@@ -58808,6 +58808,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 728141911769538753, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -8771702890237521690, guid: 6d25cda92e1963d40b9e2f0df00592a7,
+        type: 3}
     - target: {fileID: 728141911769538753, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
         type: 3}
       propertyPath: m_SortingLayer
