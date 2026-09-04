@@ -7,6 +7,8 @@ public static class Rng
     public static System.Random dungeonRng;
     public static System.Random enemyRng;
     public static System.Random chestRng;
+    public static System.Random debuffRng;
+
 
     public static void Init(int seed)
     {
@@ -17,6 +19,8 @@ public static class Rng
         dungeonRng = new System.Random(seed);
         enemyRng = new System.Random(seed + 1);
         chestRng = new System.Random(seed + 2);
+        debuffRng = new System.Random(seed + 3);
+
     }
 
     // =================
@@ -60,4 +64,17 @@ public static class Rng
         return (float)chestRng.NextDouble();
     }
 
+    // =================
+    // DEBUFF
+    // =================
+
+    public static int DebuffRange(int min, int max)
+    {
+        return debuffRng.Next(min, max);
+    }
+
+    public static float DebuffValue()
+    {
+        return (float)debuffRng.NextDouble();
+    }
 }

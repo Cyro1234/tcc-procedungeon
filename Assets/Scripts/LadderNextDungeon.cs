@@ -26,7 +26,14 @@ public class LadderNextDungeon : MonoBehaviour
 
             if (dungeonGenerator != null) 
             {
-                dungeonGenerator.GenerateDungeon(); // Gera uma nova dungeon
+                if (DowngradeMenuManager.Instance != null)
+                {
+                    DowngradeMenuManager.Instance.OpenMenu(dungeonGenerator); // Abre o menu de downgrade antes de gerar a proxima dungeon
+                }
+                else
+                {
+                    dungeonGenerator.GenerateDungeon(); // Gera uma nova dungeon
+                }
             }
         }
     }
