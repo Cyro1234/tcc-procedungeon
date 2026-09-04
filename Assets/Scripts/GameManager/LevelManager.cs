@@ -48,6 +48,7 @@ public class LevelManager : MonoBehaviour
             biomaAtual = biomaSelecionado;
             return biomaSelecionado;
         }
+        biomaAtual = TileMapVisualizer.Biomas.Infinito;
         return TileMapVisualizer.Biomas.Infinito;
     }
 

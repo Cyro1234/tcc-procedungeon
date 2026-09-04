@@ -6206,6 +6206,60 @@ MonoBehaviour:
   optionsPanel: {fileID: 1909128271}
   controlsPanel: {fileID: 1260074971}
   playerMovement: {fileID: 0}
+--- !u!1 &1064850053
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1064850054}
+  - component: {fileID: 1064850055}
+  m_Layer: 0
+  m_Name: BossRoomSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1064850054
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064850053}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1095434269}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1064850055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064850053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f80e632eb4ff0841ae054820547644c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossRoomSpawner
+  bossRoomFlorestaPrefab: {fileID: 1069111929993797017, guid: 44656e77168b6804c9c36156fd3a0afd,
+    type: 3}
+  bossRoomCavernaPrefab: {fileID: 5299917589624699150, guid: 76b0776ae5542c74796ca499c691c89e,
+    type: 3}
+  bossRoomAbismoPrefab: {fileID: 993110379075357110, guid: 4c4c7d0679829c242947eb685b072ecf,
+    type: 3}
+  bossRoomDesertoPrefab: {fileID: 2172514063294146974, guid: cc995a106412ce943ad3d1de98109a5e,
+    type: 3}
+  bossRoomInfinitoPrefab: {fileID: 4027524520349344542, guid: 0f74d69ff70ec9f469526db932fe20ae,
+    type: 3}
 --- !u!1 &1069344450
 GameObject:
   m_ObjectHideFlags: 0
@@ -6447,6 +6501,7 @@ Transform:
   - {fileID: 913200452}
   - {fileID: 1942525113}
   - {fileID: 265426991}
+  - {fileID: 1064850054}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1101588029
@@ -6526,6 +6581,7 @@ MonoBehaviour:
   enemySpawner: {fileID: 265426990}
   chestSpawner: {fileID: 1942525112}
   doorSpawner: {fileID: 913200453}
+  bossRoomSpawner: {fileID: 1064850055}
   playerTransform: {fileID: 992072327}
 --- !u!1 &1102669962
 GameObject:
@@ -56423,6 +56479,8 @@ MonoBehaviour:
   wallTileMap: {fileID: 1240858254}
   walkInFrontTileMap: {fileID: 1754510999}
   exitPrefab: {fileID: 6965201669180963775, guid: 574df4b20857e8c4f9b676bf94d5ae78,
+    type: 3}
+  teleportPrefab: {fileID: 3226959348742468604, guid: 2f59d0fceb3568e45aa2ee5605606020,
     type: 3}
   floorTilesNivelFloresta:
     items:

@@ -27,6 +27,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private ChestSpawner chestSpawner;
     [SerializeField] private DoorSpawner doorSpawner;
+    [SerializeField] private BossRoomSpawner bossRoomSpawner;
 
     [SerializeField] private Transform playerTransform;
 
@@ -111,6 +112,8 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         tileMapVisualizer.PaintFloorTiles(floor, levelManager.GetBiomaAtual());
         WallGenerator.CreateWalls(floor, tileMapVisualizer);
 
+        SpawnBossRoom();
+
     }
 
     private List<HashSet<Vector2Int>> CreateSubBSPRooms(List<BoundsInt> roomList, int offset, int minRoomWidth, int minRoomHeight)
@@ -169,19 +172,19 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                         }
                     }
                 }
-                }
-
-                // garante que o centro e os eixos principais existam evitando q a sala suma
-                Vector2Int center = (Vector2Int)Vector3Int.RoundToInt(roomBounds.center); // obtem o ponto central
-                roomFloor.Add(center); // adiciona o centro de volta caso ele tenha sido removido
-
-                floor.UnionWith(roomFloor);
-
-                salas.Add(roomFloor);
             }
-            return salas;
+
+            // garante que o centro e os eixos principais existam evitando q a sala suma
+            Vector2Int center = (Vector2Int)Vector3Int.RoundToInt(roomBounds.center); // obtem o ponto central
+            roomFloor.Add(center); // adiciona o centro de volta caso ele tenha sido removido
+
+            floor.UnionWith(roomFloor);
+
+            salas.Add(roomFloor);
         }
-        
+        return salas;
+    }
+
     // Coloca o jogador no spawn e cria a saida da fase
     private void PlaceSpawnAndExit(List<Vector2Int> roomsCenters)
     {
@@ -190,8 +193,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
         chestSpawner.SpawnaBauInicial(levelManager.GetNivelAtual(), levelManager.GetAndar(), roomsCenters);
 
-        // Cria a escada da ultima sala
-        tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this);
+        // Cria o teleport na ultima sala
+        //tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this); 
+        tileMapVisualizer.PaintTeleport(roomsCenters[roomsCenters.Count - 1]);
 
     }
 
@@ -211,6 +215,11 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             }
         }
         return floor;
+    }
+
+    private void SpawnBossRoom() 
+    {
+        bossRoomSpawner.spawnBossRoom(levelManager.GetBiomaAtual(), this, tileMapVisualizer);
     }
 
 }

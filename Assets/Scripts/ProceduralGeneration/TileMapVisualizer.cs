@@ -14,6 +14,7 @@ public class TileMapVisualizer : MonoBehaviour
 
     // PREFAB DA ESCADA
     [SerializeField] private GameObject exitPrefab;
+    [SerializeField] private GameObject teleportPrefab;
 
     // LISTA DE TILES DE CADA DIFICULDADE.
     // tile[0] eh o chao
@@ -51,6 +52,8 @@ public class TileMapVisualizer : MonoBehaviour
     private const int RIGHT = 8;   // Vizinho direita
 
     private GameObject currentLadder;
+    private GameObject currentTeleport;
+
     public enum Niveis
     {
         Baixo,
@@ -323,6 +326,16 @@ public class TileMapVisualizer : MonoBehaviour
         {
             floorTileMap.SetTile(tilePosition, floorTileEscolhido);
         }
+    }
+
+    public void PaintTeleport(Vector2Int position)
+    {
+        if (currentTeleport != null)
+        {
+            Destroy(currentTeleport);
+        }
+
+        currentTeleport = Instantiate(teleportPrefab, new Vector3(position.x, position.y, 0), Quaternion.identity);
     }
 
     // Gera a escada no final do nivel
