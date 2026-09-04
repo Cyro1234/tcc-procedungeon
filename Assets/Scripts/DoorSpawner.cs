@@ -11,7 +11,8 @@ public class DoorSpawner : MonoBehaviour
 
     [SerializeField] private AudioClip somFecharPorta;
     [SerializeField] private AudioClip somAbrirPorta;
-    private int offset = 1;
+    [SerializeField] private RoomFirstDungeonGenerator roomFirstDungeonGenerator;
+    private int offset = 4;
     private AudioSource audioSource;
 
     private void Awake()
@@ -27,6 +28,10 @@ public class DoorSpawner : MonoBehaviour
         {
             roomDetector.AoEntrarNaSalaComInimigos += FecharPortasDaSala;
             roomDetector.AoLimparSala += AbrirPortasDaSala;
+        }
+        if (roomFirstDungeonGenerator != null)
+        {
+            offset = roomFirstDungeonGenerator.Offset;
         }
     }
 
