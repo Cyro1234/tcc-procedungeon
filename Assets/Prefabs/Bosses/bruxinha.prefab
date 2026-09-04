@@ -13,6 +13,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: bruxinha
       objectReference: {fileID: 0}
+    - target: {fileID: -2253911629886400664, guid: deadca3e7e064f545be0b0611baa0b41,
+        type: 3}
+      propertyPath: m_TagString
+      value: Boss
+      objectReference: {fileID: 0}
     - target: {fileID: 3626916397498700004, guid: deadca3e7e064f545be0b0611baa0b41,
         type: 3}
       propertyPath: m_SortingLayer

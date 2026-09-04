@@ -14,6 +14,8 @@ public class Weapon : MonoBehaviour
     // Quando entra na colisao
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.CompareTag("Bullet")) return;
+
         EnemyMovement enemy = collision.GetComponent<EnemyMovement>(); // Tenta pegar o inimigo que entrou na colisao
         if (enemy != null)  // Se foi um inimigo
         {
