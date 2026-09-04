@@ -104,6 +104,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4721007357640280547}
+    - targetCorrespondingSourceObject: {fileID: -2253911629886400664, guid: 2b3e8a3d70b19bf439e09ee0ad394c62,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -6579595314177238504}
   m_SourcePrefab: {fileID: -8435245712485981826, guid: 2b3e8a3d70b19bf439e09ee0ad394c62,
     type: 3}
 --- !u!1 &6348080733024774840 stripped
@@ -202,3 +206,20 @@ MonoBehaviour:
   cooldown: 0.8
   maxAmmo: 12
   reloadTime: 3
+--- !u!114 &-6579595314177238504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6348080733024774840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bdc635ad0c9d944698c5c7b036efb22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
+  moveSpeed: 0.2
+  viewDistance: 50
+  maxHealth: 30
+  strength: 2
+  knockbackDuration: 0
