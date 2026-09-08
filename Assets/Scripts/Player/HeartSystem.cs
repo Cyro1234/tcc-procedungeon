@@ -4,6 +4,7 @@ using UnityEngine.Audio;
 public class HeartSystem : MonoBehaviour
 {
     public GameObject[] hearts;
+    public GameObject Escudo;
     private PlayerStatsHandler stats;
     int life;
 
@@ -81,6 +82,7 @@ public class HeartSystem : MonoBehaviour
                 // O dano quebrou o escudo e sobrou um pouco. Subtrai a sobra da vida.
                 life += shieldHealth; // shieldHealth ficou negativo, então isso subtrai da vida
                 shieldHealth = 0;
+                Escudo.SetActive(false);
                 Debug.Log("O escudo quebrou e o jogador sofreu o impacto!");
             }
             else
@@ -114,6 +116,7 @@ public class HeartSystem : MonoBehaviour
     public void EquipShield(int shieldAmount)
     {
         shieldHealth = shieldAmount;
+        Escudo.SetActive(true);
         Debug.Log($"Escudo Equipado! Proteção total: {shieldHealth} de dano.");
         //hasShield = true;
         //Debug.Log("Escudo Equipado! Você tem uma vida extra.");
