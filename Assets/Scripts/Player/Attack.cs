@@ -1,3 +1,4 @@
+using Unity.ProjectAuditor.Editor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,6 +6,9 @@ public class Attack : MonoBehaviour
 {
     public GameObject Melee;
     public GameObject Pivot;
+    public SpriteRenderer armaRender;
+    [SerializeField] private Sprite espadaLonga;
+    [SerializeField] private Sprite adaga;
     public float rotationSpeed = 360f;
     bool isAttacking = false;
     bool isCooldown = false;
@@ -112,11 +116,13 @@ public class Attack : MonoBehaviour
     {
         if (weaponType == Chest.ItemType.LongSword)
         {
+            armaRender.sprite = espadaLonga; // lista pro arquivo .aseprite
             Melee.transform.localScale = originalMeleeScale * 1.5f;
             atkDuration = originalAtkDuration * 2.0f;
         }
         else if (weaponType == Chest.ItemType.Dagger)
         {
+            armaRender.sprite = adaga; // lista pro arquivo .aseprite
             Melee.transform.localScale = originalMeleeScale * 0.7f;
             atkDuration = originalAtkDuration * 0.5f;
         }
