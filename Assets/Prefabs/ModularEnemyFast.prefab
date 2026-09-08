@@ -235,7 +235,7 @@ PrefabInstance:
     - target: {fileID: 1618488855308889225, guid: b345273adb83d5b489890b032d92087f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0403
+      value: -0.0051545426
       objectReference: {fileID: 0}
     - target: {fileID: 3114274380179119202, guid: b345273adb83d5b489890b032d92087f,
         type: 3}
@@ -271,7 +271,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 7878328547838954626, guid: 36f893d4207ce78488d7ea9860265dae,
+      objectReference: {fileID: -2174129376930821446, guid: a404f7d537d7dcb439211265ab871234,
         type: 3}
     - target: {fileID: 3279619983088827450, guid: b345273adb83d5b489890b032d92087f,
         type: 3}
@@ -554,19 +554,19 @@ MonoBehaviour:
   - {fileID: 1821603649868851465}
   legRenderer: {fileID: 5770679076124609881}
   headOptions:
-  - sprite: {fileID: 7878328547838954626, guid: 36f893d4207ce78488d7ea9860265dae,
+  - sprite: {fileID: -2174129376930821446, guid: a404f7d537d7dcb439211265ab871234,
       type: 3}
     statMultipliers:
     - bonus: 0.5
       bonusType: 0
       stat: 0
-  - sprite: {fileID: 7323964712694880449, guid: 409da5c3183fdf44ea8cd3f5f3bb129b,
+  - sprite: {fileID: 2998538012896838387, guid: 0c032d671e1535a408f5e85dce865c37,
       type: 3}
     statMultipliers:
     - bonus: 1
       bonusType: 0
       stat: 2
-  - sprite: {fileID: 6125089568992504126, guid: 42878145bdeed814f97bc2f132309dc5,
+  - sprite: {fileID: -8272369301768352020, guid: 8b631e10a2c9e51479be2cb4183909df,
       type: 3}
     statMultipliers:
     - bonus: 1.5
