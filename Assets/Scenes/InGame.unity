@@ -6616,9 +6616,9 @@ MonoBehaviour:
   - {fileID: 439264405}
   slotSelecionadoIndex: 0
   inventarioAberto: 0
-  spriteEspadaLonga: {fileID: 7876488597303208744, guid: 34b8842abbfd35e46a63aa16473446ff,
+  spriteEspadaLonga: {fileID: 8953792446637478238, guid: 91842188fa611ce44936be896abfc6f1,
     type: 3}
-  spriteAdaga: {fileID: 7876488597303208744, guid: 34b8842abbfd35e46a63aa16473446ff,
+  spriteAdaga: {fileID: -8370915199016746703, guid: 8059310dcd4b29248adfc9f3a6ea3978,
     type: 3}
 --- !u!4 &878909396
 Transform:
@@ -61030,11 +61030,11 @@ MonoBehaviour:
     - item: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
         type: 3}
       weight: 5
-  randomStartingChest: 1
+  randomStartingChest: 0
   manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
     type: 3}
-  forceStartingItem: 0
-  startingChestItem: 5
+  forceStartingItem: 1
+  startingChestItem: 6
 --- !u!4 &1942525113
 Transform:
   m_ObjectHideFlags: 0

@@ -16,6 +16,7 @@ public class Attack : MonoBehaviour
     float atkTimer = 0f;
 
     private PlayerStatsHandler stats;
+    private Sprite spriteBaseOriginal;
 
 
     // Guardamos os valores originais para usar como base
@@ -34,6 +35,11 @@ public class Attack : MonoBehaviour
         // Ao iniciar, o jogo memoriza o tamanho e velocidade padrão
         originalAtkDuration = atkDuration;
         originalMeleeScale = Melee.transform.localScale;
+
+        if (armaRender != null)
+        {
+            spriteBaseOriginal = armaRender.sprite;
+        }
     }
 
     // Update is called once per frame
@@ -115,21 +121,26 @@ public class Attack : MonoBehaviour
     private void PrepararArma(Chest.ItemType weaponType)
     {
         if (weaponType == Chest.ItemType.LongSword)
-        {
-            armaRender.sprite = espadaLonga; // lista pro arquivo .aseprite
+        {         
             Melee.transform.localScale = originalMeleeScale * 1.5f;
             atkDuration = originalAtkDuration * 2.0f;
+            if (armaRender != null) armaRender.sprite = espadaLonga; // lista pro arquivo .aseprite
         }
         else if (weaponType == Chest.ItemType.Dagger)
         {
-            armaRender.sprite = adaga; // lista pro arquivo .aseprite
             Melee.transform.localScale = originalMeleeScale * 0.7f;
             atkDuration = originalAtkDuration * 0.5f;
+            if (armaRender != null) armaRender.sprite = adaga;
         }
         else // Se for Chest.ItemType.None (mãos vazias) ou poção
         {
             Melee.transform.localScale = originalMeleeScale;
             atkDuration = originalAtkDuration;
+
+            if (armaRender != null)
+            {
+                armaRender.sprite = spriteBaseOriginal;
+            }
         }
     }
 
