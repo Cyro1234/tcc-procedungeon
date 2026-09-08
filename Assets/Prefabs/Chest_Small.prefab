@@ -155,9 +155,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Chest
   itemTable:
     items:
-    - item: 0
+    - item: 1
       weight: 70
-    - item: 5
+    - item: 6
       weight: 30
   itemInside: 0
 --- !u!95 &896005281407797099

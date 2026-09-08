@@ -156,11 +156,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Chest
   itemTable:
     items:
-    - item: 1
+    - item: 2
       weight: 60
     - item: 5
       weight: 20
-    - item: 4
+    - item: 6
       weight: 20
   itemInside: 0
 --- !u!95 &896005281407797099

@@ -42,17 +42,34 @@ public class Attack : MonoBehaviour
     {
         if (Time.timeScale == 0f) return;
 
-        if (isCooldown == false)
+        if (isCooldown == false && isAttacking == false)
         {
-            if (isAttacking == false)
-            {
-                AudioManager.Instance.PlaySFX("Ataque");
-                Melee.SetActive(true);
-                Pivot.SetActive(true);
-                isAttacking = true;
-            }
+            // O jogador "pergunta" ao inventário qual item está na mão
+            Chest.ItemType itemAtual = InventoryManager.Instance.ObterItemSelecionado();
+            PrepararArma(itemAtual);
+
+            AudioManager.Instance.PlaySFX("Ataque");
+            Melee.SetActive(true);
+            Pivot.SetActive(true);
+            isAttacking = true;
         }
     }
+
+    //public void OnAttack()
+    //{
+    //    if (Time.timeScale == 0f) return;
+
+    //    if (isCooldown == false)
+    //    {
+    //        if (isAttacking == false)
+    //        {
+    //            AudioManager.Instance.PlaySFX("Ataque");
+    //            Melee.SetActive(true);
+    //            Pivot.SetActive(true);
+    //            isAttacking = true;
+    //        }
+    //    }
+    //}
 
     // Tempo que a hitbox do ataque fica ativada
     void checkMeleeTimer()
@@ -90,22 +107,42 @@ public class Attack : MonoBehaviour
         }
     }
 
-    // NOVA FUNÇÃO: Chamada pelo baú para trocar a arma
-    public void EquipWeapon(string weaponType)
+    // Antiga EquipWeapon agora se chama PrepararArma e é acionada a cada clique
+    private void PrepararArma(Chest.ItemType weaponType)
     {
-        if (weaponType == "LongSword")
+        if (weaponType == Chest.ItemType.LongSword)
         {
-            // Espada Longa: 50% maior, mas demora o dobro do tempo na tela (ataque mais lento)
             Melee.transform.localScale = originalMeleeScale * 1.5f;
             atkDuration = originalAtkDuration * 2.0f;
-            Debug.Log("Equipou Espada Longa! Área MAIOR, ataque mais LENTO.");
         }
-        else if (weaponType == "Dagger")
+        else if (weaponType == Chest.ItemType.Dagger)
         {
-            // Adaga: 30% menor, mas some da tela bem mais rápido (ataque mais rápido)
             Melee.transform.localScale = originalMeleeScale * 0.7f;
             atkDuration = originalAtkDuration * 0.5f;
-            Debug.Log("Equipou Adaga! Área MENOR, ataque mais RÁPIDO.");
+        }
+        else // Se for Chest.ItemType.None (mãos vazias) ou poção
+        {
+            Melee.transform.localScale = originalMeleeScale;
+            atkDuration = originalAtkDuration;
         }
     }
+
+    // NOVA FUNÇÃO: Chamada pelo baú para trocar a arma
+    //public void EquipWeapon(string weaponType)
+    //{
+    //    if (weaponType == "LongSword")
+    //    {
+    //        // Espada Longa: 50% maior, mas demora o dobro do tempo na tela (ataque mais lento)
+    //        Melee.transform.localScale = originalMeleeScale * 1.5f;
+    //        atkDuration = originalAtkDuration * 2.0f;
+    //        Debug.Log("Equipou Espada Longa! Área MAIOR, ataque mais LENTO.");
+    //    }
+    //    else if (weaponType == "Dagger")
+    //    {
+    //        // Adaga: 30% menor, mas some da tela bem mais rápido (ataque mais rápido)
+    //        Melee.transform.localScale = originalMeleeScale * 0.7f;
+    //        atkDuration = originalAtkDuration * 0.5f;
+    //        Debug.Log("Equipou Adaga! Área MENOR, ataque mais RÁPIDO.");
+    //    }
+    //}
 }
