@@ -6,6 +6,7 @@ public class Attack : MonoBehaviour
 {
     public GameObject Melee;
     public GameObject Pivot;
+    public GameObject pivotTransform;
     public SpriteRenderer armaRender;
     [SerializeField] private Sprite espadaLonga;
     [SerializeField] private Sprite adaga;
@@ -34,7 +35,7 @@ public class Attack : MonoBehaviour
     {
         // Ao iniciar, o jogo memoriza o tamanho e velocidade padrão
         originalAtkDuration = atkDuration;
-        originalMeleeScale = Melee.transform.localScale;
+        originalMeleeScale = pivotTransform.transform.localScale;
 
         if (armaRender != null)
         {
@@ -122,19 +123,20 @@ public class Attack : MonoBehaviour
     {
         if (weaponType == Chest.ItemType.LongSword)
         {         
-            Melee.transform.localScale = originalMeleeScale * 1.5f;
+            // pivotTransform.transform.localScale = originalMeleeScale * 1.5f;
+            pivotTransform.transform.localScale = new Vector3(originalMeleeScale.x * 1.5f, originalMeleeScale.y * 1.16f, originalMeleeScale.z);
             atkDuration = originalAtkDuration * 2.0f;
             if (armaRender != null) armaRender.sprite = espadaLonga; // lista pro arquivo .aseprite
         }
         else if (weaponType == Chest.ItemType.Dagger)
         {
-            Melee.transform.localScale = originalMeleeScale * 0.7f;
+            pivotTransform.transform.localScale = new Vector3(originalMeleeScale.x * 0.7f, originalMeleeScale.y * 0.9f, originalMeleeScale.z);
             atkDuration = originalAtkDuration * 0.5f;
             if (armaRender != null) armaRender.sprite = adaga;
         }
         else // Se for Chest.ItemType.None (mãos vazias) ou poção
         {
-            Melee.transform.localScale = originalMeleeScale;
+            pivotTransform.transform.localScale = originalMeleeScale;
             atkDuration = originalAtkDuration;
 
             if (armaRender != null)

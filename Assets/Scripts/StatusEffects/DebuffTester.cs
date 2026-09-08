@@ -12,7 +12,7 @@ public class DebuffTester : MonoBehaviour
     private void Start()
     {
         // Pega todos os scripts de debuff anexados a ESTE mesmo GameObject
-        // Se os scripts estiverem em outros objetos, você precisará de outra lógica
+        // Se os scripts estiverem em outros objetos, vocï¿½ precisarï¿½ de outra lï¿½gica
         availableDebuffs = GetComponents<IDebuff>().ToList();
 
         Debug.Log($"[DebuffTester] {availableDebuffs.Count} debuffs carregados!");
@@ -26,14 +26,14 @@ public class DebuffTester : MonoBehaviour
         // Pega o primeiro caractere digitado (ex: "1", "2")
         char c = Input.inputString[0];
 
-        // Se o caractere for um dígito de 1 a 9
-        if (char.IsDigit(c) && c != '0')
-        {
-            // Converte o caractere para int (ex: '1' vira 1) e subtrai 1 para o índice da lista
-            int index = (int)char.GetNumericValue(c) - 1;
-
-            ApplyDebuffByIndex(index);
-        }
+        // Se o caractere for um dï¿½gito de 1 a 9
+        // if (char.IsDigit(c) && c != '0')
+        // {
+        //     // Converte o caractere para int (ex: '1' vira 1) e subtrai 1 para o ï¿½ndice da lista
+        //     int index = (int)char.GetNumericValue(c) - 1;
+        //
+        //     ApplyDebuffByIndex(index);
+        // }
     }
 
     private void ApplyDebuffByIndex(int index)
