@@ -1,3 +1,4 @@
+using Unity.ProjectAuditor.Editor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,6 +6,9 @@ public class Attack : MonoBehaviour
 {
     public GameObject Melee;
     public GameObject Pivot;
+    public SpriteRenderer armaRender;
+    [SerializeField] private Sprite espadaLonga;
+    [SerializeField] private Sprite adaga;
     public float rotationSpeed = 360f;
     bool isAttacking = false;
     bool isCooldown = false;
@@ -95,6 +99,10 @@ public class Attack : MonoBehaviour
     {
         if (weaponType == "LongSword")
         {
+            armaRender.sprite = espadaLonga; // lista pro arquivo .aseprite
+
+            
+
             // Espada Longa: 50% maior, mas demora o dobro do tempo na tela (ataque mais lento)
             Melee.transform.localScale = originalMeleeScale * 1.5f;
             atkDuration = originalAtkDuration * 2.0f;
@@ -102,6 +110,9 @@ public class Attack : MonoBehaviour
         }
         else if (weaponType == "Dagger")
         {
+            armaRender.sprite = adaga; // lista pro arquivo .aseprite
+
+
             // Adaga: 30% menor, mas some da tela bem mais rápido (ataque mais rápido)
             Melee.transform.localScale = originalMeleeScale * 0.7f;
             atkDuration = originalAtkDuration * 0.5f;
