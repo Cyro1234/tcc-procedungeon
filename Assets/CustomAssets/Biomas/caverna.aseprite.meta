@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: c927a8aea9f32784a88d3b87114cc853
+guid: 46b6e20319c67514fa86ebc6f78cbb0d
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -102,7 +102,7 @@ ScriptedImporter:
     generateIndividualEvents: 1
     generateSpriteAtlas: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 639246019702059938
+  platformSettingsDirtyTick: 639246062670192219
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -141,7 +141,7 @@ ScriptedImporter:
       y: 4
       width: 32
       height: 32
-    spriteID: 83160731df2b8b24aba1b4a49fd061ae
+    spriteID: 78f5514270fd21944a33ff8a7977c160
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -152,27 +152,6 @@ ScriptedImporter:
     uvTransform: {x: 4, y: 4}
   - name: Tileset_0_2
     originalName: 
-    pivot: {x: 0.5, y: 0.51724136}
-    alignment: 9
-    border: {x: 0, y: 0, z: 0, w: 0}
-    customData: 
-    rect:
-      serializedVersion: 2
-      x: 44
-      y: 44
-      width: 30
-      height: 29
-    spriteID: 6aa632cf57483b04f8ebbde7534f69fe
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: 43, y: 43}
-  - name: Tileset_0_3
-    originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -183,7 +162,7 @@ ScriptedImporter:
       y: 44
       width: 32
       height: 32
-    spriteID: 5aca0ea81447af248a66a8b8bdf70eed
+    spriteID: 49ca9fce1d1d3654cba8942ef31d91f2
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -192,48 +171,6 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 4, y: 44}
-  - name: Tileset_0_4
-    originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 9
-    border: {x: 0, y: 0, z: 0, w: 0}
-    customData: 
-    rect:
-      serializedVersion: 2
-      x: 4
-      y: 84
-      width: 32
-      height: 32
-    spriteID: f9d40c1690930b947a0fd9c7d26d622a
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: 4, y: 84}
-  - name: Tileset_0_5
-    originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 9
-    border: {x: 0, y: 0, z: 0, w: 0}
-    customData: 
-    rect:
-      serializedVersion: 2
-      x: 44
-      y: 4
-      width: 32
-      height: 32
-    spriteID: 34a11413dbea9b341943c3cd7978b706
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    uvTransform: {x: 44, y: 4}
   asepriteLayers:
   - layerIndex: 0
     uuid:
@@ -254,9 +191,9 @@ ScriptedImporter:
       cellRect:
         x: 0
         y: 0
-        width: 18
-        height: 9
-      tileIndices: 040000000500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000040000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000
+        width: 2
+        height: 1
+      tileIndices: 0100000002000000
     tileSetIndex: 0
     parentIndex: -1
   tileSets:
@@ -271,31 +208,13 @@ ScriptedImporter:
         x: 32
         y: 32
       name: Tileset_0_1
-      spriteId: 83160731df2b8b24aba1b4a49fd061ae
+      spriteId: 78f5514270fd21944a33ff8a7977c160
     - tileId: 2
       size:
         x: 32
         y: 32
       name: Tileset_0_2
-      spriteId: 6aa632cf57483b04f8ebbde7534f69fe
-    - tileId: 3
-      size:
-        x: 32
-        y: 32
-      name: Tileset_0_3
-      spriteId: 5aca0ea81447af248a66a8b8bdf70eed
-    - tileId: 4
-      size:
-        x: 32
-        y: 32
-      name: Tileset_0_4
-      spriteId: f9d40c1690930b947a0fd9c7d26d622a
-    - tileId: 5
-      size:
-        x: 32
-        y: 32
-      name: Tileset_0_5
-      spriteId: 34a11413dbea9b341943c3cd7978b706
+      spriteId: 49ca9fce1d1d3654cba8942ef31d91f2
     guid: -1102077067
   platformSettings:
   - name: DefaultTexturePlatform
@@ -326,4 +245,4 @@ ScriptedImporter:
   secondarySpriteTextures: []
   spritePackingTag: 
   canvasSize: {x: 640, y: 320}
-  previousTextureSize: {x: 128, y: 128}
+  previousTextureSize: {x: 64, y: 128}
