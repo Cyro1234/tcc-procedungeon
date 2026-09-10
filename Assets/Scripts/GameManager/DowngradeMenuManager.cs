@@ -11,6 +11,7 @@ public class DowngradeMenuManager : MonoBehaviour
     [SerializeField] private PlayerStatsHandler playerStats;
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private GameObject downgradePanel;
+    [SerializeField] private Sprite buttonSprite;
 
     [SerializeField] private List<DowngradeOption> downgradePool;
 
@@ -76,8 +77,20 @@ public class DowngradeMenuManager : MonoBehaviour
 
             int buttonIndex = i; // captura local pro listener
             choiceButtons[i].gameObject.SetActive(true);
+            Button btn = choiceButtons[i];
             choiceButtons[i].onClick.RemoveAllListeners();
             choiceButtons[i].onClick.AddListener(() => SelectChoice(buttonIndex));
+
+            Image btnImage = btn.GetComponent<Image>();
+                
+            if (buttonSprite != null)
+            {
+                btnImage.sprite = buttonSprite;
+            }
+            //else if (defaultSpriteFrame != null)
+            //{
+            //    btnImage.sprite = defaultSpriteFrame;
+            //}
 
             if (i < choiceLabels.Count)
             {
