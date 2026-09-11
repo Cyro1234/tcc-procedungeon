@@ -44,7 +44,7 @@ public class Bruxinha : MonoBehaviour
     private void FixedUpdate()
     {
         if (player == null) return;
-        //if (GameManager.getDeuTeleport() == false) return; // Nao atira se o jogador ainda nao teleportou
+        if (GameManager.getDeuTeleport() == false) return; // Nao atira se o jogador ainda nao teleportou
 
         if (Time.time >= proximoCharm)
         {
