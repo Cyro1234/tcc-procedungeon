@@ -2748,29 +2748,63 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DowngradeMenuManager
   playerStats: {fileID: 992072361}
   playerMovement: {fileID: 6206706722819151299}
+  statusEffects: {fileID: 6206706722819151301}
   downgradePanel: {fileID: 1568516445}
   buttonSprite: {fileID: -4244967946932158418, guid: 002aca5d22cb65b4e8a808c13fa14dfc,
     type: 3}
-  downgradePool:
-  - displayName: "Maldi\xE7\xE3o da Perna de Pau"
+  playerStatusDebuffPool:
+  - isActive: 1
+    displayName: "Cora\xE7\xE3o Fraco"
+    statType: 0
+    modifierType: 0
+    modifierSource: 2
+    useRange: 0
+    minMagnitude: 0
+    maxMagnitude: 0
+    fixedMagnitude: 1
+  - isActive: 1
+    displayName: Pernas Fracas
     statType: 1
     modifierType: 1
     modifierSource: 2
-    minMagnitude: 0.95
-    maxMagnitude: 0.95
-  - displayName: "Maldi\xE7\xE3o dos Fracotes"
-    statType: 2
-    modifierType: 0
-    modifierSource: 2
-    minMagnitude: 0.5
+    useRange: 1
+    minMagnitude: 0.25
     maxMagnitude: 0.5
-  - displayName: "Oi eu sou a op\xE7\xE3o pra te tirar do menu para casos de debug
-      :)"
-    statType: 0
-    modifierType: 0
-    modifierSource: 0
-    minMagnitude: 0
-    maxMagnitude: 0
+    fixedMagnitude: 0
+  - isActive: 1
+    displayName: Fracote
+    statType: 2
+    modifierType: 1
+    modifierSource: 2
+    useRange: 1
+    minMagnitude: 0.5
+    maxMagnitude: 0.25
+    fixedMagnitude: 0
+  gameStatusEffectDebuffPool:
+  - isActive: 1
+    displayName: Bebum
+    statusEffectKind: 1
+    hasDuration: 1
+    isRange: 0
+    fixedDuration: 180
+    minDuration: 0
+    maxDuration: 0
+  - isActive: 1
+    displayName: Perneta
+    statusEffectKind: 2
+    hasDuration: 0
+    isRange: 0
+    fixedDuration: 0
+    minDuration: 0
+    maxDuration: 0
+  - isActive: 1
+    displayName: Labirintite
+    statusEffectKind: 3
+    hasDuration: 0
+    isRange: 0
+    fixedDuration: 0
+    minDuration: 0
+    maxDuration: 0
   choiceButtons:
   - {fileID: 1129503150}
   - {fileID: 1686742529}
@@ -59436,6 +59470,7 @@ GameObject:
   - component: {fileID: 1635360953}
   - component: {fileID: 1635360952}
   - component: {fileID: 1635360954}
+  - component: {fileID: 1635360955}
   m_Layer: 0
   m_Name: CinemachineCamera
   m_TagString: Untagged
@@ -59520,6 +59555,18 @@ MonoBehaviour:
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
   FollowOffset: {x: 0, y: 0, z: -10}
+--- !u!114 &1635360955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635360950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a05d52788ee3e7a4f846880d997f4531, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraEffectsController
 --- !u!1 &1645939859
 GameObject:
   m_ObjectHideFlags: 0
@@ -63614,6 +63661,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
         type: 3}
+      propertyPath: m_ActionEvents.Array.size
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      propertyPath: m_ActionEvents.Array.data[19].m_ActionId
+      value: 004b350f-5228-475d-b051-d7b98e720e11
+      objectReference: {fileID: 0}
+    - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      propertyPath: m_ActionEvents.Array.data[19].m_ActionName
+      value: 'Player/Inventory[/Keyboard/t]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -63796,6 +63858,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 992072369}
+    - targetCorrespondingSourceObject: {fileID: 2492088174279128530, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6206706722819151301}
+    - targetCorrespondingSourceObject: {fileID: 2492088174279128530, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6206706722819151300}
   m_SourcePrefab: {fileID: 100100000, guid: abe2bb6ffaa41d1449d7952ca0c370f1, type: 3}
 --- !u!114 &6206706722819151299 stripped
 MonoBehaviour:
@@ -63809,6 +63879,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 766c850617b45e847813947d7adbcd78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+--- !u!114 &6206706722819151300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992072324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f71855b05e4d34479d2d2bf29f38fad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectTester
+  statusEffects: {fileID: 6206706722819151301}
+--- !u!114 &6206706722819151301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992072324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 790a7ad3ce241ba478bc03295477785d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectManager
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

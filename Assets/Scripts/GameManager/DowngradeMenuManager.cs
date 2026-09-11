@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 // Menu que aparece depois da fase terminar!!! O jogador escolhe 1 downgrade entre N sorteados.
@@ -10,18 +11,29 @@ public class DowngradeMenuManager : MonoBehaviour
 
     [SerializeField] private PlayerStatsHandler playerStats;
     [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private StatusEffectManager statusEffects;
     [SerializeField] private GameObject downgradePanel;
     [SerializeField] private Sprite buttonSprite;
 
-    [SerializeField] private List<DowngradeOption> downgradePool;
+    [FormerlySerializedAs("downgradePool")]
+    [SerializeField] private List<DowngradeOption> playerStatusDebuffPool;
+    [SerializeField] private List<StatusEffectDowngradeOption> gameStatusEffectDebuffPool;
 
     [Header("UI")]
     [SerializeField] private List<Button> choiceButtons;
     [SerializeField] private List<TMP_Text> choiceLabels;
 
     private AbstractDungeonGenerator pendingGenerator;
-    private readonly List<DowngradeOption> currentChoices = new List<DowngradeOption>();
-    private readonly List<float> currentRolledValues = new List<float>();
+    private readonly List<RolledChoice> currentChoices = new List<RolledChoice>();
+
+    // Uma escolha ja sorteada e mostrada no menu ou embrulha um DowngradeOption
+    // (com a magnitude ja sorteada), ou um StatusEffectDowngradeOption.
+    private class RolledChoice
+    {
+        public DowngradeOption statOption;
+        public StatusEffectDowngradeOption statusEffectOption;
+        public float magnitude;
+    }
 
     private void Awake()
     {
@@ -56,24 +68,58 @@ public class DowngradeMenuManager : MonoBehaviour
     private void RollChoices()
     {
         currentChoices.Clear();
-        currentRolledValues.Clear();
 
-        List<int> availableIndexes = new List<int>();
-        for (int i = 0; i < downgradePool.Count; i++) availableIndexes.Add(i);
+        List<int> availableStatIndexes = new List<int>();
+        for (int i = 0; i < playerStatusDebuffPool.Count; i++)
+        {
+            if (playerStatusDebuffPool[i].isActive) availableStatIndexes.Add(i);
+        }
 
-        int amount = Mathf.Min(choiceButtons.Count, availableIndexes.Count);
+        List<int> availableStatusEffectIndexes = new List<int>();
+        for (int i = 0; i < gameStatusEffectDebuffPool.Count; i++)
+        {
+            if (gameStatusEffectDebuffPool[i].isActive) availableStatusEffectIndexes.Add(i);
+        }
+
+        int amount = Mathf.Min(choiceButtons.Count, availableStatIndexes.Count + availableStatusEffectIndexes.Count);
 
         for (int i = 0; i < amount; i++)
         {
-            int pick = Rng.DebuffRange(0, availableIndexes.Count);
-            int optionIndex = availableIndexes[pick];
-            availableIndexes.RemoveAt(pick);
+            // Sorteia um slot dentro dos dois pools juntos, pra debuffs simples e complexos aparecerem misturados no menu com a mesma chance
+            int pick = Rng.DebuffRange(0, availableStatIndexes.Count + availableStatusEffectIndexes.Count);
 
-            DowngradeOption option = downgradePool[optionIndex];
-            float magnitude = Mathf.Lerp(option.minMagnitude, option.maxMagnitude, Rng.DebuffValue());
+            RolledChoice choice;
+            if (pick < availableStatIndexes.Count)
+            {
+                int optionIndex = availableStatIndexes[pick];
+                availableStatIndexes.RemoveAt(pick);
 
-            currentChoices.Add(option);
-            currentRolledValues.Add(magnitude);
+                DowngradeOption option = playerStatusDebuffPool[optionIndex];
+                float magnitude = option.useRange
+                    ? Mathf.Lerp(option.minMagnitude, option.maxMagnitude, Rng.DebuffValue())
+                    : option.fixedMagnitude;
+
+                choice = new RolledChoice { statOption = option, magnitude = magnitude };
+            }
+            else
+            {
+                int statusEffectIndex = pick - availableStatIndexes.Count;
+                int optionIndex = availableStatusEffectIndexes[statusEffectIndex];
+                availableStatusEffectIndexes.RemoveAt(statusEffectIndex);
+
+                StatusEffectDowngradeOption seOption = gameStatusEffectDebuffPool[optionIndex];
+                float duration = 0f;
+                if (seOption.hasDuration)
+                {
+                    duration = seOption.isRange
+                        ? Mathf.Lerp(seOption.minDuration, seOption.maxDuration, Rng.DebuffValue())
+                        : seOption.fixedDuration;
+                }
+
+                choice = new RolledChoice { statusEffectOption = seOption, magnitude = duration };
+            }
+
+            currentChoices.Add(choice);
 
             int buttonIndex = i; // captura local pro listener
             choiceButtons[i].gameObject.SetActive(true);
@@ -82,7 +128,7 @@ public class DowngradeMenuManager : MonoBehaviour
             choiceButtons[i].onClick.AddListener(() => SelectChoice(buttonIndex));
 
             Image btnImage = btn.GetComponent<Image>();
-                
+
             if (buttonSprite != null)
             {
                 btnImage.sprite = buttonSprite;
@@ -94,19 +140,29 @@ public class DowngradeMenuManager : MonoBehaviour
 
             if (i < choiceLabels.Count)
             {
-                choiceLabels[i].text = BuildLabel(option, magnitude);
+                choiceLabels[i].text = BuildLabel(choice);
             }
         }
 
-        // Esconde botoes sobrando caso o pool tenha menos opcoes que botoes
+        // Esconde botoes sobrando caso os pools tenham menos opcoes que botoes
         for (int i = amount; i < choiceButtons.Count; i++)
         {
             choiceButtons[i].gameObject.SetActive(false);
         }
     }
 
-    private string BuildLabel(DowngradeOption option, float magnitude)
+    private string BuildLabel(RolledChoice choice)
     {
+        if (choice.statusEffectOption != null)
+        {
+            return choice.statusEffectOption.hasDuration
+                ? $"{choice.statusEffectOption.displayName}\n({choice.magnitude:0.#}s)"
+                : $"{choice.statusEffectOption.displayName}\n(Permanente)";
+        }
+
+        DowngradeOption option = choice.statOption;
+        float magnitude = choice.magnitude;
+
         string sign = option.modifierSource == ModifierSource.Buff ? "+" : "-";
 
         string valueText = option.modifierType == ModifierType.Percent
@@ -118,7 +174,6 @@ public class DowngradeMenuManager : MonoBehaviour
         return $"{option.displayName}\n{statName} ({valueText})";
     }
 
-    // Nome do stat em portugues pra exibir no label do botao
     private string GetStatDisplayName(StatType statType)
     {
         switch (statType)
@@ -133,9 +188,22 @@ public class DowngradeMenuManager : MonoBehaviour
 
     public void SelectChoice(int index)
     {
-        DowngradeOption option = currentChoices[index];
-        float magnitude = currentRolledValues[index];
-        float signedValue = option.modifierSource == ModifierSource.Buff ? magnitude : -magnitude;
+        RolledChoice choice = currentChoices[index];
+
+        if (choice.statusEffectOption != null)
+        {
+            StatusEffect effect = StatusEffectFactory.Create(choice.statusEffectOption.statusEffectKind, choice.magnitude);
+            if (effect != null && statusEffects != null)
+            {
+                statusEffects.ApplyEffect(effect);
+            }
+
+            CloseMenuAndAdvance();
+            return;
+        }
+
+        DowngradeOption option = choice.statOption;
+        float signedValue = option.modifierSource == ModifierSource.Buff ? choice.magnitude : -choice.magnitude;
 
         StatModifier modifier = new StatModifier(
             option.displayName,

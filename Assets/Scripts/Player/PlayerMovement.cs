@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour
 
     public Transform Aim;
 
+    // Debuffs de complexos de movimento (bebum, perneta, etc) se registram aqui em vez deste script precisar saber que eles existem.
+    public readonly ModifierPipeline<IMovementModifier> MovementModifiers = new ModifierPipeline<IMovementModifier>();
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,7 +31,14 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        rb.linearVelocity = moveInput * stats.GetPlayerWalkSpeed();
+        // moveInput cru continua guiando animacao e a mira, so a velocidade real é modificada quando um debuff ou buff e ativado, assim nao muda pra onde o jogador mira.
+        Vector2 moveDirection = moveInput;
+        foreach (var modifier in MovementModifiers.Modifiers)
+        {
+            moveDirection = modifier.ModifyDirection(moveDirection, Time.deltaTime);
+        }
+
+        rb.linearVelocity = moveDirection * stats.GetPlayerWalkSpeed();
 
         if (moveInput != Vector2.zero)
         {
