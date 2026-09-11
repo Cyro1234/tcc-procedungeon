@@ -8,13 +8,13 @@ public class Goblin : MonoBehaviour
     [SerializeField] private int maxAmmo = 12;
     [SerializeField] private float reloadTime = 3.0f;
 
-    private int ammo;
+    private int ammo = 0;
     private float proximoTiro = 0f;
     private Transform player;
 
     private void Start()
     {
-        ammo = maxAmmo;
+        // ammo = maxAmmo; Comeca sem municao para dar tempo do jogador reagir ao teleporte
 
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
@@ -26,6 +26,7 @@ public class Goblin : MonoBehaviour
     private void FixedUpdate()
     {
         if (player == null) return;
+        if (GameManager.getDeuTeleport() == false) return; // Nao atira se o jogador ainda nao teleportou
 
         if (Time.time >= proximoTiro)
         {

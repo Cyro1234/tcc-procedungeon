@@ -5,9 +5,19 @@ public class GameManager : MonoBehaviour
 {
     private RoomFirstDungeonGenerator generator;
     [SerializeField] private TMP_Text seedText;
-    
+
     [SerializeField] private bool useRandomSeed = true;
     [SerializeField] private int seed = 0;
+
+    // Para o Boss
+    private static bool deuTeleport = false;
+    public static void setDeuTeleport(bool newDeuTeleport) { deuTeleport = newDeuTeleport; }
+    public static bool getDeuTeleport() { return deuTeleport; }
+    
+    private static bool bossMorreu = false;
+    public static void setBossMorreu(bool newBossMorreu) { bossMorreu = newBossMorreu; }
+    public static bool getBossMorreu() { return bossMorreu; }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

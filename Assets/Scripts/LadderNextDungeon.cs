@@ -20,12 +20,15 @@ public class LadderNextDungeon : MonoBehaviour
         if (used) return;
 
         // Se quem entrou na colisao foi o jogador
-        if (collision.CompareTag("Player")) 
+        if (collision.CompareTag("Player"))
         {
+            if (GameManager.getBossMorreu() == false) { return; } // So desce se o boss morreu
             used = true;
 
             if (dungeonGenerator != null) 
             {
+                GameManager.setDeuTeleport(false);
+                GameManager.setBossMorreu(false);
                 if (DowngradeMenuManager.Instance != null)
                 {
                     DowngradeMenuManager.Instance.OpenMenu(dungeonGenerator); // Abre o menu de downgrade antes de gerar a proxima dungeon

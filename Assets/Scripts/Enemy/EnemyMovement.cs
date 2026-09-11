@@ -89,6 +89,7 @@ public class EnemyMovement : MonoBehaviour
 
         if (health <= 0)
         {
+            if (tag == "Boss") { GameManager.setBossMorreu(true); }
             Destroy(gameObject);
         }
     }
