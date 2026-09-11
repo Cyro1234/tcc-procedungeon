@@ -8,7 +8,7 @@ public static class Rng
     public static System.Random enemyRng;
     public static System.Random chestRng;
     public static System.Random debuffRng;
-
+    
 
     public static void Init(int seed)
     {

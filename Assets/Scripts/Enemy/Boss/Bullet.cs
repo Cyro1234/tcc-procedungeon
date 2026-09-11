@@ -31,11 +31,11 @@ public class Bullet : MonoBehaviour
         if (collision.CompareTag("Boss")) return;
         if (collision.CompareTag("Melee")) return;
 
-        if (collision.CompareTag("Player"))
-        {
-            // Dar dano no jogador
-        }
+        //if (collision.CompareTag("Player"))
+        //{
+        //    // Dar dano no jogador
+        //}
 
-        Destroy(gameObject);
+        Destroy(gameObject); // destroi ao bater na parede ou no jogador
     }
 }

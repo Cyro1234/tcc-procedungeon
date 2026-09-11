@@ -8330,11 +8330,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossRoomSpawner
   bossRoomFlorestaPrefab: {fileID: 1069111929993797017, guid: 44656e77168b6804c9c36156fd3a0afd,
     type: 3}
-  bossRoomCavernaPrefab: {fileID: 5299917589624699150, guid: 76b0776ae5542c74796ca499c691c89e,
+  bossRoomCavernaPrefab: {fileID: 5525558223668211937, guid: 813ddc50bd891f04db0497ad09ab3ea4,
     type: 3}
   bossRoomAbismoPrefab: {fileID: 72034654447501311, guid: 9b7571d87bf2f754ca909799631a9801,
     type: 3}
-  bossRoomDesertoPrefab: {fileID: 4381152668571771730, guid: 0702aa0496fa44648a06e1d3372780b2,
+  bossRoomDesertoPrefab: {fileID: 7035977960112051557, guid: fe40f1ffafb940e4b87ea2c4701d0763,
     type: 3}
   bossRoomInfinitoPrefab: {fileID: 4027524520349344542, guid: 0f74d69ff70ec9f469526db932fe20ae,
     type: 3}
