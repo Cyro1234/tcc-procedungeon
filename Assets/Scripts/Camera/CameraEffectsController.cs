@@ -27,13 +27,14 @@ public class CameraEffectsController : MonoBehaviour
     }
 
     private void Start()
-    {
-        baseOrthographicSize = cineCam.Lens.OrthographicSize;
+    {        
         baseDutch = cineCam.Lens.Dutch;
     }
-
+    
     private void Update()
     {
+        baseOrthographicSize = cineCam.Lens.OrthographicSize;
+
         var ctx = new CameraModifierContext
         {
             rotation = Quaternion.Euler(0f, 0f, baseDutch),
