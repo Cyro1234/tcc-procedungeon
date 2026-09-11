@@ -18,6 +18,12 @@ public class GameManager : MonoBehaviour
     public static void setBossMorreu(bool newBossMorreu) { bossMorreu = newBossMorreu; }
     public static bool getBossMorreu() { return bossMorreu; }
 
+    public static void clean()
+    {
+        setDeuTeleport(false);
+        setBossMorreu(false);
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

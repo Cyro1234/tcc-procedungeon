@@ -46,6 +46,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     public void Setup(int seed)
     {
         Rng.Init(seed);
+        GameManager.clean();
         levelManager.setup();
         RunProceduralGeneration();
     }
