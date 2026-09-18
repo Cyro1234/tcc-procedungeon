@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 966f09340af309549b310ae310c16db4
+guid: 8947b53d80aee9145a187ec98ca007df
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3746539665382324490
-    second: ModFastEnemy_Legs_InsectLegs_0
+      213: 3709642724044926049
+    second: ModFastEnemy_Arm_Bee_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ModFastEnemy_Legs_InsectLegs_0
+      name: ModFastEnemy_Arm_Bee_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 4
         y: 0
-        width: 24
-        height: 22
+        width: 16
+        height: 8
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a093604c9f16ef330800000000000000
-      internalID: 3746539665382324490
+      spriteID: 16c6f4a276c4b7330800000000000000
+      internalID: 3709642724044926049
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ModFastEnemy_Legs_InsectLegs_0: 3746539665382324490
+      ModFastEnemy_Arm_Bee_0: 3709642724044926049
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 409da5c3183fdf44ea8cd3f5f3bb129b
+guid: 86b0d5e54656cc746a50668002bd3eaf
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7323964712694880449
-    second: ModFastEnemy_Head_Devil_0
+      213: 4430267939537565099
+    second: ModFastEnemy_Torso_Devil_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ModFastEnemy_Head_Devil_0
+      name: ModFastEnemy_Torso_Devil_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 37
-        height: 43
+        width: 23
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1c89ca72a13f3a560800000000000000
-      internalID: 7323964712694880449
+      spriteID: ba530fbe7397b7d30800000000000000
+      internalID: 4430267939537565099
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ModFastEnemy_Head_Devil_0: 7323964712694880449
+      ModFastEnemy_Torso_Devil_0: 4430267939537565099
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

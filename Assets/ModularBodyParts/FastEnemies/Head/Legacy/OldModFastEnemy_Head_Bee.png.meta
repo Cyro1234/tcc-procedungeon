@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 74af57a809f4b2948b754a958e5fad77
+guid: 78c7799b5145add4da9579ddc28ba5a6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2579638711705034095
-    second: ModFastEnemy_Legs_Pants_0
+      213: -7455076867361590207
+    second: OldModFastEnemy_Head_Bee_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ModFastEnemy_Legs_Pants_0
+      name: OldModFastEnemy_Head_Bee_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 24
-        height: 22
+        width: 37
+        height: 42
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f6d5604adb7bcc320800000000000000
-      internalID: 2579638711705034095
+      spriteID: 1443eab761f3a8890800000000000000
+      internalID: -7455076867361590207
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ModFastEnemy_Legs_Pants_0: 2579638711705034095
+      OldModFastEnemy_Head_Bee_0: -7455076867361590207
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
