@@ -225,5 +225,5 @@ MonoBehaviour:
   maxHealth: 50
   strength: 1
   knockbackDuration: 0
-  healthBarPrefab: {fileID: 6545154737959135111, guid: 1c7ed1c68b329f6469cdf1bfe4cddf4c,
+  healthBarPrefab: {fileID: 6545154737959135111, guid: 1d34a06c94600c24d9cf72ac4f9b07e4,
     type: 3}

@@ -11,6 +11,7 @@ TagManager:
   - Bullet
   - Teleporter
   - Ladder
+  - Retrato
   layers:
   - Default
   - TransparentFX
