@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -13,7 +14,7 @@ public class GameManager : MonoBehaviour
     private static bool deuTeleport = false;
     public static void setDeuTeleport(bool newDeuTeleport) { deuTeleport = newDeuTeleport; }
     public static bool getDeuTeleport() { return deuTeleport; }
-    
+
     private static bool bossMorreu = false;
     public static void setBossMorreu(bool newBossMorreu) { bossMorreu = newBossMorreu; }
     public static bool getBossMorreu() { return bossMorreu; }

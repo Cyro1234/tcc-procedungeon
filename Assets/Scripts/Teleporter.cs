@@ -33,6 +33,7 @@ public class Teleporter : MonoBehaviour
             }
 
             GameManager.setDeuTeleport(true);
+
             collision.transform.position = new Vector2(1000, 0);
 
             yield return new WaitForEndOfFrame();

@@ -222,6 +222,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
   moveSpeed: 0
   viewDistance: 50
-  maxHealth: 30
+  maxHealth: 50
   strength: 1
   knockbackDuration: 0
+  healthBarPrefab: {fileID: 6545154737959135111, guid: 1c7ed1c68b329f6469cdf1bfe4cddf4c,
+    type: 3}

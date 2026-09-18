@@ -20,8 +20,19 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] float strength = 4f;
     [SerializeField] float knockbackDuration = 0.15f;
 
+    [SerializeField] private GameObject healthBarPrefab = null;
+    private HealthBar healthBar;
+    private bool hpVisivel = false;
+    private GameObject barInstance;
+
     private void Awake()
     {
+        if (healthBarPrefab != null) 
+        {
+            barInstance = Instantiate(healthBarPrefab);
+            barInstance.SetActive(false);
+            healthBar = barInstance.GetComponentInChildren<HealthBar>();
+        }
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -31,14 +42,22 @@ public class EnemyMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         health = maxHealth;
 
+        if (tag == "Boss") { healthBar.SetMaxHealth(health); }
     }
 
     void Update() // Calcula pra onde o inimigo deve andar
     {
         if (target) // Se tiver um jogador para seguir
         {
-            if (Vector3.Distance(target.position, transform.position) < viewDistance)
-            {   // Mover em direcao ao jogador
+            if (Vector3.Distance(target.position, transform.position) < viewDistance) // Viu o jogador
+            {   
+                if (tag == "Boss" && hpVisivel == false) 
+                {
+                    hpVisivel = true;
+                    barInstance.SetActive(true);
+                }
+                
+                // Mover em direcao ao jogador
                 Vector3 direction = (target.position - transform.position).normalized;
                 moveDirection = direction;
 
@@ -83,16 +102,17 @@ public class EnemyMovement : MonoBehaviour
 
     public void takeDamage(float damage, GameObject sender)
     {
-        Debug.Log("DANO: " + damage);
-        Debug.Log("Vida restante: " + health);
         health -= damage;
         StartCoroutine(Knockback(sender));
         AudioManager.Instance.PlaySFX("InimigoTomouDano");
+
+        healthBar.SetHealth(health);
 
         if (health <= 0)
         {
             if (tag == "Boss") { GameManager.setBossMorreu(true); }
             Destroy(gameObject);
+            Destroy(barInstance, 0.5f);
         }
     }
 
