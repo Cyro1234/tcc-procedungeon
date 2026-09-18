@@ -8378,7 +8378,7 @@ MonoBehaviour:
     type: 3}
   bossRoomAbismoPrefab: {fileID: 72034654447501311, guid: 9b7571d87bf2f754ca909799631a9801,
     type: 3}
-  bossRoomDesertoPrefab: {fileID: 3019161955002687727, guid: c259d1cd65532f846b885d5cebae7fbe,
+  bossRoomDesertoPrefab: {fileID: 303268357330994046, guid: 345acc615060d774b93159b0ac8a85f6,
     type: 3}
   bossRoomInfinitoPrefab: {fileID: 4027524520349344542, guid: 0f74d69ff70ec9f469526db932fe20ae,
     type: 3}

@@ -38,11 +38,14 @@ public class RoomDetector : MonoBehaviour
     
     public void SetRooms(List<BoundsInt> rooms, int offset) // recebe a lista do parametro e volta pro roomslist
     {
-        this.roomsList = rooms;
+        this.roomsList = new List<BoundsInt>(rooms);
         this.currentOffset = offset;
         listaDeCentros.Clear(); // limpa a lista antiga 
 
         if (roomsList == null) return;
+
+        // Adiciona sala boss
+        roomsList.Add(new BoundsInt(new Vector3Int(1000 - 9, -9, 0), new Vector3Int(18, 18, 0)));
 
         foreach (var room in roomsList)
         {
@@ -51,6 +54,8 @@ public class RoomDetector : MonoBehaviour
 
             listaDeCentros.Add(center);
         }
+
+        
     }
 
     private void OnDrawGizmos()
@@ -106,21 +111,21 @@ public class RoomDetector : MonoBehaviour
                         cameraTarget.position = center;
 
                         virtualCamera.Lens.OrthographicSize = room.size.y / 2.2f;
-                    }        
-                }
-
-                // aqui ele usa offset nos inimigos, pegando o tamanho real
-                foreach (GameObject inimigo in inimigosNoMapa)
-                {
-                    if (inimigo == null) continue;
-                    Vector3Int enemyPos = Vector3Int.FloorToInt(inimigo.transform.position);
-                    if (enemyPos.x >= room.xMin + offset && enemyPos.x < room.xMax - offset &&
-                        enemyPos.y >= room.yMin + offset && enemyPos.y < room.yMax - offset)
-                    {
-                        inimigoSala = true;
-                        break;
                     }
                 }
+                
+                    // aqui ele usa offset nos inimigos, pegando o tamanho real
+                    foreach (GameObject inimigo in inimigosNoMapa)
+                    {
+                        if (inimigo == null) continue;
+                        Vector3Int enemyPos = Vector3Int.FloorToInt(inimigo.transform.position);
+                        if (enemyPos.x >= room.xMin + offset && enemyPos.x < room.xMax - offset &&
+                            enemyPos.y >= room.yMin + offset && enemyPos.y < room.yMax - offset)
+                        {
+                            inimigoSala = true;
+                            break;
+                        }
+                    }
 
                 jogadorSala = (playerPos.x >= room.xMin + offset && playerPos.x < room.xMax - offset &&
                                playerPos.y >= room.yMin + offset && playerPos.y < room.yMax - offset);

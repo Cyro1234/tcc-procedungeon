@@ -60,6 +60,7 @@ public class Redemoinho : MonoBehaviour
         if (collision.CompareTag("Boss")) return;
         if (collision.CompareTag("Bullet")) return;
         if (collision.CompareTag("Melee")) return;
+        if (collision.CompareTag("Ladder")) return;
 
         Destroy(gameObject); // destroi ao bater na parede ou no jogador
     }

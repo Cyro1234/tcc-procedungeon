@@ -83,6 +83,8 @@ public class EnemyMovement : MonoBehaviour
 
     public void takeDamage(float damage, GameObject sender)
     {
+        Debug.Log("DANO: " + damage);
+        Debug.Log("Vida restante: " + health);
         health -= damage;
         StartCoroutine(Knockback(sender));
         AudioManager.Instance.PlaySFX("InimigoTomouDano");

@@ -29,7 +29,9 @@ public class Bullet : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Boss")) return;
+        if (collision.CompareTag("Bullet")) return;
         if (collision.CompareTag("Melee")) return;
+        if (collision.CompareTag("Ladder")) return;
 
         //if (collision.CompareTag("Player"))
         //{
