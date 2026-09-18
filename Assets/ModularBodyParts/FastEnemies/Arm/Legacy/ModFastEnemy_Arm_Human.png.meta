@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 93a14bbbd7106f642b6fe8059127745e
+guid: f3eab6d177b97474b9a6c03e60c08615
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4225661937901459665
-    second: ModFastEnemy_Legs_Spring_0
+      213: -5986388255158357986
+    second: ModFastEnemy_Arm_Human_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ModFastEnemy_Legs_Spring_0
+      name: ModFastEnemy_Arm_Human_0
       rect:
         serializedVersion: 2
-        x: 2
+        x: 0
         y: 0
         width: 20
-        height: 22
+        height: 8
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1d8518dd42194aa30800000000000000
-      internalID: 4225661937901459665
+      spriteID: e1037b369931ceca0800000000000000
+      internalID: -5986388255158357986
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ModFastEnemy_Legs_Spring_0: 4225661937901459665
+      ModFastEnemy_Arm_Human_0: -5986388255158357986
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 42878145bdeed814f97bc2f132309dc5
+guid: fca37031ddf4f3849aaeac54c082ad01
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6125089568992504126
-    second: ModFastEnemy_Head_Virus_0
+      213: -6270718866768478902
+    second: OldFastEnemy_Head_Virus_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -113,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ModFastEnemy_Head_Virus_0
+      name: OldFastEnemy_Head_Virus_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 37
-        height: 34
+        height: 35
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e39af39c280b00550800000000000000
-      internalID: 6125089568992504126
+      spriteID: a4dbce31a6ee9f8a0800000000000000
+      internalID: -6270718866768478902
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 748b4c7033acd9f4b878fd238779e3a7
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ModFastEnemy_Head_Virus_0: 6125089568992504126
+      OldFastEnemy_Head_Virus_0: -6270718866768478902
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

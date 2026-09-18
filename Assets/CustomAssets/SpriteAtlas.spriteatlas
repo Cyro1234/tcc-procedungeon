@@ -46,7 +46,6 @@ SpriteAtlas:
     variantMultiplier: 1
     packables:
     - {fileID: 2800000, guid: ef1ae0138efab624fb1b22dfb6dee589, type: 3}
-    - {fileID: 7323964712694880449, guid: 409da5c3183fdf44ea8cd3f5f3bb129b, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -115,7 +114,6 @@ SpriteAtlas:
     - ef1ae0138efab624fb1b22dfb6dee589: 187396248
     - ef1ae0138efab624fb1b22dfb6dee589: 1763545265
     - ef1ae0138efab624fb1b22dfb6dee589: -1868178105
-    - 409da5c3183fdf44ea8cd3f5f3bb129b: 7323964712694880449
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 1544170826, guid: ef1ae0138efab624fb1b22dfb6dee589, type: 3}
@@ -182,7 +180,6 @@ SpriteAtlas:
   - {fileID: 187396248, guid: ef1ae0138efab624fb1b22dfb6dee589, type: 3}
   - {fileID: 1763545265, guid: ef1ae0138efab624fb1b22dfb6dee589, type: 3}
   - {fileID: -1868178105, guid: ef1ae0138efab624fb1b22dfb6dee589, type: 3}
-  - {fileID: 7323964712694880449, guid: 409da5c3183fdf44ea8cd3f5f3bb129b, type: 3}
   m_PackedSpriteNamesToIndex:
   - LevelsColorsTileSet_63
   - LevelsColorsTileSet_62
@@ -248,7 +245,6 @@ SpriteAtlas:
   - LevelsColorsTileSet_10
   - LevelsColorsTileSet_42
   - LevelsColorsTileSet_11
-  - ModFastEnemy_Head_Devil_0
   m_RenderDataMap: {}
   m_Tag: SpriteAtlas
   m_IsVariant: 0

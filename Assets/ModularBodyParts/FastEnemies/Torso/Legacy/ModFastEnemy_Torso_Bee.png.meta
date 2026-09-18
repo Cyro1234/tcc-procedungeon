@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 36f893d4207ce78488d7ea9860265dae
+guid: 15a3476d9e423af42a6fbdf10bd57342
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7878328547838954626
-    second: ModFastEnemy_Head_Bee_0
+      213: -765642321180032193
+    second: ModFastEnemy_Torso_Bee_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ModFastEnemy_Head_Bee_0
+      name: ModFastEnemy_Torso_Bee_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 37
-        height: 42
+        width: 23
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 28c82c5b212755d60800000000000000
-      internalID: 7878328547838954626
+      spriteID: f330f0d8d54ef55f0800000000000000
+      internalID: -765642321180032193
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ModFastEnemy_Head_Bee_0: 7878328547838954626
+      ModFastEnemy_Torso_Bee_0: -765642321180032193
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
