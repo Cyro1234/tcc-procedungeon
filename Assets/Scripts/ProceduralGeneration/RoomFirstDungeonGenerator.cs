@@ -41,6 +41,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         tileMapVisualizer.Clear();
         tileMapVisualizer.Setup(levelManager.GetBioma());
         CreateRooms();
+
+        // Fade + banner "Andar X - Bioma" (so visual, nao usa o Rng da seed)
+        GameEffects.Instance.OnNewFloor(levelManager.GetAndar(), levelManager.GetBiomaAtual());
     }
 
     public void Setup(int seed)

@@ -14,10 +14,22 @@ public class PlayerMovement : MonoBehaviour
     // Debuffs de complexos de movimento (bebum, perneta, etc) se registram aqui em vez deste script precisar saber que eles existem.
     public readonly ModifierPipeline<IMovementModifier> MovementModifiers = new ModifierPipeline<IMovementModifier>();
 
+    // Velocidade "forcada" por um curto periodo (knockback ao tomar dano).
+    // Enquanto estiver ativa, o input normal nao controla o rigidbody.
+    private Vector2 overrideVelocity;
+    private float overrideStart;
+    private float overrideEnd;
+    private bool overrideDecay;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         stats = GetComponent<PlayerStatsHandler>();
     }
@@ -31,7 +43,20 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // moveInput cru continua guiando animacao e a mira, so a velocidade real é modificada quando um debuff ou buff e ativado, assim nao muda pra onde o jogador mira.
+        UpdateAnimationAndAim();
+
+        if (Time.time < overrideEnd)
+        {
+            float k = 1f;
+            if (overrideDecay)
+            {
+                k = 1f - Mathf.InverseLerp(overrideStart, overrideEnd, Time.time);
+            }
+            rb.linearVelocity = overrideVelocity * k;
+            return;
+        }
+
+        // moveInput cru continua guiando animacao e a mira, so a velocidade real e modificada quando um debuff ou buff e ativado, assim nao muda pra onde o jogador mira.
         Vector2 moveDirection = moveInput;
         foreach (var modifier in MovementModifiers.Modifiers)
         {
@@ -39,7 +64,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
         rb.linearVelocity = moveDirection * stats.GetPlayerWalkSpeed();
+    }
 
+    private void UpdateAnimationAndAim()
+    {
         if (moveInput != Vector2.zero)
         {
             animator.SetBool("isWalking", true);
@@ -58,6 +86,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // Forca uma velocidade por "duration" segundos. decay = true faz ela diminuir ate zero (bom pra knockback).
+    public void OverrideVelocity(Vector2 velocity, float duration, bool decay)
+    {
+        overrideVelocity = velocity;
+        overrideStart = Time.time;
+        overrideEnd = Time.time + duration;
+        overrideDecay = decay;
+    }
+
     // Movimentacao do jogador
     public void Move(InputAction.CallbackContext context)
     {
@@ -66,6 +103,7 @@ public class PlayerMovement : MonoBehaviour
     public void ForcarParada()
     {
         moveInput = Vector2.zero;
+        overrideEnd = 0f;
         if (rb != null) rb.linearVelocity = Vector2.zero;
         if (animator != null) animator.SetBool("isWalking", false);
     }

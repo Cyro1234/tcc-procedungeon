@@ -16,10 +16,15 @@ public class EnemyDamage : MonoBehaviour
     // Ao entrar na colisao do inimigo
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        TryDamage(collision);
+    }
+
+    private void TryDamage(Collider2D collision)
+    {
         HeartSystem heartSystem = collision.gameObject.GetComponent<HeartSystem>(); // Tenta pegar o sistema de vidas do jogador
-        if (heartSystem != null) // se quem entrou na colisao nao foi um jogador
+        if (heartSystem != null && !heartSystem.IsInvulnerable) // se quem entrou na colisao foi o jogador
         {
-            heartSystem.takeDamage(damage);
+            heartSystem.takeDamage(damage, transform);
         }
     }
 

@@ -25,9 +25,24 @@ public class EnemyMovement : MonoBehaviour
     private bool hpVisivel = false;
     private GameObject barInstance;
 
+    [Header("Game effects")]
+    [Tooltip("Chance (0-1) de soltar um coracao ao morrer.")]
+    [SerializeField] private float heartDropChance = 0.1f;
+    [Tooltip("Chance (0-1) de soltar um coracao ao morrer quando o jogador esta com 1 de vida.")]
+    [SerializeField] private float heartDropChanceLowHealth = 0.3f;
+
+    private bool dead = false;
+
+    private SpriteRenderer[] renderers;
+    private Color[] baseColors;
+    private Vector3 baseScale;
+    private Coroutine flashRoutine;
+
+    private bool IsBoss => CompareTag("Boss");
+
     private void Awake()
     {
-        if (healthBarPrefab != null) 
+        if (healthBarPrefab != null)
         {
             barInstance = Instantiate(healthBarPrefab);
             barInstance.SetActive(false);
@@ -38,11 +53,17 @@ public class EnemyMovement : MonoBehaviour
 
     void Start()
     {
-        target = GameObject.Find("Player").transform;
+        GameObject playerObj = GameObject.Find("Player");
+        if (playerObj != null) target = playerObj.transform;
         animator = GetComponent<Animator>();
         health = maxHealth;
 
-        if (tag == "Boss") { healthBar.SetMaxHealth(health); }
+        if (IsBoss && healthBar != null) { healthBar.SetMaxHealth(health); }
+
+        renderers = GetComponentsInChildren<SpriteRenderer>();
+        baseColors = new Color[renderers.Length];
+        for (int i = 0; i < renderers.Length; i++) baseColors[i] = renderers[i].color;
+        baseScale = transform.localScale;
     }
 
     void Update() // Calcula pra onde o inimigo deve andar
@@ -50,25 +71,25 @@ public class EnemyMovement : MonoBehaviour
         if (target) // Se tiver um jogador para seguir
         {
             if (Vector3.Distance(target.position, transform.position) < viewDistance) // Viu o jogador
-            {   
-                if (tag == "Boss" && hpVisivel == false) 
+            {
+                if (IsBoss && hpVisivel == false && barInstance != null)
                 {
                     hpVisivel = true;
                     barInstance.SetActive(true);
                 }
-                
+
                 // Mover em direcao ao jogador
                 Vector3 direction = (target.position - transform.position).normalized;
                 moveDirection = direction;
 
                 // Se o inimigo tiver um animator, atualiza os parametros de animacao.
                 if (animator != null)
-                { 
+                {
 
                     // Animacao walk
                     animator.SetBool("isWalking", true);
-                    animator.SetFloat("InputX", moveDirection.x);
-                    animator.SetFloat("InputY", moveDirection.y);
+                    animator.SetFloat("InputX", direction.x);
+                    animator.SetFloat("InputY", direction.y);
                 }
             }
             else
@@ -102,6 +123,8 @@ public class EnemyMovement : MonoBehaviour
 
     public void takeDamage(float damage, GameObject sender)
     {
+        if (dead) return;
+
         health -= damage;
         StartCoroutine(Knockback(sender));
         AudioManager.Instance.PlaySFX("InimigoTomouDano");
@@ -110,14 +133,71 @@ public class EnemyMovement : MonoBehaviour
         {
             healthBar.SetHealth(health);
         }
-        
+
+        SpriteRenderer mainRenderer = renderers != null && renderers.Length > 0 ? renderers[0] : null;
 
         if (health <= 0)
         {
-            if (tag == "Boss") { GameManager.setBossMorreu(true); }
+            dead = true;
+            bool boss = IsBoss;
+            GameEffects.Instance.EnemyKilled(transform.position, boss, mainRenderer);
+            DropLoot(boss);
+
+            if (boss) { GameManager.setBossMorreu(true); }
             Destroy(gameObject);
             Destroy(barInstance, 0.5f);
+            return;
         }
+
+        GameEffects.Instance.EnemyHit(transform.position, mainRenderer);
+
+        if (flashRoutine != null) StopCoroutine(flashRoutine);
+        flashRoutine = StartCoroutine(HitFlash());
+    }
+
+    private void DropLoot(bool boss)
+    {
+        float chance = heartDropChance;
+        HeartSystem hs = target != null ? target.GetComponent<HeartSystem>() : null;
+        if (hs != null && hs.Life <= 1) chance = heartDropChanceLowHealth;
+
+        // Chefe sempre solta um coracao
+        if (boss || Random.value < chance)
+        {
+            HeartPickup.Spawn(transform.position);
+        }
+    }
+
+    // Pisca em vermelho/branco e da uma "amassada" ao tomar dano
+    private IEnumerator HitFlash()
+    {
+        const float duration = 0.12f;
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.unscaledDeltaTime;
+            float k = t / duration;
+
+            Color flash = Color.Lerp(new Color(1f, 0.25f, 0.25f, 1f), Color.white, k);
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                if (renderers[i] == null) continue;
+                Color c = baseColors[i] * flash;
+                c.a = baseColors[i].a;
+                renderers[i].color = c;
+            }
+
+            float squash = Mathf.Sin(k * Mathf.PI) * 0.2f;
+            transform.localScale = new Vector3(baseScale.x * (1f + squash), baseScale.y * (1f - squash), baseScale.z);
+            yield return null;
+        }
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if (renderers[i] != null) renderers[i].color = baseColors[i];
+        }
+        transform.localScale = baseScale;
+        flashRoutine = null;
     }
 
     private IEnumerator Knockback(GameObject sender)
@@ -142,7 +222,7 @@ public class EnemyMovement : MonoBehaviour
 
         // Aplica os bonus de vida
         maxHealth = (maxHealth + healthFlat) * healthMult;
-        health = maxHealth; // Garante que o inimigo nasça com a vida cheia ajustada
+        health = maxHealth; // Garante que o inimigo nasÃ§a com a vida cheia ajustada
 
         // Aplica os bonus de ataque
         strength = (strength + attackFlat) * attackMult;
