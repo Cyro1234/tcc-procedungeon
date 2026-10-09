@@ -31,7 +31,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // moveInput cru continua guiando animacao e a mira, so a velocidade real é modificada quando um debuff ou buff e ativado, assim nao muda pra onde o jogador mira.
+        // moveInput cru continua guiando animacao e a mira, so a velocidade real Ã© modificada quando um debuff ou buff e ativado, assim nao muda pra onde o jogador mira.
         Vector2 moveDirection = moveInput;
         foreach (var modifier in MovementModifiers.Modifiers)
         {
@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
     // Movimentacao do jogador
     public void Move(InputAction.CallbackContext context)
     {
-        moveInput = context.ReadValue<Vector2>();
+        moveInput = Vector2.ClampMagnitude(context.ReadValue<Vector2>(), 1f);
     }
     public void ForcarParada()
     {

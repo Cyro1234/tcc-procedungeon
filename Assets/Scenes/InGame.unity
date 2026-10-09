@@ -21202,6 +21202,7 @@ GameObject:
   - component: {fileID: 1260074972}
   - component: {fileID: 1260074974}
   - component: {fileID: 1260074973}
+  - component: {fileID: 2140000100}
   m_Layer: 5
   m_Name: ControlsPanel
   m_TagString: Untagged
@@ -63726,7 +63727,7 @@ PrefabInstance:
     - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
         type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
         type: 3}
@@ -63741,7 +63742,7 @@ PrefabInstance:
     - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
         type: 3}
       propertyPath: m_ActionEvents.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnAttack
+      value: AoAtacar
       objectReference: {fileID: 0}
     - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
         type: 3}
@@ -63968,3 +63969,61 @@ SceneRoots:
   - {fileID: 1095434269}
   - {fileID: 878909396}
   - {fileID: 1014877159}
+--- !u!114 &2140000100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260074971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a06832d4f48f4b79b77605777c034774, type: 3}
+  m_Name: ConnectedGamepadControls
+  m_EditorClassIdentifier: Assembly-CSharp::ConnectedGamepadControls
+  conteudoTeclado:
+  - {fileID: 701335535}
+  - {fileID: 1354537112}
+  - {fileID: 1261161767}
+  fonte: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  comandos:
+  - nome: "Mover"
+    xbox: {fileID: 21300000, guid: 139b83464b859cd429d0370dc816028c, type: 3}
+    playstation: {fileID: 21300000, guid: 7e177675a5fc16248b6e164ef7a7f2a6, type: 3}
+    alternativaXbox: {fileID: 21300000, guid: d1610599218d48042bffac0712c379a6, type: 3}
+    alternativaPlaystation: {fileID: 21300000, guid: bff5253ebc5a14f43b4bd8aa1d207855, type: 3}
+  - nome: "Atacar"
+    xbox: {fileID: 21300000, guid: cde7469096582e04897fae80dfc34fbe, type: 3}
+    playstation: {fileID: 21300000, guid: 428de70370df69d45bd4c0025b7ba36e, type: 3}
+    alternativaXbox: {fileID: 0}
+    alternativaPlaystation: {fileID: 0}
+  - nome: "Inventário"
+    xbox: {fileID: 21300000, guid: 17fd7d74524d4cc4ea612a100880d012, type: 3}
+    playstation: {fileID: 21300000, guid: 47b0c8cbcd450124abdb1b62fb7f5806, type: 3}
+    alternativaXbox: {fileID: 0}
+    alternativaPlaystation: {fileID: 0}
+  - nome: "Slot anterior"
+    xbox: {fileID: 21300000, guid: 672696fcd6aec9d4c84945fa59765f64, type: 3}
+    playstation: {fileID: 21300000, guid: 7eaab648006558044a9680311037b8f9, type: 3}
+    alternativaXbox: {fileID: 0}
+    alternativaPlaystation: {fileID: 0}
+  - nome: "Próximo slot"
+    xbox: {fileID: 21300000, guid: ed60ff0de79971e468ae179e077d66ca, type: 3}
+    playstation: {fileID: 21300000, guid: 22b97dfa5af0d1947a62312c31e633e5, type: 3}
+    alternativaXbox: {fileID: 0}
+    alternativaPlaystation: {fileID: 0}
+  - nome: "Confirmar / diálogo"
+    xbox: {fileID: 21300000, guid: f609c9b3b1675f947a865ec558b5ad90, type: 3}
+    playstation: {fileID: 21300000, guid: 2da2d15ce082e12448ac493c55a33f0f, type: 3}
+    alternativaXbox: {fileID: 0}
+    alternativaPlaystation: {fileID: 0}
+  - nome: "Voltar / cancelar"
+    xbox: {fileID: 21300000, guid: d08c52c09554ca8418a86627f4bd14e1, type: 3}
+    playstation: {fileID: 21300000, guid: c7f381483fb41f14e935b2d6d9fec62f, type: 3}
+    alternativaXbox: {fileID: 0}
+    alternativaPlaystation: {fileID: 0}
+  - nome: "Pausar / retomar"
+    xbox: {fileID: 21300000, guid: 5c1e24bea89729e4a8ed25e26a432f84, type: 3}
+    playstation: {fileID: 21300000, guid: 3e20a6306ae08e34f970de090c3a1cd1, type: 3}
+    alternativaXbox: {fileID: 0}
+    alternativaPlaystation: {fileID: 0}

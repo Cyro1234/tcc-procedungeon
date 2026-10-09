@@ -1,4 +1,3 @@
-using Unity.ProjectAuditor.Editor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -64,6 +63,12 @@ public class Attack : MonoBehaviour
             Pivot.SetActive(true);
             isAttacking = true;
         }
+    }
+
+    public void AoAtacar(InputAction.CallbackContext context)
+    {
+        if (context.performed && enabled)
+            OnAttack();
     }
 
     //public void OnAttack()

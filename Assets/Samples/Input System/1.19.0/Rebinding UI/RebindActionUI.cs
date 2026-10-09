@@ -521,6 +521,8 @@ namespace UnityEngine.InputSystem.Samples.RebindUI
 
         protected void OnDisable()
         {
+            // Cancelar executa a limpeza e restaura as ações antes de esconder a tela.
+            m_RebindOperation?.Cancel();
             m_RebindOperation?.Dispose();
             m_RebindOperation = null;
 

@@ -1,11 +1,33 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class MainMenu : MonoBehaviour
 {
     public GameObject mainMenu;
     public GameObject optionsMenu;
     public GameObject controlsMenu;
+    private InputSystem_Actions controles;
+
+    private void OnEnable()
+    {
+        controles = new InputSystem_Actions();
+        controles.UI.Cancel.performed += AoVoltar;
+        controles.UI.Cancel.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controles?.Disable();
+        controles?.Dispose();
+        controles = null;
+    }
+
+    private void AoVoltar(InputAction.CallbackContext context)
+    {
+        if (controlsMenu.activeSelf) RetornarConfiguracoes();
+        else if (optionsMenu.activeSelf) RetornarMenu();
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

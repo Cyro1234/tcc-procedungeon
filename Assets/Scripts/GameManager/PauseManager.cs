@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class PauseManager : MonoBehaviour
 {
@@ -13,6 +14,24 @@ public class PauseManager : MonoBehaviour
 
     public static bool pausado = false;
     private static int i = 1;
+    private InputSystem_Actions controles;
+
+    private void OnEnable()
+    {
+        controles = new InputSystem_Actions();
+        InputAction pausa = controles.FindAction("Player/Pause", true);
+        pausa.performed += AoPausar;
+        pausa.Enable();
+        controles.UI.Cancel.performed += AoVoltar;
+        controles.UI.Cancel.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controles?.Disable();
+        controles?.Dispose();
+        controles = null;
+    }
 
     void Start()
     {
@@ -26,16 +45,23 @@ public class PauseManager : MonoBehaviour
             playerMovement = Object.FindAnyObjectByType<PlayerMovement>();
     }
 
-    // Ao apertar a tecla ESC, o jogo pausa/despausa e exibe/oculta o menu de pausa
-    void Update()
+    private void AoPausar(InputAction.CallbackContext context)
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (!pausado)
-                PausarJogo();
-            else
-                ResumirJogo();
-        }   
+        if (pausePanel.activeSelf || optionsPanel.activeSelf || controlsPanel.activeSelf)
+            ResumirJogo();
+        else if (Time.timeScale > 0f)
+            PausarJogo();
+    }
+
+    private void AoVoltar(InputAction.CallbackContext context)
+    {
+        // Escape é tratado por Pause; Cancel no controle volta um nível do menu.
+        if (!(context.control.device is Gamepad)) return;
+        if (InventoryManager.Instance != null && InventoryManager.Instance.inventarioAberto)
+            return;
+        if (controlsPanel.activeSelf) VoltarParaOpcoes();
+        else if (optionsPanel.activeSelf) VoltarParaPause();
+        else if (pausePanel.activeSelf) ResumirJogo();
     }
 
     //private void Start() // APENAS PARA TESTAR AS SEEDS. DEIXAR COMENTADO CASO NAO FOR TESTAR

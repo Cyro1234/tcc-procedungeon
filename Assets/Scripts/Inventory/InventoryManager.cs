@@ -6,16 +6,76 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance;
 
-    [Header("ConfiguraÁıes da UI")]
+    [Header("Configura√ß√µes da UI")]
     public RectTransform hotbarPanel;
-    public Vector2 posicaoJogo; // PosiÁ„o na base da tela
-    public Vector2 posicaoInventario; // PosiÁ„o no centro da tela
+    public Vector2 posicaoJogo; // Posi√ß√£o na base da tela
+    public Vector2 posicaoInventario; // Posi√ß√£o no centro da tela
 
     [Header("Slots e Dados")]
     public InventorySlot[] slots = new InventorySlot[8];
     private Chest.ItemType[] itensNoInventario = new Chest.ItemType[8];
     public int slotSelecionadoIndex = 0;
     public bool inventarioAberto = false;
+    private InputSystem_Actions controles;
+    private int origemTroca = -1;
+
+    private void OnEnable()
+    {
+        controles = new InputSystem_Actions();
+        controles.Player.Inventory.performed += AoAlternarInventario;
+        controles.Player.Previous.performed += AoSelecionarAnterior;
+        controles.Player.Next.performed += AoSelecionarProximo;
+        controles.Player.Jump.performed += AoConfirmarTroca;
+        controles.UI.Cancel.performed += AoCancelarInventario;
+        controles.Player.Inventory.Enable();
+        controles.Player.Previous.Enable();
+        controles.Player.Next.Enable();
+        controles.Player.Jump.Enable();
+        controles.UI.Cancel.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controles?.Disable();
+        controles?.Dispose();
+        controles = null;
+    }
+
+    private void AoAlternarInventario(InputAction.CallbackContext context)
+    {
+        if (inventarioAberto || Time.timeScale > 0f)
+            AlternarInventario();
+    }
+
+    private void AoSelecionarAnterior(InputAction.CallbackContext context) => SelecionarSlotRelativo(-1);
+    private void AoSelecionarProximo(InputAction.CallbackContext context) => SelecionarSlotRelativo(1);
+
+    private void SelecionarSlotRelativo(int deslocamento)
+    {
+        if (Time.timeScale == 0f && !inventarioAberto) return;
+        slotSelecionadoIndex = (slotSelecionadoIndex + deslocamento + itensNoInventario.Length) % itensNoInventario.Length;
+    }
+
+    private void AoConfirmarTroca(InputAction.CallbackContext context)
+    {
+        if (!inventarioAberto || !(context.control.device is Gamepad)) return;
+        if (origemTroca < 0)
+        {
+            origemTroca = slotSelecionadoIndex;
+        }
+        else
+        {
+            TrocarItens(origemTroca, slotSelecionadoIndex);
+            origemTroca = -1;
+        }
+    }
+
+    private void AoCancelarInventario(InputAction.CallbackContext context)
+    {
+        if (!inventarioAberto || !(context.control.device is Gamepad)) return;
+        if (origemTroca >= 0) origemTroca = -1;
+        else AlternarInventario();
+    }
 
     [Header("Banco de Sprites")]
     public Sprite spriteEspadaLonga;
@@ -41,15 +101,9 @@ public class InventoryManager : MonoBehaviour
 
     private void LidarComInputsDeTeclado()
     {
-        // Alternar Invent·rio com 'T'
-        if (Keyboard.current.tKey.wasPressedThisFrame)
-        {
-            AlternarInventario();
-        }
+        if (Keyboard.current == null || inventarioAberto || Time.timeScale == 0f) return;
 
-        if (inventarioAberto) return; // N„o permite trocar de slot enquanto o invent·rio estiver aberto organizando
-
-        // SeleÁ„o de Slots (Teclas 1 a 8)
+        // Sele√ß√£o de Slots (Teclas 1 a 8)
         if (Keyboard.current.digit1Key.wasPressedThisFrame) slotSelecionadoIndex = 0;
         if (Keyboard.current.digit2Key.wasPressedThisFrame) slotSelecionadoIndex = 1;
         if (Keyboard.current.digit3Key.wasPressedThisFrame) slotSelecionadoIndex = 2;
@@ -63,6 +117,9 @@ public class InventoryManager : MonoBehaviour
     private void AlternarInventario()
     {
         inventarioAberto = !inventarioAberto;
+        origemTroca = -1;
+        if (UnityEngine.EventSystems.EventSystem.current != null)
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
 
         if (inventarioAberto)
         {
@@ -88,7 +145,7 @@ public class InventoryManager : MonoBehaviour
                 return true; // Adicionado com sucesso
             }
         }
-        Debug.Log("Invent·rio Cheio!");
+        Debug.Log("Invent√°rio Cheio!");
         return false;
     }
 
@@ -109,7 +166,7 @@ public class InventoryManager : MonoBehaviour
         for (int i = 0; i < slots.Length; i++)
         {
             Sprite icone = ObterSprite(itensNoInventario[i]);
-            bool estaSelecionado = (i == slotSelecionadoIndex);
+            bool estaSelecionado = (i == slotSelecionadoIndex || i == origemTroca);
             slots[i].AtualizarSlot(itensNoInventario[i], icone, estaSelecionado);
         }
     }
