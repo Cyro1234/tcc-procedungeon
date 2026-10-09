@@ -1004,6 +1004,39 @@ MonoBehaviour:
   animacaoMataBoss: {fileID: 680156745}
   text: {fileID: 1235052610}
   textspeed: 0.05
+  duracaoFade: 3
+  cenaJogo: InGame
+  falas:
+  - texto: Olho...
+    personagem: 0
+    animarAntes: 0
+  - texto: ALEX SEU MALDITO
+    personagem: 1
+    animarAntes: 0
+  - texto: VOCE SENTIRA A IRA DE UM DEUS
+    personagem: 1
+    animarAntes: 0
+  - texto: TOMAAAA!!!!!!!
+    personagem: 1
+    animarAntes: 0
+  - texto: "Você morrerá agora..."
+    personagem: 0
+    animarAntes: 0
+  - texto: "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    personagem: 1
+    animarAntes: 1
+  - texto: "Eu morrerei porem não será em vão!"
+    personagem: 1
+    animarAntes: 0
+  - texto: "VOCÊ SERÁ AMALDIÇOADO!"
+    personagem: 1
+    animarAntes: 0
+  - texto: "......"
+    personagem: 0
+    animarAntes: 0
+  - texto: Hora de voltar para casa...
+    personagem: 0
+    animarAntes: 0
   imagem: {fileID: 938614875}
   sprites:
   - {fileID: -8771702890237521690, guid: 6d25cda92e1963d40b9e2f0df00592a7, type: 3}
