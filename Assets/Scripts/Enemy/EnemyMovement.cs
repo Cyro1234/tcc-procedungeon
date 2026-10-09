@@ -106,7 +106,11 @@ public class EnemyMovement : MonoBehaviour
         StartCoroutine(Knockback(sender));
         AudioManager.Instance.PlaySFX("InimigoTomouDano");
 
-        healthBar.SetHealth(health);
+        if (healthBar != null)
+        {
+            healthBar.SetHealth(health);
+        }
+        
 
         if (health <= 0)
         {
