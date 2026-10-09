@@ -12,6 +12,33 @@ public class TileMapVisualizer : MonoBehaviour
     [SerializeField] private Tilemap wallTileMap;
     [SerializeField] private Tilemap walkInFrontTileMap;
 
+    private void Awake()
+    {
+        ConfigurarColisaoDasParedes();
+    }
+
+    private void ConfigurarColisaoDasParedes()
+    {
+        if (wallTileMap == null) return;
+        var tiles = wallTileMap.GetComponent<TilemapCollider2D>();
+        if (tiles == null) return;
+
+        var corpo = wallTileMap.GetComponent<Rigidbody2D>();
+        if (corpo == null) corpo = wallTileMap.gameObject.AddComponent<Rigidbody2D>();
+        corpo.bodyType = RigidbodyType2D.Static;
+
+        var paredes = wallTileMap.GetComponent<CompositeCollider2D>();
+        if (paredes == null) paredes = wallTileMap.gameObject.AddComponent<CompositeCollider2D>();
+        paredes.geometryType = CompositeCollider2D.GeometryType.Polygons;
+        paredes.generationType = CompositeCollider2D.GenerationType.Synchronous;
+        paredes.vertexDistance = 0.005f;
+
+        // Unir tiles vizinhos elimina as arestas internas que prendem o jogador.
+        // Uma extrusão mínima fecha pequenas diferenças entre os contornos dos tiles.
+        tiles.extrusionFactor = 0.001f;
+        tiles.compositeOperation = Collider2D.CompositeOperation.Merge;
+    }
+
     // PREFAB DA ESCADA
     [SerializeField] private GameObject exitPrefab;
     [SerializeField] private GameObject teleportPrefab;

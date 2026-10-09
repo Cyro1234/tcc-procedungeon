@@ -44,6 +44,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         UpdateAnimationAndAim();
+    }
+
+    private void FixedUpdate()
+    {
+        if (Time.timeScale == 0f) return;
 
         if (Time.time < overrideEnd)
         {
@@ -60,7 +65,7 @@ public class PlayerMovement : MonoBehaviour
         Vector2 moveDirection = moveInput;
         foreach (var modifier in MovementModifiers.Modifiers)
         {
-            moveDirection = modifier.ModifyDirection(moveDirection, Time.deltaTime);
+            moveDirection = modifier.ModifyDirection(moveDirection, Time.fixedDeltaTime);
         }
 
         rb.linearVelocity = moveDirection * stats.GetPlayerWalkSpeed();
