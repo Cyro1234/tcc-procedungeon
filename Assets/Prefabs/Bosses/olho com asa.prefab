@@ -188,7 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
   moveSpeed: 0
-  viewDistance: 50
+  viewDistance: 0
   maxHealth: 1
   strength: 0
   knockbackDuration: 0

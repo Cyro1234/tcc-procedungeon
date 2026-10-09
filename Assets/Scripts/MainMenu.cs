@@ -21,7 +21,8 @@ public class MainMenu : MonoBehaviour
             Time.timeScale = 1f;
         }
 
-        SceneManager.LoadSceneAsync(1); // Carrega a cena no index X em File >> Build Profiles >> Scene List
+        // Carrega a intro
+        SceneManager.LoadSceneAsync(2); // Carrega a cena no index X em File >> Build Profiles >> Scene List
     }
 
     public void AbrirOpcoes()
