@@ -13,6 +13,7 @@ public class DoorSpawner : MonoBehaviour
     [SerializeField] private AudioClip somAbrirPorta;
     [SerializeField] private RoomFirstDungeonGenerator roomFirstDungeonGenerator;
     private int offset = 4;
+    public int CorridorOffset => offset;
     private AudioSource audioSource;
 
     private void Awake()
@@ -57,7 +58,7 @@ public class DoorSpawner : MonoBehaviour
 
     private void FecharPortasDaSala(BoundsInt bounds)
     {
-        if (salaTrancada) return; // Se j· t· trancada, ignora
+        if (salaTrancada) return; // Se j√° t√° trancada, ignora
 
         currentBounds = bounds;
         salaTrancada = true;
@@ -125,5 +126,6 @@ public class DoorSpawner : MonoBehaviour
     {
         roomEntrances.Clear();
         salaTrancada = false;
+        currentBounds = null;
     }
 }
