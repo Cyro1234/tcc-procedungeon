@@ -296,6 +296,13 @@ public class TileMapVisualizer : MonoBehaviour
     {
         var tilePosition = tileMap.WorldToCell((Vector3Int)position);
         tileMap.SetTile(tilePosition, tile);
+
+        // Paredes e portas ocupam a celula inteira. O contorno do sprite pode
+        // nao estar disponivel no Player quando a textura usa um atlas.
+        if (tileMap == wallTileMap && tile != null)
+        {
+            tileMap.SetColliderType(tilePosition, Tile.ColliderType.Grid);
+        }
     }
 
     // Limpa todos os tilemaps. Chamar antes de pintar o proximo andar
@@ -319,8 +326,7 @@ public class TileMapVisualizer : MonoBehaviour
         floorTileMap.SetTile(tilePosition, null);
 
         // pinta a porta na camada de paredes
-        var tilePos = wallTileMap.WorldToCell((Vector3Int)position);
-        wallTileMap.SetTile(tilePos, doorTile);
+        PaintSingleTile(position, wallTileMap, doorTile);
     }
 
     // Remove a porta e pinta o chao no lugar da porta novamente
