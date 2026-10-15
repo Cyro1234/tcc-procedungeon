@@ -1,4 +1,3 @@
-using UnityEditor;
 
 public enum StatType // Fiz um enum pra delimitar os tipos de stats que da pra ser modificados com buffs e debuffs!!!
 {

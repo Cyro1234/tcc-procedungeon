@@ -1,4 +1,3 @@
-using UnityEditor;
 public class StatModifier
 {
     public string statName;            // Nome
