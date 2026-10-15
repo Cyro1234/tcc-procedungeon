@@ -32,10 +32,14 @@ public class InventoryManager : MonoBehaviour
         controles.Player.Next.Enable();
         controles.Player.Jump.Enable();
         controles.UI.Cancel.Enable();
+        if (stats != null) AtualizarBonusBota();
     }
 
     private void OnDisable()
     {
+        if (stats != null && modificadorBota != null)
+            stats.RemoveSimpleModifier(modificadorBota);
+        modificadorBota = null;
         controles?.Disable();
         controles?.Dispose();
         controles = null;
@@ -80,6 +84,53 @@ public class InventoryManager : MonoBehaviour
     [Header("Banco de Sprites")]
     public Sprite spriteEspadaLonga;
     public Sprite spriteAdaga;
+    public Sprite spriteBota;
+    public Sprite spritePocaoVida;
+    [SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.2f;
+    private Sprite spriteProvisorio;
+    private PlayerStatsHandler stats;
+    private StatModifier modificadorBota;
+
+    private void Start()
+    {
+        AtualizarBonusBota();
+    }
+
+    private void AtualizarBonusBota()
+    {
+        if (stats == null) stats = FindAnyObjectByType<PlayerStatsHandler>();
+        if (stats == null) return;
+        bool temBota = System.Array.IndexOf(itensNoInventario, Chest.ItemType.SpeedBoots) >= 0;
+        if (temBota && modificadorBota == null && isActiveAndEnabled)
+        {
+            modificadorBota = new StatModifier("Bota de velocidade", StatType.Speed,
+                ModifierSource.Item, ModifierType.Percent, bonusVelocidadeBota);
+            stats.AddSimpleModifier(modificadorBota);
+        }
+        else if (!temBota && modificadorBota != null)
+        {
+            stats.RemoveSimpleModifier(modificadorBota);
+            modificadorBota = null;
+        }
+    }
+
+    public bool UsarItemSelecionado()
+    {
+        if (inventarioAberto || Time.timeScale == 0f ||
+            ObterItemSelecionado() != Chest.ItemType.HealthPotion) return false;
+        var vida = FindAnyObjectByType<HeartSystem>();
+        if (vida == null || vida.IsDead || vida.IsFullHealth) return false;
+        vida.RestaurarVidaInteira();
+        itensNoInventario[slotSelecionadoIndex] = Chest.ItemType.None;
+        AtualizarUI();
+        return true;
+    }
+
+    private void OnDestroy()
+    {
+        if (spriteProvisorio != null) Destroy(spriteProvisorio);
+        if (Instance == this) Instance = null;
+    }
 
     private void Awake()
     {
@@ -142,6 +193,7 @@ public class InventoryManager : MonoBehaviour
             if (itensNoInventario[i] == Chest.ItemType.None)
             {
                 itensNoInventario[i] = novoItem;
+                AtualizarBonusBota();
                 return true; // Adicionado com sucesso
             }
         }
@@ -167,7 +219,12 @@ public class InventoryManager : MonoBehaviour
         {
             Sprite icone = ObterSprite(itensNoInventario[i]);
             bool estaSelecionado = (i == slotSelecionadoIndex || i == origemTroca);
-            slots[i].AtualizarSlot(itensNoInventario[i], icone, estaSelecionado);
+            Color cor = Color.white;
+            if (itensNoInventario[i] == Chest.ItemType.SpeedBoots && spriteBota == null)
+                cor = new Color(0.2f, 0.65f, 1f);
+            else if (itensNoInventario[i] == Chest.ItemType.HealthPotion && spritePocaoVida == null)
+                cor = new Color(1f, 0.2f, 0.3f);
+            slots[i].AtualizarSlot(itensNoInventario[i], icone, estaSelecionado, cor);
         }
     }
 
@@ -175,6 +232,16 @@ public class InventoryManager : MonoBehaviour
     {
         if (tipo == Chest.ItemType.LongSword) return spriteEspadaLonga;
         if (tipo == Chest.ItemType.Dagger) return spriteAdaga;
+        if (tipo == Chest.ItemType.SpeedBoots && spriteBota != null) return spriteBota;
+        if (tipo == Chest.ItemType.HealthPotion && spritePocaoVida != null) return spritePocaoVida;
+        if (tipo == Chest.ItemType.SpeedBoots || tipo == Chest.ItemType.HealthPotion)
+        {
+            if (spriteProvisorio == null)
+                spriteProvisorio = Sprite.Create(Texture2D.whiteTexture,
+                    new Rect(0, 0, Texture2D.whiteTexture.width, Texture2D.whiteTexture.height),
+                    new Vector2(0.5f, 0.5f));
+            return spriteProvisorio;
+        }
         return null;
     }
 }

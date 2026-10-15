@@ -36,12 +36,12 @@ SpriteAtlas:
       m_ForceMaximumCompressionQuality_BC6H_BC7: 0
     packingSettings:
       serializedVersion: 2
-      padding: 4
+      padding: 8
       blockOffset: 1
       allowAlphaSplitting: 0
-      enableRotation: 1
-      enableTightPacking: 1
-      enableAlphaDilation: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 1
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:

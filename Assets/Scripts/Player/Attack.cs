@@ -52,6 +52,13 @@ public class Attack : MonoBehaviour
     {
         if (Time.timeScale == 0f) return;
 
+        if (InventoryManager.Instance != null &&
+            InventoryManager.Instance.ObterItemSelecionado() == Chest.ItemType.HealthPotion)
+        {
+            InventoryManager.Instance.UsarItemSelecionado();
+            return;
+        }
+
         if (isCooldown == false && isAttacking == false)
         {
             // O jogador "pergunta" ao inventário qual item está na mão

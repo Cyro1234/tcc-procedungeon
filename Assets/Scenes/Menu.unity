@@ -3968,7 +3968,7 @@ MonoBehaviour:
     playstation: {fileID: 21300000, guid: 7e177675a5fc16248b6e164ef7a7f2a6, type: 3}
     alternativaXbox: {fileID: 21300000, guid: d1610599218d48042bffac0712c379a6, type: 3}
     alternativaPlaystation: {fileID: 21300000, guid: bff5253ebc5a14f43b4bd8aa1d207855, type: 3}
-  - nome: "Atacar"
+  - nome: "Atacar / usar item"
     xbox: {fileID: 21300000, guid: cde7469096582e04897fae80dfc34fbe, type: 3}
     playstation: {fileID: 21300000, guid: 428de70370df69d45bd4c0025b7ba36e, type: 3}
     alternativaXbox: {fileID: 0}

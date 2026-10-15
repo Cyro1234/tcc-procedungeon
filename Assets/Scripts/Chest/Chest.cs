@@ -3,29 +3,29 @@ using UnityEngine;
 public class Chest : MonoBehaviour
 {
     // NOVO: Tipos de itens atualizados com as qualidades dos escudos
-    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger }
+    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion }
 
-    [Header("ConfiguraÁıes do Ba˙")]
-    // Cada Prefab de ba˙ ter· sua prÛpria tabela de loot configurada no Inspector
+    [Header("Configura√ß√µes do Ba√∫")]
+    // Cada Prefab de ba√∫ ter√° sua pr√≥pria tabela de loot configurada no Inspector
     [SerializeField] private WeightedTable<ItemType> itemTable;
 
-    [Header("Apenas para depuraÁ„o (N„o alterar)")]
+    [Header("Apenas para depura√ß√£o (N√£o alterar)")]
     public ItemType itemInside;
 
     private bool isOpen = false;
     private Animator animator;
 
-    private bool itemPreConfigurado = false; // NOVO: Trava para n„o sobrescrever o item manual
+    private bool itemPreConfigurado = false; // NOVO: Trava para n√£o sobrescrever o item manual
 
     void Start()
     {
         animator = GetComponent<Animator>();
 
-        // O prÛprio ba˙ sorteia o item de sua tabela assim que È instanciado
-        // SÛ sorteia se o Gerador da Masmorra n„o tiver forÁado um item antes!
+        // O pr√≥prio ba√∫ sorteia o item de sua tabela assim que √© instanciado
+        // S√≥ sorteia se o Gerador da Masmorra n√£o tiver for√ßado um item antes!
         if (!itemPreConfigurado && itemTable != null && itemTable.items.Count > 0)
         {
-            System.Random rng = new System.Random(System.Guid.NewGuid().GetHashCode());
+            System.Random rng = Rng.chestRng ?? new System.Random();
             itemInside = itemTable.getRandom(rng);
         }
         //if (itemTable != null && itemTable.items.Count > 0)
@@ -51,6 +51,12 @@ public class Chest : MonoBehaviour
 
     private void OpenChest(GameObject player)
     {
+        // Um invent√°rio cheio n√£o deve fazer o item desaparecer dentro de um ba√∫ aberto.
+        bool vaiParaInventario = itemInside == ItemType.LongSword || itemInside == ItemType.Dagger ||
+            itemInside == ItemType.SpeedBoots || itemInside == ItemType.HealthPotion;
+        if (vaiParaInventario && (InventoryManager.Instance == null ||
+            !InventoryManager.Instance.AdicionarItem(itemInside))) return;
+
         isOpen = true;
         if (animator != null) animator.SetTrigger("Open");
 
@@ -70,11 +76,12 @@ public class Chest : MonoBehaviour
                 player.GetComponent<HeartSystem>()?.EquipShield(10);
                 break;
 
-            // Armas agora v„o para o Invent·rio!
+            // Armas agora v√£o para o Invent√°rio!
             case ItemType.LongSword:
             case ItemType.Dagger:
-                InventoryManager.Instance.AdicionarItem(itemInside);
-                Debug.Log(itemInside + " adicionado ao invent·rio!");
+            case ItemType.SpeedBoots:
+            case ItemType.HealthPotion:
+                Debug.Log(itemInside + " adicionado ao invent√°rio!");
                 break;
         }
     }

@@ -11,17 +11,18 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private Transform originalParent;
     private Vector3 originalPosition;
 
-    // NOVO: Referência segura para o Canvas principal
+    // NOVO: ReferÃªncia segura para o Canvas principal
     private Canvas canvas;
 
     private void Start()
     {
-        // Busca o Canvas onde a UI está renderizada assim que o jogo começa
+        // Busca o Canvas onde a UI estÃ¡ renderizada assim que o jogo comeÃ§a
         canvas = GetComponentInParent<Canvas>();
     }
 
-    public void AtualizarSlot(Chest.ItemType tipoItem, Sprite icone, bool selecionado)
+    public void AtualizarSlot(Chest.ItemType tipoItem, Sprite icone, bool selecionado, Color? cor = null)
     {
+        itemIcon.color = cor ?? Color.white;
         if (tipoItem == Chest.ItemType.None)
         {
             itemIcon.sprite = null;
@@ -43,10 +44,10 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         originalParent = itemIcon.transform.parent;
         originalPosition = itemIcon.transform.position;
 
-        // NOVO: Movemos o ícone para o Canvas de forma segura (true mantém a escala original)
+        // NOVO: Movemos o Ã­cone para o Canvas de forma segura (true mantÃ©m a escala original)
         itemIcon.transform.SetParent(canvas.transform, true);
 
-        // Coloca a imagem como a última da lista para renderizar por cima de tudo
+        // Coloca a imagem como a Ãºltima da lista para renderizar por cima de tudo
         itemIcon.transform.SetAsLastSibling();
         itemIcon.raycastTarget = false;
     }
@@ -55,7 +56,7 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         if (!InventoryManager.Instance.inventarioAberto || itemIcon.sprite == null) return;
 
-        // NOVO: A forma matemática correta e à prova de falhas de mover UI no Unity
+        // NOVO: A forma matemÃ¡tica correta e Ã  prova de falhas de mover UI no Unity
         Vector3 globalMousePos;
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
             canvas.GetComponent<RectTransform>(),
@@ -71,7 +72,7 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     {
         if (!InventoryManager.Instance.inventarioAberto || itemIcon.sprite == null) return;
 
-        // Devolve o item para o botão de origem (true mantém a escala original)
+        // Devolve o item para o botÃ£o de origem (true mantÃ©m a escala original)
         itemIcon.transform.SetParent(originalParent, true);
         itemIcon.transform.position = originalPosition;
         itemIcon.raycastTarget = true;
@@ -83,7 +84,7 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
         InventorySlot slotArrastado = eventData.pointerDrag.GetComponent<InventorySlot>();
 
-        // NOVO: Adicionado um teste de segurança (slotArrastado != this) para evitar que ele troque o item com ele mesmo
+        // NOVO: Adicionado um teste de seguranÃ§a (slotArrastado != this) para evitar que ele troque o item com ele mesmo
         if (slotArrastado != null && slotArrastado != this)
         {
             InventoryManager.Instance.TrocarItens(slotArrastado.slotIndex, this.slotIndex);

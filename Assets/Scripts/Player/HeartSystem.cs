@@ -83,6 +83,11 @@ public class HeartSystem : MonoBehaviour
         GameEffects.Instance.PlayerHealed(transform.position, amount);
     }
 
+    public void RestaurarVidaInteira()
+    {
+        Heal(Mathf.Max(0, MaxLife - life));
+    }
+
     public void takeDamage(int damage)
     {
         takeDamage(damage, null);
