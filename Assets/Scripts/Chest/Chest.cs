@@ -55,7 +55,7 @@ public class Chest : MonoBehaviour
     {
         // Um inventário cheio não deve fazer o item desaparecer dentro de um baú aberto.
         bool vaiParaInventario = itemInside == ItemType.LongSword || itemInside == ItemType.Dagger ||
-            itemInside == ItemType.SpeedBoots || itemInside == ItemType.HealthPotion;
+            itemInside == ItemType.HealthPotion;
         if (vaiParaInventario && (InventoryManager.Instance == null ||
             !InventoryManager.Instance.AdicionarItem(itemInside))) return;
 
@@ -78,10 +78,13 @@ public class Chest : MonoBehaviour
                 player.GetComponent<HeartSystem>()?.EquipShield(10);
                 break;
 
+            case ItemType.SpeedBoots:
+                player.GetComponent<PlayerStatsHandler>()?.EquiparBota();
+                break;
+
             // Armas agora vão para o Inventário!
             case ItemType.LongSword:
             case ItemType.Dagger:
-            case ItemType.SpeedBoots:
             case ItemType.HealthPotion:
                 Debug.Log(itemInside + " adicionado ao inventário!");
                 break;

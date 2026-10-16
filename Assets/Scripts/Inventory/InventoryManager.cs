@@ -32,7 +32,6 @@ public class InventoryManager : MonoBehaviour
             LigarAcao("Player/Jump", AoConfirmarTroca);
             LigarAcao("UI/Cancel", AoCancelarInventario);
         }
-        if (stats != null) AtualizarBonusBota();
     }
 
     private void OnDisable()
@@ -47,9 +46,6 @@ public class InventoryManager : MonoBehaviour
             controles.FindAction("UI/Cancel", true).performed -= AoCancelarInventario;
         }
         FecharInventario();
-        if (stats != null && modificadorBota != null)
-            stats.RemoveSimpleModifier(modificadorBota);
-        modificadorBota = null;
         controles = null;
     }
 
@@ -104,35 +100,8 @@ public class InventoryManager : MonoBehaviour
     [Header("Banco de Sprites")]
     public Sprite spriteEspadaLonga;
     public Sprite spriteAdaga;
-    public Sprite spriteBota;
     public Sprite spritePocaoVida;
-    [SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.2f;
     private Sprite spriteProvisorio;
-    private PlayerStatsHandler stats;
-    private StatModifier modificadorBota;
-
-    private void Start()
-    {
-        AtualizarBonusBota();
-    }
-
-    private void AtualizarBonusBota()
-    {
-        if (stats == null) stats = FindAnyObjectByType<PlayerStatsHandler>();
-        if (stats == null) return;
-        bool temBota = System.Array.IndexOf(itensNoInventario, Chest.ItemType.SpeedBoots) >= 0;
-        if (temBota && modificadorBota == null && isActiveAndEnabled)
-        {
-            modificadorBota = new StatModifier("Bota de velocidade", StatType.Speed,
-                ModifierSource.Item, ModifierType.Percent, bonusVelocidadeBota);
-            stats.AddSimpleModifier(modificadorBota);
-        }
-        else if (!temBota && modificadorBota != null)
-        {
-            stats.RemoveSimpleModifier(modificadorBota);
-            modificadorBota = null;
-        }
-    }
 
     public bool UsarItemSelecionado()
     {
@@ -209,12 +178,19 @@ public class InventoryManager : MonoBehaviour
 
     public bool AdicionarItem(Chest.ItemType novoItem)
     {
+        // Equipamentos passivos nao ocupam slots, mesmo quando recebidos por este metodo.
+        if (novoItem == Chest.ItemType.SpeedBoots)
+        {
+            var atributos = FindAnyObjectByType<PlayerStatsHandler>();
+            if (atributos == null) return false;
+            atributos.EquiparBota();
+            return true;
+        }
         for (int i = 0; i < itensNoInventario.Length; i++)
         {
             if (itensNoInventario[i] == Chest.ItemType.None)
             {
                 itensNoInventario[i] = novoItem;
-                AtualizarBonusBota();
                 return true; // Adicionado com sucesso
             }
         }
@@ -242,9 +218,7 @@ public class InventoryManager : MonoBehaviour
             Sprite icone = ObterSprite(itensNoInventario[i]);
             bool estaSelecionado = (i == slotSelecionadoIndex || i == origemTroca);
             Color cor = Color.white;
-            if (itensNoInventario[i] == Chest.ItemType.SpeedBoots && spriteBota == null)
-                cor = new Color(0.2f, 0.65f, 1f);
-            else if (itensNoInventario[i] == Chest.ItemType.HealthPotion && spritePocaoVida == null)
+            if (itensNoInventario[i] == Chest.ItemType.HealthPotion && spritePocaoVida == null)
                 cor = new Color(1f, 0.2f, 0.3f);
             slots[i].AtualizarSlot(itensNoInventario[i], icone, estaSelecionado, cor);
         }
@@ -254,9 +228,8 @@ public class InventoryManager : MonoBehaviour
     {
         if (tipo == Chest.ItemType.LongSword) return spriteEspadaLonga;
         if (tipo == Chest.ItemType.Dagger) return spriteAdaga;
-        if (tipo == Chest.ItemType.SpeedBoots && spriteBota != null) return spriteBota;
         if (tipo == Chest.ItemType.HealthPotion && spritePocaoVida != null) return spritePocaoVida;
-        if (tipo == Chest.ItemType.SpeedBoots || tipo == Chest.ItemType.HealthPotion)
+        if (tipo == Chest.ItemType.HealthPotion)
         {
             if (spriteProvisorio == null)
                 spriteProvisorio = Sprite.Create(Texture2D.whiteTexture,

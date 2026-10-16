@@ -23,8 +23,21 @@ public class PlayerStatsHandler : MonoBehaviour
     private float basePlayerDamage = 1f;
     private float basePlayerAttackCooldown = 0f;
 
+    [Header("Equipamento passivo")]
+    [SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.5f;
+    private StatModifier modificadorBota;
+    public bool TemBotaEquipada => modificadorBota != null;
+
     // Lista de modificadores permanentes
     private List<StatModifier> modifiers = new List<StatModifier>();
+
+    public void EquiparBota()
+    {
+        // Cada bota adiciona seu proprio modificador permanente de velocidade.
+        modificadorBota = new StatModifier("Bota de velocidade", StatType.Speed,
+            ModifierSource.Item, ModifierType.Percent, bonusVelocidadeBota);
+        AddSimpleModifier(modificadorBota);
+    }
 
     public void AddSimpleModifier(StatModifier modifier)    // Adiciona um modificador permanente!!
     {

@@ -6743,14 +6743,11 @@ MonoBehaviour:
   - {fileID: 515468877}
   - {fileID: 439264405}
   slotSelecionadoIndex: 0
-  inventarioAberto: 0
   spriteEspadaLonga: {fileID: 8953792446637478238, guid: 91842188fa611ce44936be896abfc6f1,
     type: 3}
   spriteAdaga: {fileID: -8370915199016746703, guid: 8059310dcd4b29248adfc9f3a6ea3978,
     type: 3}
-  spriteBota: {fileID: 0}
   spritePocaoVida: {fileID: 0}
-  bonusVelocidadeBota: 0.2
 --- !u!4 &878909396
 Transform:
   m_ObjectHideFlags: 0
@@ -7904,6 +7901,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da3174212ca36724d8c87e1fea6b6707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsHandler
+  bonusVelocidadeBota: 0.2
 --- !u!114 &992072369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61887,7 +61885,7 @@ MonoBehaviour:
   manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
     type: 3}
   forceStartingItem: 1
-  startingChestItem: 8
+  startingChestItem: 7
 --- !u!4 &1942525113
 Transform:
   m_ObjectHideFlags: 0
