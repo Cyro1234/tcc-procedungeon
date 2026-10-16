@@ -59,6 +59,12 @@ public class EnemyMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private void OnDestroy()
+    {
+        // A barra fica fora da hierarquia do inimigo e deve acompanhar qualquer destruicao dele.
+        if (barInstance != null) Destroy(barInstance);
+    }
+
     void Start()
     {
         if (lootRng == null) InitializeRandom();
@@ -154,7 +160,6 @@ public class EnemyMovement : MonoBehaviour
 
             if (boss) { GameManager.setBossMorreu(true); }
             Destroy(gameObject);
-            Destroy(barInstance, 0.5f);
             return;
         }
 
