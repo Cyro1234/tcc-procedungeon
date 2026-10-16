@@ -8678,7 +8678,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   seedText: {fileID: 1645939861}
   useRandomSeed: 1
-  seed: -854919384
+  seed: 1
 --- !u!114 &1101588032
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,6 +3,8 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.DualShock;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -40,6 +42,7 @@ public class Intro : MonoBehaviour
     [SerializeField, Min(0f)] private float textspeed = 0.05f;
     [SerializeField, Min(0f)] private float duracaoFade = 3f;
     [SerializeField] private string cenaJogo = "InGame";
+
     [SerializeField] private Fala[] falas =
     {
         new Fala("Olho...", Personagem.Alex),
@@ -54,6 +57,12 @@ public class Intro : MonoBehaviour
         new Fala("Hora de voltar para casa...", Personagem.Alex)
     };
 
+    [Header("Pular introdução")]
+    [SerializeField, Min(0.2f)] private float tempoParaPular = 1.5f;
+    [SerializeField] private CanvasGroup indicadorPular;
+    [SerializeField] private TextMeshProUGUI textoPular;
+    [SerializeField] private RectTransform barraProgresso;
+
     private CanvasGroup grupoDialogo;
     private Estado estado = Estado.Entrada;
     private Coroutine digitacao;
@@ -63,6 +72,10 @@ public class Intro : MonoBehaviour
     private int indice;
     private InputSystem_Actions controles;
     private int ultimoFrameDeAvanco = -1;
+    private ButtonControl botaoSegurado;
+    private float inicioPressao;
+    private bool entradaLiberada;
+    private const string DicaPular = "Segure o botão de avançar para pular";
 
     private void Awake()
     {
@@ -86,6 +99,8 @@ public class Intro : MonoBehaviour
 
     private void OnEnable()
     {
+        entradaLiberada = false;
+        CancelarPulo();
         controles.UI.Click.performed += AoAvancarDialogo;
         controles.UI.Submit.performed += AoAvancarDialogo;
         controles.UI.Click.Enable();
@@ -96,6 +111,19 @@ public class Intro : MonoBehaviour
 
     private void AoAvancarDialogo(InputAction.CallbackContext context)
     {
+        if (!inicializado || !entradaLiberada || estado == Estado.Finalizando ||
+            !(context.control is ButtonControl botao) || !botao.isPressed)
+            return;
+
+        // Uma pressao continua pertence a um unico botao/dispositivo.
+        if (botaoSegurado != null && botaoSegurado.device.added &&
+            botaoSegurado.device.enabled && botaoSegurado.isPressed) return;
+        botaoSegurado = botao;
+        inicioPressao = Time.unscaledTime;
+        string nome = botao.device is Mouse ? "clique" : botao.shortDisplayName ?? botao.displayName;
+        if (botao.device is DualShockGamepad pad && botao == pad.buttonSouth) nome = "X";
+        textoPular.text = $"Segure {nome} para pular";
+
         if (estado != Estado.Digitando && estado != Estado.AguardandoClique)
             return;
         // Click é PassThrough: também dispara ao soltar o botão.
@@ -117,9 +145,69 @@ public class Intro : MonoBehaviour
         }
         else
         {
-            estado = Estado.Finalizando;
-            StartCoroutine(FinalizarIntro());
+            EncerrarIntro(false);
         }
+    }
+
+    private void Update()
+    {
+        if (!inicializado || estado == Estado.Finalizando) return;
+
+        // Nao aproveitar um botao que veio segurado do menu anterior.
+        if (!entradaLiberada)
+        {
+            entradaLiberada = !AcaoPressionada(controles.UI.Click) && !AcaoPressionada(controles.UI.Submit);
+            return;
+        }
+
+        if (botaoSegurado == null) return;
+        if (!botaoSegurado.device.added || !botaoSegurado.device.enabled || !botaoSegurado.isPressed)
+        {
+            CancelarPulo();
+            return;
+        }
+
+        float progresso = Mathf.Clamp01((Time.unscaledTime - inicioPressao) / Mathf.Max(0.2f, tempoParaPular));
+        barraProgresso.anchorMax = new Vector2(progresso, 1f);
+        indicadorPular.alpha = 1f;
+        if (progresso >= 1f) EncerrarIntro(true);
+    }
+
+    private static bool AcaoPressionada(InputAction acao)
+    {
+        foreach (var controle in acao.controls)
+            if (controle is ButtonControl botao && botao.isPressed) return true;
+        return false;
+    }
+
+    private void CancelarPulo()
+    {
+        botaoSegurado = null;
+        inicioPressao = 0f;
+        if (barraProgresso != null) barraProgresso.anchorMax = new Vector2(0f, 1f);
+        if (textoPular != null) textoPular.text = DicaPular;
+        if (indicadorPular != null) indicadorPular.alpha = estado == Estado.Finalizando ? 0f : 0.75f;
+    }
+
+    private void OnApplicationFocus(bool foco)
+    {
+        if (foco) return;
+        CancelarPulo();
+        entradaLiberada = false;
+    }
+
+    private void EncerrarIntro(bool pulada)
+    {
+        if (estado == Estado.Finalizando) return;
+        estado = Estado.Finalizando;
+        CancelarPulo();
+        indicadorPular.alpha = 0f;
+        StopAllCoroutines();
+        digitacao = null;
+        PlayableDirector diretor = diretorEmExecucao;
+        RemoverInscricaoAnimacao();
+        if (diretor != null) diretor.Stop();
+        StartCoroutine(FinalizarIntro(pulada ? Mathf.Min(duracaoFade, 0.35f) : duracaoFade));
     }
 
     private IEnumerator IniciarIntro()
@@ -127,9 +215,10 @@ public class Intro : MonoBehaviour
         estado = Estado.Entrada;
         indice = 0;
         ultimoFrameDeAvanco = -1;
+        CancelarPulo();
         text.text = string.Empty;
         MostrarDialogo(false);
-        yield return Fade(1f, 0f);
+        yield return Fade(1f, 0f, duracaoFade);
         yield return ApresentarFala();
     }
 
@@ -174,23 +263,23 @@ public class Intro : MonoBehaviour
         digitacao = null;
     }
 
-    private IEnumerator FinalizarIntro()
+    private IEnumerator FinalizarIntro(float tempoFade)
     {
         MostrarDialogo(false);
-        yield return Fade(fadePanel.alpha, 1f);
+        yield return Fade(fadePanel.alpha, 1f, tempoFade);
         SceneManager.LoadSceneAsync(cenaJogo);
     }
 
-    private IEnumerator Fade(float origem, float destino)
+    private IEnumerator Fade(float origem, float destino, float duracao)
     {
         fadePanel.gameObject.SetActive(true);
         fadePanel.blocksRaycasts = true;
         fadePanel.alpha = origem;
         float tempo = 0f;
-        while (tempo < duracaoFade)
+        while (tempo < duracao)
         {
             tempo += Time.unscaledDeltaTime;
-            fadePanel.alpha = Mathf.Lerp(origem, destino, Mathf.Clamp01(tempo / duracaoFade));
+            fadePanel.alpha = Mathf.Lerp(origem, destino, Mathf.Clamp01(tempo / duracao));
             yield return null;
         }
         fadePanel.alpha = destino;
@@ -219,6 +308,8 @@ public class Intro : MonoBehaviour
 
     private void OnDisable()
     {
+        CancelarPulo();
+        if (indicadorPular != null) indicadorPular.alpha = 0f;
         controles.UI.Click.performed -= AoAvancarDialogo;
         controles.UI.Submit.performed -= AoAvancarDialogo;
         controles.UI.Click.Disable();
@@ -240,10 +331,11 @@ public class Intro : MonoBehaviour
     private bool ValidarConfiguracao()
     {
         if (painelDialogo == null || fadePanel == null || text == null || imagem == null ||
+            indicadorPular == null || textoPular == null || barraProgresso == null ||
             sprites == null || sprites.Length < 2 || sprites[0] == null || sprites[1] == null ||
             falas == null || falas.Length == 0)
         {
-            Debug.LogError("Intro: configure a interface, os dois retratos e as falas no Inspector.", this);
+            Debug.LogError("Intro: configure a interface, o indicador de pulo, os dois retratos e as falas no Inspector.", this);
             return false;
         }
         foreach (Fala fala in falas)
