@@ -46,7 +46,6 @@ public class GameEffects : MonoBehaviour
     public enum Sfx { Kill, Heal }
 
     // ---------------- Configuracao ----------------
-    private const float HitStopTimeScale = 0.02f;
     private const float MaxShakeOffset = 0.35f;
 
     // ---------------- Estado ----------------
@@ -119,7 +118,7 @@ public class GameEffects : MonoBehaviour
         if (cameraOffset != null) cameraOffset.Offset = Vector3.zero;
 
         // Se sair da cena no meio de um hit-stop, nao deixa o tempo travado
-        if (inHitStop && Mathf.Approximately(Time.timeScale, HitStopTimeScale)) Time.timeScale = 1f;
+        if (inHitStop) GameFlow.SetHitStop(false);
 
         if (instance == this) instance = null;
     }
@@ -137,6 +136,7 @@ public class GameEffects : MonoBehaviour
     // normalmente (timeScale == 1), assim nao atrapalha pause, menu de downgrade, etc.
     public void HitStop(float duration)
     {
+        if (!GameFlow.CanPlay) return;
         if (!inHitStop && !Mathf.Approximately(Time.timeScale, 1f)) return;
 
         hitStopUntil = Mathf.Max(hitStopUntil, Time.unscaledTime + duration);
@@ -146,20 +146,21 @@ public class GameEffects : MonoBehaviour
     private IEnumerator HitStopRoutine()
     {
         inHitStop = true;
-        Time.timeScale = HitStopTimeScale;
+        GameFlow.SetHitStop(true);
 
         while (Time.unscaledTime < hitStopUntil)
         {
             // Alguem (pause, game over...) mexeu no tempo no meio do hit-stop: respeita e sai.
-            if (!Mathf.Approximately(Time.timeScale, HitStopTimeScale))
+            if (!GameFlow.CanPlay || !GameFlow.IsHitStopped)
             {
                 inHitStop = false;
+                GameFlow.SetHitStop(false);
                 yield break;
             }
             yield return null;
         }
 
-        if (Mathf.Approximately(Time.timeScale, HitStopTimeScale)) Time.timeScale = 1f;
+        GameFlow.SetHitStop(false);
         inHitStop = false;
     }
 

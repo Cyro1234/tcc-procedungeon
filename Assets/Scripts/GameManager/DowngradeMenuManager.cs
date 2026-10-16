@@ -47,6 +47,32 @@ public class DowngradeMenuManager : MonoBehaviour
         }
     }
 
+    private void OnEnable() => GameFlow.Changed += AoAlterarEstado;
+
+    private void OnDisable()
+    {
+        GameFlow.Changed -= AoAlterarEstado;
+        pendingGenerator = null;
+        if (downgradePanel != null) downgradePanel.SetActive(false);
+        GameFlow.Resume(GameFlow.State.Downgrade);
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
+    private void AoAlterarEstado()
+    {
+        if (GameFlow.Current == GameFlow.State.Downgrade) return;
+        if ((downgradePanel != null && downgradePanel.activeSelf) || pendingGenerator != null)
+        {
+            pendingGenerator = null;
+            if (downgradePanel != null) downgradePanel.SetActive(false);
+            GameFlow.Resume(GameFlow.State.Downgrade);
+        }
+    }
+
     // Debug pro botao abrir qnd eu quiser
     //public void OpenMenuForTesting()
     //{
@@ -56,13 +82,14 @@ public class DowngradeMenuManager : MonoBehaviour
     // Chamado pela escada em vez de gerar a proxima dungeon direto
     public void OpenMenu(AbstractDungeonGenerator generator)
     {
+        if (GameFlow.Current == GameFlow.State.GameOver || GameFlow.Current == GameFlow.State.Downgrade) return;
         pendingGenerator = generator;
 
         RollChoices();
 
         if (playerMovement != null) playerMovement.ForcarParada();
+        GameFlow.Pause(GameFlow.State.Downgrade);
         downgradePanel.SetActive(true);
-        Time.timeScale = 0f;
     }
 
     private void RollChoices()
@@ -188,6 +215,8 @@ public class DowngradeMenuManager : MonoBehaviour
 
     public void SelectChoice(int index)
     {
+        if (GameFlow.Current != GameFlow.State.Downgrade || !downgradePanel.activeSelf ||
+            index < 0 || index >= currentChoices.Count) return;
         RolledChoice choice = currentChoices[index];
 
         if (choice.statusEffectOption != null)
@@ -228,17 +257,16 @@ public class DowngradeMenuManager : MonoBehaviour
             if (health.IsDead)
             {
                 pendingGenerator = null;
+                GameFlow.Resume(GameFlow.State.Downgrade);
                 return;
             }
         }
 
-        Time.timeScale = 1f;
         if (playerMovement != null) playerMovement.ForcarParada();
 
-        if (pendingGenerator != null)
-        {
-            pendingGenerator.GenerateDungeon();
-            pendingGenerator = null;
-        }
+        var generator = pendingGenerator;
+        pendingGenerator = null;
+        if (generator != null) generator.GenerateDungeon();
+        GameFlow.Resume(GameFlow.State.Downgrade);
     }
 }

@@ -26,6 +26,13 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private void OnEnable() => GameFlow.Changed += ForcarParada;
+    private void OnDisable()
+    {
+        GameFlow.Changed -= ForcarParada;
+        ForcarParada();
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -37,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Time.timeScale == 0f)
+        if (!GameFlow.CanPlay || Time.timeScale == 0f)
         {
             rb.linearVelocity = Vector2.zero;
             return;
@@ -48,7 +55,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (Time.timeScale == 0f) return;
+        if (!GameFlow.CanPlay || Time.timeScale == 0f) return;
 
         if (Time.time < overrideEnd)
         {
@@ -103,6 +110,7 @@ public class PlayerMovement : MonoBehaviour
     // Movimentacao do jogador
     public void Move(InputAction.CallbackContext context)
     {
+        if (!GameFlow.CanPlay) { ForcarParada(); return; }
         moveInput = Vector2.ClampMagnitude(context.ReadValue<Vector2>(), 1f);
     }
     public void ForcarParada()

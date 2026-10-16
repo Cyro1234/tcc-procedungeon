@@ -12,44 +12,51 @@ public class PauseManager : MonoBehaviour
 
     [SerializeField] private PlayerMovement playerMovement;
 
-    public static bool pausado = false;
+    public static bool pausado => !GameFlow.CanPlay;
     private static int i = 1;
-    private InputSystem_Actions controles;
+    private InputActionAsset controles;
 
     private void OnEnable()
     {
-        controles = new InputSystem_Actions();
+        GameFlow.Changed += AoAlterarEstado;
+        controles = GameFlow.PlayerActions;
+        if (controles == null) return;
         InputAction pausa = controles.FindAction("Player/Pause", true);
         pausa.performed += AoPausar;
         pausa.Enable();
-        controles.UI.Cancel.performed += AoVoltar;
-        controles.UI.Cancel.Enable();
+        controles.FindAction("UI/Cancel", true).performed += AoVoltar;
+        controles.FindAction("UI/Cancel", true).Enable();
     }
 
     private void OnDisable()
     {
-        controles?.Disable();
-        controles?.Dispose();
+        GameFlow.Changed -= AoAlterarEstado;
+        if (controles != null)
+        {
+            controles.FindAction("Player/Pause", true).performed -= AoPausar;
+            controles.FindAction("UI/Cancel", true).performed -= AoVoltar;
+        }
         controles = null;
+        ResumirJogo();
     }
 
     void Start()
     {
-        // Força a variável a resetar toda vez que uma fase iniciar
-        pausado = false;
-
-        // Garante que o tempo do jogo comece normal, caso retornar pro menu com o jogo pausado
-        Time.timeScale = 1f;
-
         if (playerMovement == null)
             playerMovement = Object.FindAnyObjectByType<PlayerMovement>();
     }
 
     private void AoPausar(InputAction.CallbackContext context)
     {
-        if (pausePanel.activeSelf || optionsPanel.activeSelf || controlsPanel.activeSelf)
-            ResumirJogo();
-        else if (Time.timeScale > 0f)
+        if (GameFlow.Current == GameFlow.State.Inventory)
+            InventoryManager.Instance?.FecharInventario();
+        else if (GameFlow.Current == GameFlow.State.PauseMenu)
+        {
+            if (context.control.device is Keyboard && controlsPanel.activeSelf) VoltarParaOpcoes();
+            else if (context.control.device is Keyboard && optionsPanel.activeSelf) VoltarParaPause();
+            else ResumirJogo();
+        }
+        else if (GameFlow.CanPlay)
             PausarJogo();
     }
 
@@ -57,8 +64,7 @@ public class PauseManager : MonoBehaviour
     {
         // Escape é tratado por Pause; Cancel no controle volta um nível do menu.
         if (!(context.control.device is Gamepad)) return;
-        if (InventoryManager.Instance != null && InventoryManager.Instance.inventarioAberto)
-            return;
+        if (GameFlow.Current != GameFlow.State.PauseMenu) return;
         if (controlsPanel.activeSelf) VoltarParaOpcoes();
         else if (optionsPanel.activeSelf) VoltarParaPause();
         else if (pausePanel.activeSelf) ResumirJogo();
@@ -72,46 +78,56 @@ public class PauseManager : MonoBehaviour
 
     public void PausarJogo()
     {
+        if (!GameFlow.CanPlay) return;
+        GameFlow.Pause(GameFlow.State.PauseMenu);
         pausePanel.SetActive(true);
         optionsPanel.SetActive(false);
         controlsPanel.SetActive(false);
 
         if (playerMovement != null) playerMovement.ForcarParada();
 
-        Time.timeScale = 0;
-        pausado = true;
     }
 
     public void ResumirJogo()
     {
-        pausePanel.SetActive(false);
-        optionsPanel.SetActive(false);
-        controlsPanel.SetActive(false);
+        if (pausePanel != null) pausePanel.SetActive(false);
+        if (optionsPanel != null) optionsPanel.SetActive(false);
+        if (controlsPanel != null) controlsPanel.SetActive(false);
 
         if (playerMovement != null) playerMovement.ForcarParada();
 
-        Time.timeScale = 1;
-        pausado = false;
+        GameFlow.Resume(GameFlow.State.PauseMenu);
+    }
+
+    private void AoAlterarEstado()
+    {
+        if (GameFlow.Current != GameFlow.State.PauseMenu &&
+            ((pausePanel != null && pausePanel.activeSelf) || (optionsPanel != null && optionsPanel.activeSelf) ||
+            (controlsPanel != null && controlsPanel.activeSelf))) ResumirJogo();
     }
 
     public void AbrirOpcoes()
     {
+        if (GameFlow.Current != GameFlow.State.PauseMenu) return;
         pausePanel.SetActive(false);
         optionsPanel.SetActive(true);
     }
 
     public void AbrirControles()
     {
+        if (GameFlow.Current != GameFlow.State.PauseMenu) return;
         optionsPanel.SetActive(false);
         controlsPanel.SetActive(true);
     }
     public void VoltarParaPause()
     {
+        if (GameFlow.Current != GameFlow.State.PauseMenu) return;
         optionsPanel.SetActive(false);
         pausePanel.SetActive(true);
     }
     public void VoltarParaOpcoes()
     {
+        if (GameFlow.Current != GameFlow.State.PauseMenu) return;
         controlsPanel.SetActive(false);
         optionsPanel.SetActive(true);
     }
@@ -119,7 +135,6 @@ public class PauseManager : MonoBehaviour
     
     private void RestartGame()
     {
-        Time.timeScale = 1f; // despausa
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 

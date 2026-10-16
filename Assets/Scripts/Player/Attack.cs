@@ -14,6 +14,7 @@ public class Attack : MonoBehaviour
     bool isCooldown = false;
     float atkDuration = 0.3f; // Podemos deixar isso no PlayerStatsHandler.cs depois, pra gente ter a possibilidade de modificar o tempo de duração do ataque com buffs e debuffs (Xicote de Alex)
     float atkTimer = 0f;
+    private float cancelledAttackDelay;
 
     private PlayerStatsHandler stats;
     private Sprite spriteBaseOriginal;
@@ -28,6 +29,33 @@ public class Attack : MonoBehaviour
     private void Awake()
     {
         stats = GetComponent<PlayerStatsHandler>();
+    }
+
+    private void OnEnable() => GameFlow.Changed += AoAlterarEstado;
+
+    private void OnDisable()
+    {
+        GameFlow.Changed -= AoAlterarEstado;
+        CancelarAtaque();
+    }
+
+    private void AoAlterarEstado()
+    {
+        if (!GameFlow.CanPlay) CancelarAtaque();
+    }
+
+    private void CancelarAtaque()
+    {
+        if (isAttacking)
+        {
+            // Abrir um menu nao deve encurtar o intervalo entre os golpes.
+            cancelledAttackDelay = Mathf.Max(0f, atkDuration - atkTimer);
+            isAttacking = false;
+            atkTimer = 0f;
+            isCooldown = true;
+        }
+        if (Melee != null) Melee.SetActive(false);
+        if (Pivot != null) Pivot.SetActive(false);
     }
 
     void Start()
@@ -50,7 +78,7 @@ public class Attack : MonoBehaviour
 
     public void OnAttack()
     {
-        if (Time.timeScale == 0f) return;
+        if (!enabled || !GameFlow.CanPlay || Time.timeScale == 0f) return;
 
         if (InventoryManager.Instance != null &&
             InventoryManager.Instance.ObterItemSelecionado() == Chest.ItemType.HealthPotion)
@@ -122,9 +150,10 @@ public class Attack : MonoBehaviour
         if (isCooldown)
         {
             atkTimer += Time.deltaTime;
-            if (atkTimer >= stats.GetPlayerAttackCooldown())
+            if (atkTimer >= stats.GetPlayerAttackCooldown() + cancelledAttackDelay)
             {
                 atkTimer = 0f;
+                cancelledAttackDelay = 0f;
                 isCooldown = false;
             }
         }

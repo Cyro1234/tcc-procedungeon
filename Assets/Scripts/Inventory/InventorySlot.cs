@@ -10,6 +10,7 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     private Transform originalParent;
     private Vector3 originalPosition;
+    private bool arrastando;
 
     // NOVO: Referência segura para o Canvas principal
     private Canvas canvas;
@@ -39,10 +40,11 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (!InventoryManager.Instance.inventarioAberto || itemIcon.sprite == null) return;
+        if (!InventoryManager.Instance.PodeEditarInventario || itemIcon.sprite == null) return;
 
         originalParent = itemIcon.transform.parent;
         originalPosition = itemIcon.transform.position;
+        arrastando = true;
 
         // NOVO: Movemos o ícone para o Canvas de forma segura (true mantém a escala original)
         itemIcon.transform.SetParent(canvas.transform, true);
@@ -54,7 +56,7 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!InventoryManager.Instance.inventarioAberto || itemIcon.sprite == null) return;
+        if (!arrastando || !InventoryManager.Instance.PodeEditarInventario) return;
 
         // NOVO: A forma matemática correta e à prova de falhas de mover UI no Unity
         Vector3 globalMousePos;
@@ -70,17 +72,12 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (!InventoryManager.Instance.inventarioAberto || itemIcon.sprite == null) return;
-
-        // Devolve o item para o botão de origem (true mantém a escala original)
-        itemIcon.transform.SetParent(originalParent, true);
-        itemIcon.transform.position = originalPosition;
-        itemIcon.raycastTarget = true;
+        CancelarArraste();
     }
 
     public void OnDrop(PointerEventData eventData)
     {
-        if (!InventoryManager.Instance.inventarioAberto) return;
+        if (!InventoryManager.Instance.PodeEditarInventario || eventData.pointerDrag == null) return;
 
         InventorySlot slotArrastado = eventData.pointerDrag.GetComponent<InventorySlot>();
 
@@ -93,4 +90,16 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             Debug.Log($"Trocou o item do slot {slotArrastado.slotIndex} para o {this.slotIndex}!");
         }
     }
+
+    public void CancelarArraste()
+    {
+        if (!arrastando) return;
+        arrastando = false;
+        if (itemIcon == null || originalParent == null) return;
+        itemIcon.transform.SetParent(originalParent, true);
+        itemIcon.transform.position = originalPosition;
+        itemIcon.raycastTarget = true;
+    }
+
+    private void OnDisable() => CancelarArraste();
 }

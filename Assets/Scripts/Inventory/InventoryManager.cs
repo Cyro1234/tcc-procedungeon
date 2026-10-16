@@ -15,39 +15,59 @@ public class InventoryManager : MonoBehaviour
     public InventorySlot[] slots = new InventorySlot[8];
     private Chest.ItemType[] itensNoInventario = new Chest.ItemType[8];
     public int slotSelecionadoIndex = 0;
-    public bool inventarioAberto = false;
-    private InputSystem_Actions controles;
+    public bool inventarioAberto { get; private set; }
+    public bool PodeEditarInventario => inventarioAberto && GameFlow.Current == GameFlow.State.Inventory;
+    private InputActionAsset controles;
     private int origemTroca = -1;
 
     private void OnEnable()
     {
-        controles = new InputSystem_Actions();
-        controles.Player.Inventory.performed += AoAlternarInventario;
-        controles.Player.Previous.performed += AoSelecionarAnterior;
-        controles.Player.Next.performed += AoSelecionarProximo;
-        controles.Player.Jump.performed += AoConfirmarTroca;
-        controles.UI.Cancel.performed += AoCancelarInventario;
-        controles.Player.Inventory.Enable();
-        controles.Player.Previous.Enable();
-        controles.Player.Next.Enable();
-        controles.Player.Jump.Enable();
-        controles.UI.Cancel.Enable();
+        GameFlow.Changed += AoAlterarEstado;
+        controles = GameFlow.PlayerActions;
+        if (controles != null)
+        {
+            LigarAcao("Player/Inventory", AoAlternarInventario);
+            LigarAcao("Player/Previous", AoSelecionarAnterior);
+            LigarAcao("Player/Next", AoSelecionarProximo);
+            LigarAcao("Player/Jump", AoConfirmarTroca);
+            LigarAcao("UI/Cancel", AoCancelarInventario);
+        }
         if (stats != null) AtualizarBonusBota();
     }
 
     private void OnDisable()
     {
+        GameFlow.Changed -= AoAlterarEstado;
+        if (controles != null)
+        {
+            controles.FindAction("Player/Inventory", true).performed -= AoAlternarInventario;
+            controles.FindAction("Player/Previous", true).performed -= AoSelecionarAnterior;
+            controles.FindAction("Player/Next", true).performed -= AoSelecionarProximo;
+            controles.FindAction("Player/Jump", true).performed -= AoConfirmarTroca;
+            controles.FindAction("UI/Cancel", true).performed -= AoCancelarInventario;
+        }
+        FecharInventario();
         if (stats != null && modificadorBota != null)
             stats.RemoveSimpleModifier(modificadorBota);
         modificadorBota = null;
-        controles?.Disable();
-        controles?.Dispose();
         controles = null;
+    }
+
+    private void LigarAcao(string nome, System.Action<InputAction.CallbackContext> callback)
+    {
+        InputAction acao = controles.FindAction(nome, true);
+        acao.performed += callback;
+        acao.Enable();
+    }
+
+    private void AoAlterarEstado()
+    {
+        if (inventarioAberto && GameFlow.Current != GameFlow.State.Inventory) FecharInventario();
     }
 
     private void AoAlternarInventario(InputAction.CallbackContext context)
     {
-        if (inventarioAberto || Time.timeScale > 0f)
+        if (PodeEditarInventario || GameFlow.CanPlay)
             AlternarInventario();
     }
 
@@ -56,13 +76,13 @@ public class InventoryManager : MonoBehaviour
 
     private void SelecionarSlotRelativo(int deslocamento)
     {
-        if (Time.timeScale == 0f && !inventarioAberto) return;
+        if (!GameFlow.CanPlay && !PodeEditarInventario) return;
         slotSelecionadoIndex = (slotSelecionadoIndex + deslocamento + itensNoInventario.Length) % itensNoInventario.Length;
     }
 
     private void AoConfirmarTroca(InputAction.CallbackContext context)
     {
-        if (!inventarioAberto || !(context.control.device is Gamepad)) return;
+        if (!PodeEditarInventario || !(context.control.device is Gamepad)) return;
         if (origemTroca < 0)
         {
             origemTroca = slotSelecionadoIndex;
@@ -76,7 +96,7 @@ public class InventoryManager : MonoBehaviour
 
     private void AoCancelarInventario(InputAction.CallbackContext context)
     {
-        if (!inventarioAberto || !(context.control.device is Gamepad)) return;
+        if (!PodeEditarInventario || !(context.control.device is Gamepad)) return;
         if (origemTroca >= 0) origemTroca = -1;
         else AlternarInventario();
     }
@@ -116,7 +136,7 @@ public class InventoryManager : MonoBehaviour
 
     public bool UsarItemSelecionado()
     {
-        if (inventarioAberto || Time.timeScale == 0f ||
+        if (!GameFlow.CanPlay || Time.timeScale == 0f ||
             ObterItemSelecionado() != Chest.ItemType.HealthPotion) return false;
         var vida = FindAnyObjectByType<HeartSystem>();
         if (vida == null || vida.IsDead || vida.IsFullHealth) return false;
@@ -152,7 +172,7 @@ public class InventoryManager : MonoBehaviour
 
     private void LidarComInputsDeTeclado()
     {
-        if (Keyboard.current == null || inventarioAberto || Time.timeScale == 0f) return;
+        if (Keyboard.current == null || !GameFlow.CanPlay || Time.timeScale == 0f) return;
 
         // Seleção de Slots (Teclas 1 a 8)
         if (Keyboard.current.digit1Key.wasPressedThisFrame) slotSelecionadoIndex = 0;
@@ -167,23 +187,24 @@ public class InventoryManager : MonoBehaviour
 
     private void AlternarInventario()
     {
-        inventarioAberto = !inventarioAberto;
+        if (inventarioAberto) { FecharInventario(); return; }
+        if (!GameFlow.CanPlay) return;
+        inventarioAberto = true;
         origemTroca = -1;
         if (UnityEngine.EventSystems.EventSystem.current != null)
             UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
 
-        if (inventarioAberto)
-        {
-            hotbarPanel.anchoredPosition = posicaoInventario;
-            PauseManager.pausado = true;
-            Time.timeScale = 0; // Pausa o jogo
-        }
-        else
-        {
-            hotbarPanel.anchoredPosition = posicaoJogo;
-            PauseManager.pausado = false;
-            Time.timeScale = 1; // Retoma o jogo
-        }
+        hotbarPanel.anchoredPosition = posicaoInventario;
+        GameFlow.Pause(GameFlow.State.Inventory);
+    }
+
+    public void FecharInventario()
+    {
+        inventarioAberto = false;
+        origemTroca = -1;
+        foreach (InventorySlot slot in slots) if (slot != null) slot.CancelarArraste();
+        if (hotbarPanel != null) hotbarPanel.anchoredPosition = posicaoJogo;
+        GameFlow.Resume(GameFlow.State.Inventory);
     }
 
     public bool AdicionarItem(Chest.ItemType novoItem)
@@ -203,6 +224,7 @@ public class InventoryManager : MonoBehaviour
 
     public void TrocarItens(int indexOrigem, int indexDestino)
     {
+        if (!PodeEditarInventario) return;
         Chest.ItemType temp = itensNoInventario[indexDestino];
         itensNoInventario[indexDestino] = itensNoInventario[indexOrigem];
         itensNoInventario[indexOrigem] = temp;

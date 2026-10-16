@@ -16,8 +16,8 @@ public class GameOverManager : MonoBehaviour
     // Mostra a tela de game over e pausa o jogo
     public void ShowGameOver()
     {
+        GameFlow.Pause(GameFlow.State.GameOver);
         gameOverPanel.SetActive(true);
-        Time.timeScale = 0f; // pausa o jogo
 
         if (playerMovement != null) playerMovement.ForcarParada();
 
@@ -29,7 +29,6 @@ public class GameOverManager : MonoBehaviour
 
     public void RestartGame()
     {
-        Time.timeScale = 1f; // despausa
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
