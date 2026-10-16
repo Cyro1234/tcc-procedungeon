@@ -109,41 +109,32 @@ public class HeartSystem : MonoBehaviour
     public void takeDamage(int damage, Transform source)
     {
         AtualizarVidaMaxima();
-        if (IsInvulnerable) return;
+        if (damage <= 0 || IsInvulnerable) return;
 
         invincibleUntil = Time.time + invincibilityTime;
         ApplyKnockback(source);
 
         if (shieldHealth > 0)
         {
-            shieldHealth -= damage;
+            int absorbed = Mathf.Min(shieldHealth, damage);
+            shieldHealth -= absorbed;
+            damage -= absorbed;
             Debug.Log("O Escudo absorveu o dano! Resistência restante: " + shieldHealth);
 
-            AudioManager.Instance.PlaySFX("EscudoQuebrou");
             GameEffects.Instance.PlayerShieldHit(transform.position);
 
-            if (shieldHealth < 0)
+            if (shieldHealth == 0)
             {
-                // O dano quebrou o escudo e sobrou um pouco. Subtrai a sobra da vida.
-                life += shieldHealth; // shieldHealth ficou negativo, então isso subtrai da vida
-                shieldHealth = 0;
-                Escudo.SetActive(false);
-                GameEffects.Instance.PlayerHurt(transform.position);
-                Debug.Log("O escudo quebrou e o jogador sofreu o impacto!");
+                if (Escudo != null) Escudo.SetActive(false);
+                AudioManager.Instance.PlaySFX("EscudoQuebrou");
             }
-            else
-            {
-                return; // O escudo aguentou todo o impacto. Fim da função.
-            }
-        }
-        else
-        {
-            // Se não tinha escudo, tira da vida normalmente
-            life -= damage;
-            GameEffects.Instance.PlayerHurt(transform.position);
+
+            if (damage == 0) return; // O escudo absorveu o impacto inteiro, mesmo se quebrou.
         }
 
-        life = Mathf.Max(life, 0); // No maximo fica com 0 vidas
+        // Apenas o dano que nao foi absorvido chega aos coracoes.
+        life = Mathf.Max(life - damage, 0);
+        GameEffects.Instance.PlayerHurt(transform.position);
         Debug.Log("TOMOU DANO! LIFE: " + life + " - CONTAINERS: " + hearts.Length);
 
         if (life <= 0)
@@ -170,8 +161,8 @@ public class HeartSystem : MonoBehaviour
     // Função que será chamada pelo Baú para dar o escudo
     public void EquipShield(int shieldAmount)
     {
-        shieldHealth = shieldAmount;
-        Escudo.SetActive(true);
+        shieldHealth = Mathf.Max(0, shieldAmount);
+        if (Escudo != null) Escudo.SetActive(shieldHealth > 0);
         Debug.Log($"Escudo Equipado! Proteção total: {shieldHealth} de dano.");
         //hasShield = true;
         //Debug.Log("Escudo Equipado! Você tem uma vida extra.");
