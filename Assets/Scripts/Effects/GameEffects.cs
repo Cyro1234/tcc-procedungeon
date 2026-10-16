@@ -4,19 +4,16 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Sumario: central de "game effects" (juice) do jogo.
-// - Hit-stop (congela o tempo por alguns milissegundos quando um golpe acerta)
-// - Tremida de camera (via CinemachineCameraOffset, entao nao briga com o Follow nem com o RoomDetector)
-// - Flash de tela, fade entre andares e banner com o nome do andar/bioma
-// - Particulas simples e texto flutuante (usado na cura)
-// - Efeitos sonoros procedurais (gerados por codigo, nao precisa de arquivo de audio)
-//
+// Sumario: central dos efeitos de jogo.
+// - Hit-stop (hehe quase hitslop uau)
+// - Tremida de camera
+// - Flash de tela, fade entre andares e banners de texto ("Andar 2 - Deserto", "CHEFE!", etc)
+// - Textos flutuantes
+// - Efeitos sonoros procedurais
+
 // Ele se cria sozinho na primeira vez que alguem chama GameEffects.Instance, entao NAO precisa
-// colocar nada na cena. Os efeitos usam um fluxo proprio do Rng, derivado da seed,
+// colocar nada na cena!!!! Os efeitos usam um fluxo proprio do Rng, derivado da seed,
 // separado de todos os sorteios de gameplay e geracao procedural.
-//
-// A versao completa (dash, numeros de dano, banners de chefe, resumo da run, etc) esta guardada
-// em Backups/game-effects-completo na raiz do projeto.
 public class GameEffects : MonoBehaviour
 {
     private static GameEffects instance;
@@ -45,10 +42,8 @@ public class GameEffects : MonoBehaviour
 
     public enum Sfx { Kill, Heal }
 
-    // ---------------- Configuracao ----------------
     private const float MaxShakeOffset = 0.35f;
 
-    // ---------------- Estado ----------------
     private float hitStopUntil;
     private bool inHitStop;
 
@@ -57,11 +52,15 @@ public class GameEffects : MonoBehaviour
     private bool searchedCamera;
 
     private Transform player;
+    private RoomDetector roomDetector;
+    private bool roomLocked;
 
+    private Canvas canvas;
     private Image flashImage;
     private Image fadeImage;
     private TextMeshProUGUI bannerTitle;
     private TextMeshProUGUI bannerSubtitle;
+    private TextMeshProUGUI summaryText;
     private Coroutine bannerRoutine;
     private Coroutine flashRoutine;
     private Coroutine fadeRoutine;
@@ -106,6 +105,7 @@ public class GameEffects : MonoBehaviour
 
         BuildUI();
         BuildClips();
+        HookRoomDetector();
     }
 
     private void OnApplicationQuit()
@@ -115,9 +115,15 @@ public class GameEffects : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (roomDetector != null)
+        {
+            roomDetector.AoEntrarNaSalaComInimigos -= OnRoomLocked;
+            roomDetector.AoLimparSala -= OnRoomCleared;
+        }
+
         if (cameraOffset != null) cameraOffset.Offset = Vector3.zero;
 
-        // Se sair da cena no meio de um hit-stop, nao deixa o tempo travado
+        // Se sair da cena no meio de um hit-stop, nao deixa o tempo travado (bizarro qnd isso acontece)
         if (inHitStop) GameFlow.SetHitStop(false);
 
         if (instance == this) instance = null;
@@ -128,12 +134,10 @@ public class GameEffects : MonoBehaviour
         UpdateShake();
     }
 
-    // =====================================================================
-    // HIT-STOP
-    // =====================================================================
+    // HITSLOP!!!!!!!
 
     // Congela o jogo por "duration" segundos (tempo real). So funciona se o jogo estiver rodando
-    // normalmente (timeScale == 1), assim nao atrapalha pause, menu de downgrade, etc.
+    // normalmente (timeScale == 1), assim nao atrapalha pause, menu de downgrade, e coisa e tals
     public void HitStop(float duration)
     {
         if (!GameFlow.CanPlay) return;
@@ -164,11 +168,9 @@ public class GameEffects : MonoBehaviour
         inHitStop = false;
     }
 
-    // =====================================================================
     // CAMERA SHAKE
-    // =====================================================================
 
-    // amount entre 0 e 1. Os valores se acumulam (trauma) e decaem sozinhos.
+    // amount entre 0 e 1. Os valores se acumulam e decaem sozinhos.
     public void Shake(float amount)
     {
         trauma = Mathf.Clamp01(trauma + amount);
@@ -214,9 +216,7 @@ public class GameEffects : MonoBehaviour
         }
     }
 
-    // =====================================================================
-    // EVENTOS DE GAMEPLAY (chamados pelos scripts do jogo)
-    // =====================================================================
+    // EVENTOS DE GAMEPLAY
 
     public void EnemyHit(Vector3 position, SpriteRenderer reference)
     {
@@ -232,7 +232,12 @@ public class GameEffects : MonoBehaviour
         PlaySfx(Sfx.Kill, boss ? 1f : 0.8f, 0.15f);
         Burst(position, new Color(0.85f, 0.2f, 0.25f), boss ? 40 : 12, boss ? 8f : 5f, reference);
         Burst(position, Color.white, boss ? 20 : 6, boss ? 6f : 3f, reference);
-        if (boss) FlashScreen(new Color(1f, 1f, 1f, 0.6f), 0.4f);
+
+        if (boss)
+        {
+            FlashScreen(new Color(1f, 1f, 1f, 0.6f), 0.4f);
+            Banner("CHEFE DERROTADO!", "A escada foi liberada", new Color(1f, 0.85f, 0.3f), 2.5f);
+        }
     }
 
     public void PlayerHurt(Vector3 position)
@@ -243,11 +248,12 @@ public class GameEffects : MonoBehaviour
         Burst(position, new Color(1f, 0.25f, 0.25f), 10, 5f, null);
     }
 
-    public void PlayerShieldHit(Vector3 position)
+    public void PlayerShieldHit(Vector3 position, bool broke = false)
     {
         HitStop(0.05f);
-        Shake(0.2f);
-        Burst(position, new Color(0.5f, 0.8f, 1f), 8, 5f, null);
+        Shake(broke ? 0.4f : 0.2f);
+        Burst(position, new Color(0.5f, 0.8f, 1f), broke ? 16 : 8, 5f, null);
+        Popup(position + Vector3.up * 0.8f, broke ? "Escudo quebrou!" : "Bloqueado!", new Color(0.55f, 0.85f, 1f), 0.8f);
     }
 
     public void PlayerHealed(Vector3 position, int amount)
@@ -258,11 +264,90 @@ public class GameEffects : MonoBehaviour
         PlaySfx(Sfx.Heal, 1f, 0f);
     }
 
+    public void ItemObtained(Vector3 position, string text, Color color)
+    {
+        Popup(position + Vector3.up * 0.9f, text, color, 1.1f);
+        Burst(position, color, 18, 4.5f, null);
+    }
+
+    public void EnemyNoticed(Vector3 position)
+    {
+        Popup(position + Vector3.up * 0.8f, "!", new Color(1f, 0.85f, 0.2f), 1.4f, 0.45f);
+    }
+
     public void OnNewFloor(int floor, TileMapVisualizer.Biomas bioma)
     {
+        RunStats.SetFloor(floor);
+        roomLocked = false;
         HeartPickup.ClearAll();
+        HookRoomDetector();
+
         FadeFromBlack(0.7f);
         Banner($"Andar {floor}", BiomaDisplayName(bioma), BiomaColor(bioma), 2.2f);
+    }
+
+    public void OnEnterBossRoom()
+    {
+        roomLocked = false;
+        Shake(0.5f);
+        FlashScreen(new Color(0.6f, 0f, 0.1f, 0.45f), 0.6f);
+        Banner(NomeDoChefe().ToUpper(), "Sobreviva e derrote-o para descer", new Color(1f, 0.3f, 0.3f), 2f);
+    }
+
+    // Descobre qual chefe esta na sala pelo script dele.
+    // Chefe sem script proprio usa o nome do proprio objeto pra nao ficar bugado e tals
+    private static string NomeDoChefe()
+    {
+        GameObject maisPerto = null;
+        float menorDistancia = float.MaxValue;
+        foreach (GameObject boss in GameObject.FindGameObjectsWithTag("Boss"))
+        {
+            float d = Vector2.Distance(boss.transform.position, new Vector2(1000f, 0f));
+            if (d < menorDistancia) { menorDistancia = d; maisPerto = boss; }
+        }
+        if (maisPerto == null) return "Chefe";
+
+        if (maisPerto.GetComponentInParent<Goblin>() != null || maisPerto.GetComponentInChildren<Goblin>() != null) return "Goblin";
+        if (maisPerto.GetComponentInParent<Coruja>() != null || maisPerto.GetComponentInChildren<Coruja>() != null) return "Coruja Dourada";
+        if (maisPerto.GetComponentInParent<Bruxinha>() != null || maisPerto.GetComponentInChildren<Bruxinha>() != null) return "Bruxinha";
+        if (maisPerto.GetComponentInParent<Coco>() != null || maisPerto.GetComponentInChildren<Coco>() != null) return "Coco";
+
+        string nome = maisPerto.name.Replace("(Clone)", "").Trim();
+        if (string.IsNullOrEmpty(nome)) return "Chefe";
+        return System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(nome.ToLower());
+    }
+
+    public void OnDash(Vector3 position)
+    {
+        Burst(position, new Color(0.8f, 0.9f, 1f), 6, 2f, null);
+    }
+
+    // SALAS (portas trancando / sala limpa)
+
+    private void HookRoomDetector()
+    {
+        if (roomDetector != null) return;
+        roomDetector = FindAnyObjectByType<RoomDetector>();
+        if (roomDetector != null)
+        {
+            roomDetector.AoEntrarNaSalaComInimigos += OnRoomLocked;
+            roomDetector.AoLimparSala += OnRoomCleared;
+        }
+    }
+
+    private void OnRoomLocked(BoundsInt bounds)
+    {
+        if (roomLocked) return;
+        roomLocked = true;
+        Shake(0.3f);
+    }
+
+    private void OnRoomCleared()
+    {
+        if (!roomLocked) return;
+        roomLocked = false;
+        Transform p = GetPlayer();
+        if (p != null) Burst(p.position, new Color(0.5f, 1f, 0.55f), 14, 4f, null);
     }
 
     private Transform GetPlayer()
@@ -275,9 +360,7 @@ public class GameEffects : MonoBehaviour
         return player;
     }
 
-    // =====================================================================
     // TEXTO FLUTUANTE E PARTICULAS
-    // =====================================================================
 
     public void Popup(Vector3 position, string text, Color color, float size = 1f, float lifetime = 0.8f)
     {
@@ -306,7 +389,7 @@ public class GameEffects : MonoBehaviour
         ft.Init(lifetime);
     }
 
-    // Explosao de particulas quadradinhas. "reference" (opcional) serve pra copiar material/camada
+    // Explosao de particulas quadradinhas
     // de ordenacao de um sprite existente, assim as particulas ficam com a mesma iluminacao.
     public void Burst(Vector3 position, Color color, int count, float speed, SpriteRenderer reference)
     {
@@ -349,17 +432,15 @@ public class GameEffects : MonoBehaviour
         }
     }
 
-    // =====================================================================
-    // UI (flash, fade, banner do andar)
-    // =====================================================================
+    // UI (flash, fade, banner, resumo da run)
 
     private void BuildUI()
     {
         var canvasGo = new GameObject("[GameEffects UI]", typeof(RectTransform));
         canvasGo.transform.SetParent(transform, false);
-        var canvas = canvasGo.AddComponent<Canvas>();
+        canvas = canvasGo.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 900; // Por cima do HUD. Sem GraphicRaycaster: nunca bloqueia cliques.
+        canvas.sortingOrder = 900; 
 
         var scaler = canvasGo.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -371,6 +452,8 @@ public class GameEffects : MonoBehaviour
 
         bannerTitle = CreateText("BannerTitle", canvasGo.transform, new Vector2(0.5f, 0.72f), 96f);
         bannerSubtitle = CreateText("BannerSubtitle", canvasGo.transform, new Vector2(0.5f, 0.64f), 44f);
+        summaryText = CreateText("RunSummary", canvasGo.transform, new Vector2(0.5f, 0.12f), 34f);
+        summaryText.rectTransform.sizeDelta = new Vector2(1600f, 200f);
     }
 
     private Image CreateFullscreenImage(string name, Transform parent)
@@ -488,9 +571,16 @@ public class GameEffects : MonoBehaviour
         bannerTitle.rectTransform.localScale = Vector3.one * scale;
     }
 
-    // =====================================================================
-    // AUDIO PROCEDURAL
-    // =====================================================================
+    public void ShowRunSummary()
+    {
+        string newRecord = RunStats.Floor >= RunStats.BestFloor ? "  <color=#FFD54A>NOVO RECORDE!</color>" : string.Empty;
+        summaryText.color = Color.white;
+        summaryText.text =
+            $"Andar {RunStats.Floor}  |  {RunStats.Kills} inimigos  |  {RunStats.BossesKilled} chefes  |  {RunStats.ElapsedText()}\n" +
+            $"<size=70%>Recorde: Andar {RunStats.BestFloor}{newRecord}   -   [R] tentar de novo</size>";
+    }
+
+    // AUDIO PROCEDURAL oOooOOOOoOOOo
 
     public void PlaySfx(Sfx sfx, float volume = 1f, float pitchVariation = 0f)
     {
@@ -563,6 +653,7 @@ public class GameEffects : MonoBehaviour
             {
                 case Wave.Square: s = System.Math.Sin(phase) >= 0 ? 0.6f : -0.6f; break;
                 case Wave.Noise:
+                    // Ruido filtrado pela frequencia (soa como "whoosh"/impacto)
                     float n = (float)(noise.NextDouble() * 2.0 - 1.0);
                     s = Mathf.Lerp(n, (float)System.Math.Sin(phase), 0.35f);
                     break;
@@ -574,9 +665,7 @@ public class GameEffects : MonoBehaviour
         }
     }
 
-    // =====================================================================
     // UTILITARIOS
-    // =====================================================================
 
     private static float EaseOutBack(float x)
     {

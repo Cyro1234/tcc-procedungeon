@@ -1,5 +1,4 @@
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [DefaultExecutionOrder(-100)]
@@ -30,6 +29,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         generator = GetComponent<RoomFirstDungeonGenerator>();
+        RunStats.Reset();
 
         int seedToUse = seed;
 
@@ -38,13 +38,13 @@ public class GameManager : MonoBehaviour
             seedToUse = System.DateTime.Now.GetHashCode();
         }
 
-        // 1. Atualiza a UI (Interface separada da Lógica de Negócios)
+        // Atualiza a UI
         if (seedText != null)
         {
             seedText.text = seedToUse.ToString();
         }
 
-        // 2. Manda o gerador trabalhar usando a seed definida
+        // Manda o gerador trabalhar usando a seed definida
         generator.Setup(seedToUse);
     }
 }

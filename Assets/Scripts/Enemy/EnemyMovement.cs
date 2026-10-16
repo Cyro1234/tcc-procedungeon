@@ -28,11 +28,15 @@ public class EnemyMovement : MonoBehaviour
     private GameObject barInstance;
 
     [Header("Game effects")]
+    [Tooltip("Tempo que o inimigo 'leva um susto' ao ver o jogador pela primeira vez antes de comecar a perseguir.")]
+    [SerializeField] private float reactionTime = 0.35f;
     [Tooltip("Chance (0-1) de soltar um coracao ao morrer.")]
     [SerializeField] private float heartDropChance = 0.1f;
     [Tooltip("Chance (0-1) de soltar um coracao ao morrer quando o jogador esta com 1 de vida.")]
     [SerializeField] private float heartDropChanceLowHealth = 0.3f;
 
+    private bool noticedPlayer = false;
+    private float chaseStartTime = 0f;
     private bool dead = false;
     private System.Random lootRng;
 
@@ -93,9 +97,17 @@ public class EnemyMovement : MonoBehaviour
                     barInstance.SetActive(true);
                 }
 
+                // Primeira vez que viu o jogador: ele faz o coiso do metal gear e uma pequena pausa antes de ir no jogador
+                if (!noticedPlayer)
+                {
+                    noticedPlayer = true;
+                    chaseStartTime = Time.time + (IsBoss ? 0f : reactionTime);
+                    if (!IsBoss) GameEffects.Instance.EnemyNoticed(transform.position);
+                }
+
                 // Mover em direcao ao jogador
                 Vector3 direction = (target.position - transform.position).normalized;
-                moveDirection = direction;
+                moveDirection = Time.time >= chaseStartTime ? (Vector2)direction : Vector2.zero;
 
                 // Se o inimigo tiver um animator, atualiza os parametros de animacao.
                 if (animator != null && !ExternalMovement)
@@ -144,6 +156,10 @@ public class EnemyMovement : MonoBehaviour
         StartCoroutine(Knockback(sender));
         AudioManager.Instance.PlaySFX("InimigoTomouDano");
 
+        // Se o inimigo levar dano, ele ja persegue o jogador pra nao ficar travado
+        noticedPlayer = true;
+        chaseStartTime = Mathf.Min(chaseStartTime, Time.time + knockbackDuration);
+
         if (healthBar != null)
         {
             healthBar.SetHealth(health);
@@ -155,6 +171,7 @@ public class EnemyMovement : MonoBehaviour
         {
             dead = true;
             bool boss = IsBoss;
+            RunStats.AddKill(boss);
             GameEffects.Instance.EnemyKilled(transform.position, boss, mainRenderer);
             DropLoot(boss);
 
@@ -182,7 +199,7 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-    // Pisca em vermelho/branco e da uma "amassada" ao tomar dano
+    // Pisca em vermelho/branco e da uma squishada ao tomar dano
     private IEnumerator HitFlash()
     {
         const float duration = 0.12f;

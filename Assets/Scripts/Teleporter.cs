@@ -35,6 +35,7 @@ public class Teleporter : MonoBehaviour
             GameManager.setDeuTeleport(true);
 
             collision.transform.position = new Vector2(1000, 0);
+            GameEffects.Instance.OnEnterBossRoom();
 
             yield return new WaitForEndOfFrame();
 
