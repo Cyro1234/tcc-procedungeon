@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
+    // Bosses como o Coco controlam a propria velocidade durante seus ataques.
+    public bool ExternalMovement { get; set; }
 
     public float moveSpeed = 2f;
     Rigidbody2D rb;
@@ -90,7 +92,7 @@ public class EnemyMovement : MonoBehaviour
                 moveDirection = direction;
 
                 // Se o inimigo tiver um animator, atualiza os parametros de animacao.
-                if (animator != null)
+                if (animator != null && !ExternalMovement)
                 {
 
                     // Animacao walk
@@ -104,7 +106,7 @@ public class EnemyMovement : MonoBehaviour
                 moveDirection = Vector2.zero;
 
                 // Se o inimigo tiver um animator, atualiza os parametros de animacao.
-                if (animator != null)
+                if (animator != null && !ExternalMovement)
                 {
                     animator.SetBool("isWalking", false);
                     animator.SetFloat("LastInputX", moveDirection.x);
@@ -121,7 +123,7 @@ public class EnemyMovement : MonoBehaviour
 
     private void FixedUpdate() // Move o inimigo para o local calculado em Update() guardado na variavel moveDirection
     {
-        if (isKnockedBack) return; // Se nao tiver isso, a movimentacao do inimigo ira cancelar o knockback
+        if (isKnockedBack || ExternalMovement) return; // Preserva knockback e movimento controlado pelo boss.
         if (target)
         {
             rb.linearVelocity = new Vector2(moveDirection.x, moveDirection.y) * moveSpeed;
@@ -209,6 +211,7 @@ public class EnemyMovement : MonoBehaviour
 
     private IEnumerator Knockback(GameObject sender)
     {
+        if (ExternalMovement) yield break;
         isKnockedBack = true;
 
         rb.linearVelocity = Vector2.zero;
