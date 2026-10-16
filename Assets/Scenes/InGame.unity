@@ -2805,6 +2805,38 @@ MonoBehaviour:
     fixedDuration: 0
     minDuration: 0
     maxDuration: 0
+  - isActive: 1
+    displayName: Pés Escorregadios
+    statusEffectKind: 4
+    hasDuration: 1
+    isRange: 0
+    fixedDuration: 180
+    minDuration: 0
+    maxDuration: 0
+  - isActive: 1
+    displayName: Lag
+    statusEffectKind: 5
+    hasDuration: 1
+    isRange: 0
+    fixedDuration: 120
+    minDuration: 0
+    maxDuration: 0
+  - isActive: 1
+    displayName: Sonâmbulo
+    statusEffectKind: 6
+    hasDuration: 0
+    isRange: 0
+    fixedDuration: 0
+    minDuration: 0
+    maxDuration: 0
+  - isActive: 1
+    displayName: Recuo
+    statusEffectKind: 7
+    hasDuration: 0
+    isRange: 0
+    fixedDuration: 0
+    minDuration: 0
+    maxDuration: 0
   choiceButtons:
   - {fileID: 1129503150}
   - {fileID: 1686742529}

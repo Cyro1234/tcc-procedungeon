@@ -14,6 +14,7 @@ public class StatusEffectManager : MonoBehaviour
         {
             Movement = GetComponent<PlayerMovement>(),
             Stats = GetComponent<PlayerStatsHandler>(),
+            Attack = GetComponent<Attack>(),
             Camera = CameraEffectsController.Instance
         };
     }

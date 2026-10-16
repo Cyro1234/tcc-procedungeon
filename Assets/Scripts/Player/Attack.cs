@@ -16,6 +16,9 @@ public class Attack : MonoBehaviour
     float atkTimer = 0f;
     private float cancelledAttackDelay;
 
+    // Disparado toda vez que um golpe comeca. Debuffs de ataque se inscrevem aqui como debuff de recuo por exemplo!!
+    public event System.Action Swung;
+
     private PlayerStatsHandler stats;
     private Sprite spriteBaseOriginal;
 
@@ -97,6 +100,7 @@ public class Attack : MonoBehaviour
             Melee.SetActive(true);
             Pivot.SetActive(true);
             isAttacking = true;
+            Swung?.Invoke(); // Avisa quem estiver ouvindo que o ataque começou, para aplicar efeitos de debuff de recuo por exemplo
         }
     }
 

@@ -27,5 +27,30 @@ public class StatusEffectTester : MonoBehaviour
             statusEffects.ApplyEffect(new LabyrinthitisEffect(8f)); // esse faz a camera ficar girando 5 graus a cada segundo 
             Debug.Log("Aplicado: Labirintite (8s)");
         }
+
+        // F5-F8 ja sao do Xiter, por isso os novos ficam no F4 e F9-F11
+        if (Keyboard.current.f4Key.wasPressedThisFrame)
+        {
+            statusEffects.ApplyEffect(new SlipperyToesEffect(8f));
+            Debug.Log("Aplicado: Pés Escorregadios (8s)");
+        }
+
+        if (Keyboard.current.f9Key.wasPressedThisFrame)
+        {
+            statusEffects.ApplyEffect(new LagEffect(8f));
+            Debug.Log("Aplicado: Lag (8s)");
+        }
+
+        if (Keyboard.current.f10Key.wasPressedThisFrame)
+        {
+            statusEffects.ApplyEffect(new SleepwalkerEffect(8f));
+            Debug.Log("Aplicado: Sonâmbulo (8s)");
+        }
+
+        if (Keyboard.current.f11Key.wasPressedThisFrame)
+        {
+            statusEffects.ApplyEffect(new RecoilEffect(8f));
+            Debug.Log("Aplicado: Recuo (8s)");
+        }
     }
 }

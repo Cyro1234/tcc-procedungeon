@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -23,6 +24,8 @@ public class DowngradeMenuManager : MonoBehaviour
     [SerializeField] private List<Button> choiceButtons;
     [SerializeField] private List<TMP_Text> choiceLabels;
 
+    public bool IsOpen => downgradePanel != null && downgradePanel.activeSelf;
+
     private AbstractDungeonGenerator pendingGenerator;
     private readonly List<RolledChoice> currentChoices = new List<RolledChoice>();
 
@@ -44,6 +47,22 @@ public class DowngradeMenuManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    // hotkey pra que as teclas 1, 2, 3 escolhem a opcao correspondente no menu de downgrade
+    private void Update()
+    {
+        if (!IsOpen || Keyboard.current == null) return;
+
+        for (int i = 0; i < currentChoices.Count && i < 9; i++)
+        {
+            Key key = Key.Digit1 + i;
+            if (Keyboard.current[key].wasPressedThisFrame && choiceButtons[i].gameObject.activeSelf)
+            {
+                SelectChoice(i);
+                return;
+            }
         }
     }
 
@@ -167,7 +186,7 @@ public class DowngradeMenuManager : MonoBehaviour
 
             if (i < choiceLabels.Count)
             {
-                choiceLabels[i].text = BuildLabel(choice);
+                choiceLabels[i].text = $"<size=70%>[{i + 1}]</size>\n" + BuildLabel(choice);
             }
         }
 
@@ -182,9 +201,12 @@ public class DowngradeMenuManager : MonoBehaviour
     {
         if (choice.statusEffectOption != null)
         {
+            string descricao = StatusEffectFactory.Describe(choice.statusEffectOption.statusEffectKind);
+            if (!string.IsNullOrEmpty(descricao)) descricao = $"\n<size=65%>{descricao}</size>";
+
             return choice.statusEffectOption.hasDuration
-                ? $"{choice.statusEffectOption.displayName}\n({choice.magnitude:0.#}s)"
-                : $"{choice.statusEffectOption.displayName}\n(Permanente)";
+                ? $"{choice.statusEffectOption.displayName}\n({choice.magnitude:0.#}s){descricao}"
+                : $"{choice.statusEffectOption.displayName}\n(Permanente){descricao}";
         }
 
         DowngradeOption option = choice.statOption;

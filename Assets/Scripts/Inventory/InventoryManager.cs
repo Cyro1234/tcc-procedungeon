@@ -20,6 +20,9 @@ public class InventoryManager : MonoBehaviour
     private InputActionAsset controles;
     private int origemTroca = -1;
 
+    // Indice do ultimo slot que recebeu um item ou -1 se nenhum slot recebeu item recentemente
+    public int UltimoSlotAdicionado { get; private set; } = -1;
+
     private void OnEnable()
     {
         GameFlow.Changed += AoAlterarEstado;
@@ -143,6 +146,14 @@ public class InventoryManager : MonoBehaviour
     {
         if (Keyboard.current == null || !GameFlow.CanPlay || Time.timeScale == 0f) return;
 
+        // Rodinha do mouse troca de slot
+        if (Mouse.current != null)
+        {
+            float scroll = Mouse.current.scroll.ReadValue().y;
+            if (scroll > 0.01f) SelecionarSlotRelativo(-1);
+            else if (scroll < -0.01f) SelecionarSlotRelativo(1);
+        }
+
         // Seleção de Slots (Teclas 1 a 8)
         if (Keyboard.current.digit1Key.wasPressedThisFrame) slotSelecionadoIndex = 0;
         if (Keyboard.current.digit2Key.wasPressedThisFrame) slotSelecionadoIndex = 1;
@@ -184,6 +195,7 @@ public class InventoryManager : MonoBehaviour
             var atributos = FindAnyObjectByType<PlayerStatsHandler>();
             if (atributos == null) return false;
             atributos.EquiparBota();
+            UltimoSlotAdicionado = -1;
             return true;
         }
         for (int i = 0; i < itensNoInventario.Length; i++)
@@ -191,6 +203,13 @@ public class InventoryManager : MonoBehaviour
             if (itensNoInventario[i] == Chest.ItemType.None)
             {
                 itensNoInventario[i] = novoItem;
+                UltimoSlotAdicionado = i;
+
+                // Se a mao estava vazia, ja equipa o item novo
+                if (itensNoInventario[slotSelecionadoIndex] == Chest.ItemType.None || slotSelecionadoIndex == i)
+                {
+                    slotSelecionadoIndex = i;
+                }
                 return true; // Adicionado com sucesso
             }
         }

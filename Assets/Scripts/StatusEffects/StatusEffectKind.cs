@@ -6,5 +6,9 @@ public enum StatusEffectKind
     None,
     Drunkenness,
     HeavyLimp,
-    Labyrinthitis
+    Labyrinthitis,
+    SlipperyToes,
+    Lag,
+    Sleepwalker,
+    Recoil
 }

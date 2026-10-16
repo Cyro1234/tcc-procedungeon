@@ -3,6 +3,7 @@ public class PlayerContext
     public PlayerMovement Movement;
     public CameraEffectsController Camera;
     public PlayerStatsHandler Stats;
+    public Attack Attack;
 }
 
 // Cuida do ciclo de vida do efeito de status, tipo alicar, tickar para buffs com tempo e remover. A aplicacao de modificadores fica nas classes concretas,
