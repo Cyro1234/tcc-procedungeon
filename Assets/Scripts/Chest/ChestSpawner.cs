@@ -50,72 +50,23 @@ public class ChestSpawner : MonoBehaviour
     }
 
 
-    public void SpawnProceduralChests(List<HashSet<Vector2Int>> roomsList, TileMapVisualizer.Niveis nivelAtual, int andar, int seed)
+    public void SpawnProceduralChests(SpawnPlacement placement, TileMapVisualizer.Niveis nivelAtual)
     {
-        // Pega a tabela de acordo com o nível atual
         var chestTable = GetChestTablePorNivel(nivelAtual);
-
-        if (roomsList.Count <= 1 || chestTable.items.Count == 0) return;
+        if (placement.RoomCount <= 1 || chestTable.items.Count == 0) return;
 
         int qtdBaus = Rng.ChestRange(0, 3);
-
         for (int i = 0; i < qtdBaus; i++)
         {
-            int roomIndex = Rng.ChestRange(1, roomsList.Count);
-            var roomTiles = roomsList[roomIndex];
-
-            List<Vector2Int> availablePositions = new List<Vector2Int>();
-            foreach (var pos in roomTiles)
-            {
-                if (!EhParede(pos, roomTiles)) availablePositions.Add(pos);
-            }
-
-            availablePositions = Rng.OrderPositions(availablePositions);
-            if (availablePositions.Count > 0)
-            {
-                int posIndex = Rng.ChestRange(0, availablePositions.Count);
-                Vector2Int pos = availablePositions[posIndex];
-
-                // Sorteia o Prefab do baú e instancia
-                GameObject prefabToSpawn = chestTable.getRandom(Rng.chestRng);
-                if (prefabToSpawn != null)
-                {
-                    GameObject chest = Instantiate(prefabToSpawn, new Vector3(pos.x, pos.y, 0), Quaternion.identity);
-                    InicializarBau(chest);
-                    spawnedChests.Add(chest);
-                }
-            }
+            int roomIndex = Rng.ChestRange(1, placement.RoomCount);
+            if (!placement.TryTakeRandomPosition(roomIndex, Rng.chestRng, out Vector2Int position)) continue;
+            GameObject prefab = chestTable.getRandom(Rng.chestRng);
+            GameObject chest = Instantiate(prefab, new Vector3(position.x, position.y, 0), Quaternion.identity);
+            InicializarBau(chest);
+            spawnedChests.Add(chest);
         }
     }
 
-
-    // Usado quando NÃO está gerando com SubBSP (Salas Simples)
-    public void SpawnProceduralChests(List<BoundsInt> roomsList, TileMapVisualizer.Niveis nivelAtual, int andar, int seed)
-    {
-        var chestTable = GetChestTablePorNivel(nivelAtual);
-
-        if (roomsList.Count <= 1 || chestTable.items.Count == 0) return;
-
-        int qtdBaus = Rng.ChestRange(0, 3);
-
-        for (int i = 0; i < qtdBaus; i++)
-        {
-            int roomIndex = Rng.ChestRange(1, roomsList.Count);
-            BoundsInt room = roomsList[roomIndex];
-
-            int randomX = Rng.ChestRange(room.xMin + 2, room.xMax - 2);
-            int randomY = Rng.ChestRange(room.yMin + 2, room.yMax - 2);
-            Vector3 spawnPos = new Vector3(randomX, randomY, 0);
-
-            GameObject prefabToSpawn = chestTable.getRandom(Rng.chestRng);
-            if (prefabToSpawn != null)
-            {
-                GameObject chest = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
-                InicializarBau(chest);
-                spawnedChests.Add(chest);
-            }
-        }
-    }
     private void InicializarBau(GameObject chest)
     {
         var contents = chest.GetComponent<Chest>();
@@ -123,43 +74,26 @@ public class ChestSpawner : MonoBehaviour
             contents.InicializarConteudo(Rng.NewChestRandom());
     }
 
-    private bool EhParede(Vector2Int pos, HashSet<Vector2Int> floor)
+    public void SpawnaBauInicial(TileMapVisualizer.Niveis nivelAtual, SpawnPlacement placement, Vector2Int playerSpawn)
     {
-        return !floor.Contains(pos + Vector2Int.up) ||
-               !floor.Contains(pos + Vector2Int.down) ||
-               !floor.Contains(pos + Vector2Int.left) ||
-               !floor.Contains(pos + Vector2Int.right);
-    }
-
-
-    public void SpawnaBauInicial(TileMapVisualizer.Niveis nivelAtual, int andar, List<Vector2Int> roomsCenters)
-    {
-        // Instancia o Baú na primeira sala (com um offset de +1 no X para não nascer em cima do jogador)
-        // Decide se usa uma tabela sorteada ou o prefab manual
-        GameObject prefabToSpawn = manualStartingChestPrefab;
+        GameObject prefab = manualStartingChestPrefab;
         if (randomStartingChest)
         {
             var chestTable = GetChestTablePorNivel(nivelAtual);
-            if (chestTable.items.Count > 0)
-            {
-                prefabToSpawn = chestTable.getRandom(Rng.chestRng);
-            }
+            if (chestTable.items.Count > 0) prefab = chestTable.getRandom(Rng.chestRng);
         }
+        if (prefab == null) return;
 
-        if (prefabToSpawn != null)
+        // Tenta ficar perto do jogador, mas nunca ocupa uma passagem ou o proprio spawn.
+        if (!placement.TryTakeClosestPosition(0, playerSpawn + Vector2Int.right * 2, out Vector2Int position))
         {
-            Vector3 chestPosition = new Vector3(roomsCenters[0].x + 1.5f, roomsCenters[0].y, 0);
-            GameObject initialChest = Instantiate(prefabToSpawn, chestPosition, Quaternion.identity);
-            // Força o item escolhido se a opção estiver marcada
-            Chest chestScript = initialChest.GetComponent<Chest>();
-            if (chestScript != null && forceStartingItem)
-            {
-                chestScript.ConfigurarItem(startingChestItem);
-            }
-            InicializarBau(initialChest);
-            spawnedChests.Add(initialChest);
-            Debug.Log("Baú instanciado na sala inicial.");
+            Debug.LogWarning("Nao ha espaco seguro para o bau inicial nesta sala.", this);
+            return;
         }
+        GameObject initialChest = Instantiate(prefab, new Vector3(position.x, position.y, 0), Quaternion.identity);
+        Chest chestScript = initialChest.GetComponent<Chest>();
+        if (chestScript != null && forceStartingItem) chestScript.ConfigurarItem(startingChestItem);
+        InicializarBau(initialChest);
+        spawnedChests.Add(initialChest);
     }
-
 }

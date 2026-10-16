@@ -32,8 +32,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     [SerializeField] private Transform playerTransform;
 
 
-    private int seed;
-
     protected override void RunProceduralGeneration()
     {
         levelManager.passarAndar();
@@ -49,7 +47,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     public void Setup(int seed)
     {
-        this.seed = seed;
         Rng.Init(seed);
         GameManager.clean();
         levelManager.setup();
@@ -72,22 +69,10 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Coloca os offsets para que as salas fiquem um pouco distantes entre as outras
         HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
 
-        List<HashSet<Vector2Int>> salas = new List<HashSet<Vector2Int>>();
-
-        if (subBSPRooms)
-        {
-            salas = CreateSubBSPRooms(roomList, offset, minRoomWidth, minRoomHeight); // deixei o offset no 0 pra ficar grudado
-            foreach (var sala in salas)
-            {
-                floor.UnionWith(sala);
-            }
-        }
-        else
-        {
-            floor = CreateSimpleRooms(roomList);
-        }
-
-        //floor = CreateSimpleRooms(roomList);
+        List<HashSet<Vector2Int>> salas = subBSPRooms
+            ? CreateSubBSPRooms(roomList, offset, minRoomWidth, minRoomHeight)
+            : CreateSimpleRooms(roomList);
+        foreach (var sala in salas) floor.UnionWith(sala);
 
         // Obtem o ponto central das salas
         List<Vector2Int> roomsCenters = new List<Vector2Int>();
@@ -96,23 +81,17 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
             roomsCenters.Add((Vector2Int)Vector3Int.RoundToInt(room.center));
         }
 
-        // Spawn do jogador e saida. O spawn eh a primeira sala e a saida a ultima sala gerada.
-        PlaceSpawnAndExit(roomsCenters);
-
-        if (subBSPRooms)
-        {
-            enemySpawner.SpawnEnemies(salas);
-            chestSpawner.SpawnProceduralChests(salas, levelManager.GetNivelAtual(), levelManager.GetAndar(), seed);
-        }
-        else
-        {
-            enemySpawner.SpawnEnemies(roomList);
-            chestSpawner.SpawnProceduralChests(roomList, levelManager.GetNivelAtual(), levelManager.GetAndar(), seed);
-        }
-
-        // Conectar salas com corredores
+        // Os spawners precisam conhecer as passagens antes de ocupar o piso.
         HashSet<Vector2Int> corridors = CorridorGenerator.ConnectRooms(roomsCenters, doorSpawner, roomDetector);
         floor.UnionWith(corridors);
+        var placement = new SpawnPlacement(salas, corridors, doorSpawner.roomEntrances,
+            roomsCenters[0], roomsCenters[roomsCenters.Count - 1]);
+
+        // Spawn do jogador e saida. O spawn eh a primeira sala e a saida a ultima sala gerada.
+        PlaceSpawnAndExit(roomsCenters);
+        chestSpawner.SpawnaBauInicial(levelManager.GetNivelAtual(), placement, roomsCenters[0]);
+        enemySpawner.SpawnEnemies(placement);
+        chestSpawner.SpawnProceduralChests(placement, levelManager.GetNivelAtual());
 
         // Coloca o chao e paredes
         tileMapVisualizer.PaintFloorTiles(floor, levelManager.GetBiomaAtual());
@@ -197,8 +176,6 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         // Coloca o jogador na primeira Sala
         playerTransform.position = new Vector3(roomsCenters[0].x, roomsCenters[0].y, 0);
 
-        chestSpawner.SpawnaBauInicial(levelManager.GetNivelAtual(), levelManager.GetAndar(), roomsCenters);
-
         // Cria o teleport na ultima sala
         //tileMapVisualizer.PaintExit(roomsCenters[roomsCenters.Count - 1], this); 
         tileMapVisualizer.PaintTeleport(roomsCenters[roomsCenters.Count - 1]);
@@ -206,11 +183,12 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     }
 
     // Coloca os offsets das salas para nao ficar todas coladas
-    private HashSet<Vector2Int> CreateSimpleRooms(List<BoundsInt> roomList)
+    private List<HashSet<Vector2Int>> CreateSimpleRooms(List<BoundsInt> roomList)
     {
-        HashSet<Vector2Int> floor = new HashSet<Vector2Int>();
+        var rooms = new List<HashSet<Vector2Int>>();
         foreach (var room in roomList)
         {
+            var floor = new HashSet<Vector2Int>();
             for (int col = offset; col < room.size.x - offset; col++)
             {
                 for (int row = offset; row < room.size.y - offset; row++)
@@ -219,8 +197,9 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
                     floor.Add(position);
                 }
             }
+            rooms.Add(floor);
         }
-        return floor;
+        return rooms;
     }
 
     private void SpawnBossRoom() 
