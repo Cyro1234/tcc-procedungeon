@@ -37,6 +37,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
     protected override void RunProceduralGeneration()
     {
         levelManager.passarAndar();
+        Rng.BeginFloor(levelManager.GetAndar());
         Debug.Log("ANDAR: " + levelManager.GetAndar());
         tileMapVisualizer.Clear();
         tileMapVisualizer.Setup(levelManager.GetBioma());
@@ -48,6 +49,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
 
     public void Setup(int seed)
     {
+        this.seed = seed;
         Rng.Init(seed);
         GameManager.clean();
         levelManager.setup();

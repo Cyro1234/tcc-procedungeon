@@ -15,8 +15,15 @@ public class Coruja : MonoBehaviour
     private float proximoTiro = 0f;
 
     private Transform player;
+    private System.Random attackRng;
+    public void InitializeRandom()
+    {
+        attackRng = Rng.NewCombatRandom();
+    }
+
     void Start()
     {
+        if (attackRng == null) InitializeRandom();
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
         {
@@ -47,8 +54,8 @@ public class Coruja : MonoBehaviour
     private Vector3 posicaoRedemoinho()
     {
         Vector3 pos = new Vector3(1000, 0, 0); // Pos padrao sala boss
-        bool rngX = Random.value < 0.5f;
-        bool rngY = Random.value < 0.5f;
+        bool rngX = attackRng.NextDouble() < 0.5f;
+        bool rngY = attackRng.NextDouble() < 0.5f;
 
         float newPosX = pos.x;
         float newPosY = pos.y;

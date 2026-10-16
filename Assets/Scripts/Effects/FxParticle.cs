@@ -16,7 +16,7 @@ public class FxParticle : MonoBehaviour
         this.lifetime = Mathf.Max(0.05f, lifetime);
         startScale = scale;
         transform.localScale = Vector3.one * scale;
-        transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 90f));
+        transform.rotation = Quaternion.Euler(0f, 0f, Rng.EffectsRange(0f, 90f));
         sr = GetComponent<SpriteRenderer>();
         if (sr != null) startColor = sr.color;
     }

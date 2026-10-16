@@ -15,6 +15,7 @@ public class LevelManager : MonoBehaviour
 
     public void setup()
     {
+        andar = 0;
         listaBiomas = new List<TileMapVisualizer.Biomas>();
         listaBiomas.Add(TileMapVisualizer.Biomas.Floresta);
         listaBiomas.Add(TileMapVisualizer.Biomas.Deserto);
@@ -29,7 +30,7 @@ public class LevelManager : MonoBehaviour
         var last = count - 1;
         for (var i = 0; i < last; ++i)
         {
-            var r = Rng.DungeonRange(i, count);
+            var r = Rng.BiomeRange(i, count);
             var tmp = ts[i];
             ts[i] = ts[r];
             ts[r] = tmp;

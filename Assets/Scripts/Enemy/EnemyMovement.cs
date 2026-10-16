@@ -32,6 +32,12 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private float heartDropChanceLowHealth = 0.3f;
 
     private bool dead = false;
+    private System.Random lootRng;
+
+    public void InitializeRandom()
+    {
+        lootRng = Rng.NewCombatRandom();
+    }
 
     private SpriteRenderer[] renderers;
     private Color[] baseColors;
@@ -53,6 +59,7 @@ public class EnemyMovement : MonoBehaviour
 
     void Start()
     {
+        if (lootRng == null) InitializeRandom();
         GameObject playerObj = GameObject.Find("Player");
         if (playerObj != null) target = playerObj.transform;
         animator = GetComponent<Animator>();
@@ -162,7 +169,7 @@ public class EnemyMovement : MonoBehaviour
         if (hs != null && hs.Life <= 1) chance = heartDropChanceLowHealth;
 
         // Chefe sempre solta um coracao
-        if (boss || Random.value < chance)
+        if (boss || lootRng.NextDouble() < chance)
         {
             HeartPickup.Spawn(transform.position);
         }

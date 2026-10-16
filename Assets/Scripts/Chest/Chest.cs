@@ -26,18 +26,15 @@ public class Chest : MonoBehaviour
     {
         animator = GetComponent<Animator>();
 
-        // O próprio baú sorteia o item de sua tabela assim que é instanciado
-        // Só sorteia se o Gerador da Masmorra não tiver forçado um item antes!
-        if (!itemPreConfigurado && itemTable != null && itemTable.items.Count > 0)
-        {
-            System.Random rng = Rng.chestRng ?? new System.Random();
-            itemInside = itemTable.getRandom(rng);
-        }
-        //if (itemTable != null && itemTable.items.Count > 0)
-        //{
-        //    System.Random rng = new System.Random(System.Guid.NewGuid().GetHashCode());
-        //    itemInside = itemTable.getRandom(rng);
-        //}
+        if (!itemPreConfigurado)
+            InicializarConteudo(Rng.NewChestRandom());
+    }
+
+    public void InicializarConteudo(System.Random rng)
+    {
+        if (itemPreConfigurado) return;
+        itemInside = itemTable.getRandom(rng);
+        itemPreConfigurado = true;
     }
 
     public void ConfigurarItem(ItemType item)

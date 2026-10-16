@@ -27,6 +27,7 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
 
+            availablePositions = Rng.OrderPositions(availablePositions);
             int enemyCount = Rng.EnemyRange(0, maxEnemiesPerRoom + 1); // Quantidade de inimigos na sala
 
             for (int j = 0; j < enemyCount && availablePositions.Count > 0; j++)
@@ -37,6 +38,7 @@ public class EnemySpawner : MonoBehaviour
                 availablePositions.RemoveAt(index); // evita repetir posição
 
                 GameObject enemy = Instantiate(getRandomEnemy(), new Vector3(pos.x, pos.y, 0), Quaternion.identity);
+                InitializeEnemy(enemy);
                 enemies.Add(enemy);
             }
         }
@@ -61,10 +63,26 @@ public class EnemySpawner : MonoBehaviour
 
                 // Instancia o inimigo na posicao
                 GameObject enemy = Instantiate(getRandomEnemy(), spawnPos, Quaternion.identity);
+                InitializeEnemy(enemy);
                 enemies.Add(enemy); // Guarda em uma lista para que possa limpar os inimigos ao concluir a fase
             }
         }
         Debug.Log("SPAWNOU " + enemies.Count); // Quantidade de inimigos spawnadas
+    }
+
+    // Inicializa conteudo e drops antes dos callbacks Start dos prefabs.
+    public static void InitializeEnemy(GameObject enemy)
+    {
+        var movements = enemy.GetComponentsInChildren<EnemyMovement>(true);
+        for (int i = 0; i < movements.Length; i++) movements[i].InitializeRandom();
+        var regular = enemy.GetComponentsInChildren<EnemyModularBuilder>(true);
+        for (int i = 0; i < regular.Length; i++)
+            regular[i].Initialize(Rng.NewEnemyRandom());
+        var fast = enemy.GetComponentsInChildren<FastEnemyModularBuilder>(true);
+        for (int i = 0; i < fast.Length; i++)
+            fast[i].Initialize(Rng.NewEnemyRandom());
+        foreach (var owl in enemy.GetComponentsInChildren<Coruja>(true)) owl.InitializeRandom();
+        foreach (var witch in enemy.GetComponentsInChildren<Bruxinha>(true)) witch.InitializeRandom();
     }
 
     private bool EhParede(Vector2Int pos, HashSet<Vector2Int> floor)

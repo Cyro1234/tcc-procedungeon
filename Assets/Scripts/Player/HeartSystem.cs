@@ -163,7 +163,7 @@ public class HeartSystem : MonoBehaviour
         if (source == null || movement == null) return;
 
         Vector2 dir = (Vector2)(transform.position - source.position);
-        if (dir.sqrMagnitude < 0.0001f) dir = Random.insideUnitCircle;
+        if (dir.sqrMagnitude < 0.0001f) dir = Rng.CombatInsideUnitCircle();
         movement.OverrideVelocity(dir.normalized * knockbackForce, 0.15f, true);
     }
 

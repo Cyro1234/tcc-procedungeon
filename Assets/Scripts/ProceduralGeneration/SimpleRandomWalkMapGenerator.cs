@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class SimpleRandomWalkMapGenerator : AbstractDungeonGenerator
 {
@@ -28,7 +27,7 @@ public class SimpleRandomWalkMapGenerator : AbstractDungeonGenerator
             floorPosition.UnionWith(path);
             if (randomWalkParameters.startRandomEachIteration)
             {
-                currentPosition = floorPosition.ElementAt(Rng.DungeonRange(0, floorPosition.Count));
+                currentPosition = Rng.OrderPositions(floorPosition)[Rng.DungeonRange(0, floorPosition.Count)];
             }
         }
         return floorPosition;

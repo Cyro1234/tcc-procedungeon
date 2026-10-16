@@ -18,6 +18,7 @@ public class Bruxinha : MonoBehaviour
     private bool avisado = false;
 
     private Transform player;
+    private System.Random attackRng;
 
     private GameObject raioObj;
 
@@ -27,11 +28,17 @@ public class Bruxinha : MonoBehaviour
 
     private PlayerStatsHandler stats;
 
+    public void InitializeRandom()
+    {
+        attackRng = Rng.NewCombatRandom();
+    }
+
     void Start()
     {
+        if (attackRng == null) InitializeRandom();
         stats = GetComponent<PlayerStatsHandler>(); // Para aplicar o charm
 
-        randomDirecao = Random.value > 0.5f;
+        randomDirecao = attackRng.NextDouble() > 0.5f;
 
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
@@ -65,7 +72,7 @@ public class Bruxinha : MonoBehaviour
             else
             {
                 shock();
-                randomDirecao = Random.value > 0.5f;
+                randomDirecao = attackRng.NextDouble() > 0.5f;
                 avisado = false;
                 proximoTiro = Time.time + shockTime + cooldown;
             }

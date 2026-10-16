@@ -40,6 +40,7 @@ public class BossRoomSpawner : MonoBehaviour
         // Instanciar prefab boss
         GameObject bossRoomPrefab = prefabByBioma(biomaAtual);
         instanciaSala = Instantiate(bossRoomPrefab, new Vector3(1000, 0, 0), Quaternion.identity);
+        EnemySpawner.InitializeEnemy(instanciaSala);
 
         // Instanciar escada
         Vector2Int pos = new Vector2Int(1005, 0); // Mudar para algo melhor 

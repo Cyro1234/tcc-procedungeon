@@ -12,8 +12,8 @@ using UnityEngine.UI;
 // - Efeitos sonoros procedurais (gerados por codigo, nao precisa de arquivo de audio)
 //
 // Ele se cria sozinho na primeira vez que alguem chama GameEffects.Instance, entao NAO precisa
-// colocar nada na cena. Tudo aqui usa UnityEngine.Random (e nao o Rng da seed), entao nao
-// muda nada na geracao procedural.
+// colocar nada na cena. Os efeitos usam um fluxo proprio do Rng, derivado da seed,
+// separado de todos os sorteios de gameplay e geracao procedural.
 //
 // A versao completa (dash, numeros de dano, banners de chefe, resumo da run, etc) esta guardada
 // em Backups/game-effects-completo na raiz do projeto.
@@ -281,7 +281,7 @@ public class GameEffects : MonoBehaviour
     public void Popup(Vector3 position, string text, Color color, float size = 1f, float lifetime = 0.8f)
     {
         var go = new GameObject("Popup");
-        go.transform.position = position + new Vector3(Random.Range(-0.15f, 0.15f), 0f, 0f);
+        go.transform.position = position + new Vector3(Rng.EffectsRange(-0.15f, 0.15f), 0f, 0f);
 
         var tmp = go.AddComponent<TextMeshPro>();
         tmp.text = text;
@@ -342,9 +342,9 @@ public class GameEffects : MonoBehaviour
             sr.sortingOrder = sortingOrder;
             if (material != null) sr.sharedMaterial = material;
 
-            Vector2 dir = Random.insideUnitCircle.normalized;
+            Vector2 dir = Rng.EffectsInsideUnitCircle().normalized;
             var particle = go.AddComponent<FxParticle>();
-            particle.Init(dir * speed * Random.Range(0.4f, 1f), Random.Range(0.25f, 0.55f), Random.Range(0.8f, 1.6f));
+            particle.Init(dir * speed * Rng.EffectsRange(0.4f, 1f), Rng.EffectsRange(0.25f, 0.55f), Rng.EffectsRange(0.8f, 1.6f));
         }
     }
 
@@ -504,7 +504,7 @@ public class GameEffects : MonoBehaviour
             master = AudioManager.Instance.sfxSource.volume;
         }
 
-        audioSource.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+        audioSource.pitch = 1f + Rng.EffectsRange(-pitchVariation, pitchVariation);
         audioSource.PlayOneShot(clip, volume * master);
     }
 
@@ -522,7 +522,7 @@ public class GameEffects : MonoBehaviour
         const int sampleRate = 44100;
         int samples = Mathf.Max(1, Mathf.RoundToInt(sampleRate * duration));
         float[] data = new float[samples];
-        FillTone(data, 0, samples, sampleRate, startFreq, endFreq, volume, wave, name.GetHashCode());
+        FillTone(data, 0, samples, sampleRate, startFreq, endFreq, volume, wave, 0);
         AudioClip clip = AudioClip.Create(name, samples, 1, sampleRate, false);
         clip.SetData(data, 0);
         return clip;
@@ -538,7 +538,7 @@ public class GameEffects : MonoBehaviour
         for (int i = 0; i < notes.Length; i++)
         {
             int length = i == notes.Length - 1 ? tail : perNote;
-            FillTone(data, i * perNote, length, sampleRate, notes[i], notes[i], volume, Wave.Square, name.GetHashCode() + i);
+            FillTone(data, i * perNote, length, sampleRate, notes[i], notes[i], volume, Wave.Square, i);
         }
         AudioClip clip = AudioClip.Create(name, samples, 1, sampleRate, false);
         clip.SetData(data, 0);

@@ -70,6 +70,7 @@ public class ChestSpawner : MonoBehaviour
                 if (!EhParede(pos, roomTiles)) availablePositions.Add(pos);
             }
 
+            availablePositions = Rng.OrderPositions(availablePositions);
             if (availablePositions.Count > 0)
             {
                 int posIndex = Rng.ChestRange(0, availablePositions.Count);
@@ -80,6 +81,7 @@ public class ChestSpawner : MonoBehaviour
                 if (prefabToSpawn != null)
                 {
                     GameObject chest = Instantiate(prefabToSpawn, new Vector3(pos.x, pos.y, 0), Quaternion.identity);
+                    InicializarBau(chest);
                     spawnedChests.Add(chest);
                 }
             }
@@ -109,10 +111,18 @@ public class ChestSpawner : MonoBehaviour
             if (prefabToSpawn != null)
             {
                 GameObject chest = Instantiate(prefabToSpawn, spawnPos, Quaternion.identity);
+                InicializarBau(chest);
                 spawnedChests.Add(chest);
             }
         }
     }
+    private void InicializarBau(GameObject chest)
+    {
+        var contents = chest.GetComponent<Chest>();
+        if (contents != null)
+            contents.InicializarConteudo(Rng.NewChestRandom());
+    }
+
     private bool EhParede(Vector2Int pos, HashSet<Vector2Int> floor)
     {
         return !floor.Contains(pos + Vector2Int.up) ||
@@ -146,6 +156,7 @@ public class ChestSpawner : MonoBehaviour
             {
                 chestScript.ConfigurarItem(startingChestItem);
             }
+            InicializarBau(initialChest);
             spawnedChests.Add(initialChest);
             Debug.Log("Baú instanciado na sala inicial.");
         }

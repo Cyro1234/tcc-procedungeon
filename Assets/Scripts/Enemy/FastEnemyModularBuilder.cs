@@ -48,8 +48,18 @@ public class FastEnemyModularBuilder : MonoBehaviour
     public List<EnemyPart> legOptions;
 
     // Metodo que vai montar o inimigo com base na seed, sprites aleatorios
+    private bool initialized;
+
     public void EnemyBuild()
     {
+        if (!initialized)
+            Initialize(Rng.NewEnemyRandom());
+    }
+
+    public void Initialize(System.Random rng)
+    {
+        if (initialized) return;
+        initialized = true;
         EnemyMovement movementScript = GetComponent<EnemyMovement>();
 
         // Listas para pegar as partes que foram roletadas e depois calcular todos os bonus acumulados e tals
@@ -57,21 +67,21 @@ public class FastEnemyModularBuilder : MonoBehaviour
 
         if (headOptions.Count > 0)
         {
-            EnemyPart chosenHead = headOptions[Rng.EnemyRange(0, headOptions.Count)];
+            EnemyPart chosenHead = headOptions[rng.Next(0, headOptions.Count)];
             headRenderer.sprite = chosenHead.sprite;
             chosenParts.Add(chosenHead);
         }
 
         if (torsoOptions.Count > 0)
         {
-            EnemyPart chosenTorso = torsoOptions[Rng.EnemyRange(0, torsoOptions.Count)];
+            EnemyPart chosenTorso = torsoOptions[rng.Next(0, torsoOptions.Count)];
             torsoRenderer.sprite = chosenTorso.sprite;
             chosenParts.Add(chosenTorso);
         }
 
         if (armOptions.Count > 0 && armRenderers != null && armRenderers.Count > 0)
         {
-            EnemyPart chosenArm = armOptions[Rng.EnemyRange(0, armOptions.Count)];
+            EnemyPart chosenArm = armOptions[rng.Next(0, armOptions.Count)];
             foreach (var arm in armRenderers)
             {
                 if (arm != null)
@@ -82,7 +92,7 @@ public class FastEnemyModularBuilder : MonoBehaviour
 
         if (legOptions.Count > 0)
         {
-            EnemyPart chosenLeg = legOptions[Rng.EnemyRange(0, legOptions.Count)];
+            EnemyPart chosenLeg = legOptions[rng.Next(0, legOptions.Count)];
             legRenderer.sprite = chosenLeg.sprite;
             chosenParts.Add(chosenLeg);
         }

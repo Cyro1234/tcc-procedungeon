@@ -2,6 +2,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[DefaultExecutionOrder(-100)]
 public class GameManager : MonoBehaviour
 {
     private RoomFirstDungeonGenerator generator;

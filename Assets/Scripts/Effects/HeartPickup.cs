@@ -56,7 +56,7 @@ public class HeartPickup : MonoBehaviour
         pickup.sr = sr;
         pickup.baseScale = scale;
         pickup.basePosition = position;
-        pickup.popVelocity = Random.insideUnitCircle.normalized * 2.5f;
+        pickup.popVelocity = Rng.CombatInsideUnitCircle().normalized * 2.5f;
     }
 
     public static void ClearAll()
