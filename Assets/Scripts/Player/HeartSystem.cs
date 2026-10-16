@@ -32,7 +32,7 @@ public class HeartSystem : MonoBehaviour
     public bool IsFullHealth => life >= MaxLife;
     public int Life => life;
     public bool IsInvulnerable => dead || Time.time < invincibleUntil;
-    private int MaxLife => stats != null ? (int)stats.GetPlayerMaxHearts() : 3;
+    private int MaxLife => stats != null ? Mathf.Max(0, (int)stats.GetPlayerMaxHearts()) : 3;
 
     //[SerializeField] private AudioClip hurtSound;
     // Opcional: Adicione um som para quando o escudo quebrar!
@@ -46,12 +46,12 @@ public class HeartSystem : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         movement = GetComponent<PlayerMovement>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        AtualizarVidaMaxima();
     }
 
     void Update()
     {
-        // Se um downgrade diminuiu a vida maxima, a vida atual acompanha
-        if (!dead && life > MaxLife) life = MaxLife;
+        AtualizarVidaMaxima();
 
         // Decrementa os containers de vida na UI
         for (int i = 0; i < hearts.Length; i++)
@@ -72,12 +72,24 @@ public class HeartSystem : MonoBehaviour
 
     public void updateMaxLife()
     {
-        life = (int)stats.GetPlayerMaxHearts();
+        if (dead) return;
+        life = MaxLife;
+        AtualizarVidaMaxima();
+    }
+
+    // Reduzir a vida maxima a zero encerra a partida, mesmo com escudo
+    // ou invencibilidade. Reducoes nao letais nao recuperam vida perdida.
+    public void AtualizarVidaMaxima()
+    {
+        if (dead) return;
+        life = Mathf.Clamp(life, 0, MaxLife);
+        if (life == 0) Die();
     }
 
     // Usado pelos coracoes que os inimigos soltam (HeartPickup)
     public void Heal(int amount)
     {
+        AtualizarVidaMaxima();
         if (dead || amount <= 0) return;
         life = Mathf.Min(life + amount, MaxLife);
         GameEffects.Instance.PlayerHealed(transform.position, amount);
@@ -96,6 +108,7 @@ public class HeartSystem : MonoBehaviour
     // source: quem causou o dano (usado pra empurrar o jogador na direcao contraria)
     public void takeDamage(int damage, Transform source)
     {
+        AtualizarVidaMaxima();
         if (IsInvulnerable) return;
 
         invincibleUntil = Time.time + invincibilityTime;
@@ -135,10 +148,7 @@ public class HeartSystem : MonoBehaviour
 
         if (life <= 0)
         {
-            dead = true;
-            if (spriteRenderer != null) spriteRenderer.enabled = true;
             Die();
-            AudioManager.Instance.PlaySFX("PlayerMorreu");
             return;
         }
 
@@ -170,9 +180,14 @@ public class HeartSystem : MonoBehaviour
 
     private void Die()
     {
+        if (dead) return;
+        dead = true;
+        life = 0;
+        if (spriteRenderer != null) spriteRenderer.enabled = true;
         if (gameOverManager != null)
         {
             gameOverManager.ShowGameOver();
         }
+        AudioManager.Instance.PlaySFX("PlayerMorreu");
     }
 }

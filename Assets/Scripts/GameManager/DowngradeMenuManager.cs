@@ -221,6 +221,17 @@ public class DowngradeMenuManager : MonoBehaviour
     private void CloseMenuAndAdvance()
     {
         downgradePanel.SetActive(false);
+        var health = playerStats.GetComponent<HeartSystem>();
+        if (health != null)
+        {
+            health.AtualizarVidaMaxima();
+            if (health.IsDead)
+            {
+                pendingGenerator = null;
+                return;
+            }
+        }
+
         Time.timeScale = 1f;
         if (playerMovement != null) playerMovement.ForcarParada();
 
