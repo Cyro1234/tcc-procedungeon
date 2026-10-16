@@ -7,6 +7,10 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private int maxEnemiesPerRoom = 3;
     private List<GameObject> enemies = new List<GameObject>();
     [SerializeField] private WeightedTable<GameObject> enemyTable;
+    private void OnValidate()
+    {
+        WeightedTable<GameObject>.ValidateInEditor(enemyTable, this, nameof(enemyTable));
+    }
     public void SpawnEnemies(List<HashSet<Vector2Int>> roomsList) // NOVO SPAWN DE INIMIGOS PARA O SUB BSP
     {
         for (int i = 1; i < roomsList.Count; i++)

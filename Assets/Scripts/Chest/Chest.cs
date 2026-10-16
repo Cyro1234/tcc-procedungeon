@@ -17,6 +17,11 @@ public class Chest : MonoBehaviour
 
     private bool itemPreConfigurado = false; // NOVO: Trava para não sobrescrever o item manual
 
+    private void OnValidate()
+    {
+        WeightedTable<ItemType>.ValidateInEditor(itemTable, this, nameof(itemTable));
+    }
+
     void Start()
     {
         animator = GetComponent<Animator>();

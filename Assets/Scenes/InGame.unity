@@ -60432,25 +60432,25 @@ MonoBehaviour:
     - item:
       - {fileID: -7237579563219009222, guid: 28437ac6eb36c5c4584d4248be1b4c9e, type: 3}
       - {fileID: -7942678235459547240, guid: 28437ac6eb36c5c4584d4248be1b4c9e, type: 3}
-      weight: 0
+      weight: 1
   floorTilesNivelCaverna:
     items:
     - item:
       - {fileID: -7237579563219009222, guid: 46b6e20319c67514fa86ebc6f78cbb0d, type: 3}
       - {fileID: -7942678235459547240, guid: 46b6e20319c67514fa86ebc6f78cbb0d, type: 3}
-      weight: 0
+      weight: 1
   floorTilesNivelAbismo:
     items:
     - item:
       - {fileID: 5876453611139150040, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
       - {fileID: 2924956474026983373, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
-      weight: 0
+      weight: 1
   floorTilesNivelInfinito:
     items:
     - item:
       - {fileID: 11400000, guid: 0446bdd4e44979d4e81e2bf7c9f8659c, type: 2}
       - {fileID: 11400000, guid: c23960acbebc7e048a9f5b8869d6c0f8, type: 2}
-      weight: 0
+      weight: 1
   doorTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
   noiseScale: 8
   noiseThreshold: 0.5

@@ -10,6 +10,12 @@ public class ChestSpawner : MonoBehaviour
     [SerializeField] private WeightedTable<GameObject> chestTableBaixo;
     [SerializeField] private WeightedTable<GameObject> chestTableMedio;
     [SerializeField] private WeightedTable<GameObject> chestTableAlto;
+    private void OnValidate()
+    {
+        WeightedTable<GameObject>.ValidateInEditor(chestTableBaixo, this, nameof(chestTableBaixo));
+        WeightedTable<GameObject>.ValidateInEditor(chestTableMedio, this, nameof(chestTableMedio));
+        WeightedTable<GameObject>.ValidateInEditor(chestTableAlto, this, nameof(chestTableAlto));
+    }
 
     [Header("Starting Chest Settings")]
     [SerializeField] public bool randomStartingChest = false;

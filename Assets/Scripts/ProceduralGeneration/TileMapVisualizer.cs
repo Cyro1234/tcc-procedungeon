@@ -17,6 +17,15 @@ public class TileMapVisualizer : MonoBehaviour
         ConfigurarColisaoDasParedes();
     }
 
+    private void OnValidate()
+    {
+        WeightedTable<List<TileBase>>.ValidateInEditor(floorTilesNivelFloresta, this, nameof(floorTilesNivelFloresta));
+        WeightedTable<List<TileBase>>.ValidateInEditor(floorTilesNivelDeserto, this, nameof(floorTilesNivelDeserto));
+        WeightedTable<List<TileBase>>.ValidateInEditor(floorTilesNivelCaverna, this, nameof(floorTilesNivelCaverna));
+        WeightedTable<List<TileBase>>.ValidateInEditor(floorTilesNivelAbismo, this, nameof(floorTilesNivelAbismo));
+        WeightedTable<List<TileBase>>.ValidateInEditor(floorTilesNivelInfinito, this, nameof(floorTilesNivelInfinito));
+    }
+
     private void ConfigurarColisaoDasParedes()
     {
         if (wallTileMap == null) return;
