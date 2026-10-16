@@ -29,6 +29,7 @@ public class DoorSpawner : MonoBehaviour
         {
             roomDetector.AoEntrarNaSalaComInimigos += FecharPortasDaSala;
             roomDetector.AoLimparSala += AbrirPortasDaSala;
+            roomDetector.AoReiniciarSalas += CleanDoor;
         }
         if (roomFirstDungeonGenerator != null)
         {
@@ -42,6 +43,7 @@ public class DoorSpawner : MonoBehaviour
         {
             roomDetector.AoEntrarNaSalaComInimigos -= FecharPortasDaSala;
             roomDetector.AoLimparSala -= AbrirPortasDaSala;
+            roomDetector.AoReiniciarSalas -= CleanDoor;
         }
     }
 
@@ -58,7 +60,8 @@ public class DoorSpawner : MonoBehaviour
 
     private void FecharPortasDaSala(BoundsInt bounds)
     {
-        if (salaTrancada) return; // Se já tá trancada, ignora
+        if (salaTrancada && currentBounds == bounds) return;
+        if (salaTrancada) AbrirPortasDaSala();
 
         currentBounds = bounds;
         salaTrancada = true;

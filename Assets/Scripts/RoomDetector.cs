@@ -8,6 +8,7 @@ public class RoomDetector : MonoBehaviour
     // Eventos
     public event Action<BoundsInt> AoEntrarNaSalaComInimigos;
     public event Action AoLimparSala;
+    public event Action AoReiniciarSalas;
 
     private List<BoundsInt> roomsList;
     private BoundsInt? currentRoom = null;
@@ -17,7 +18,7 @@ public class RoomDetector : MonoBehaviour
     private List<Vector3> listaDeCentros = new List<Vector3>();
     public CinemachineCamera virtualCamera;
     private GameObject[] inimigosNoMapa;
-    private bool statusInimigoAnterior = false;
+    private BoundsInt? salaEmCombate = null;
     private int currentOffset;
 
     [SerializeField] private RoomFirstDungeonGenerator dungeonGenerator;
@@ -39,9 +40,14 @@ public class RoomDetector : MonoBehaviour
     {
         this.roomsList = new List<BoundsInt>(rooms);
         this.currentOffset = offset;
+        currentRoom = null;
+        salaEmCombate = null;
+        jogadorSala = false;
+        inimigoSala = false;
+        inimigosNoMapa = Array.Empty<GameObject>();
         listaDeCentros.Clear(); // limpa a lista antiga 
-
-        if (roomsList == null) return;
+        // O mapa anterior ja foi apagado. Reiniciar nao deve repintar suas portas.
+        AoReiniciarSalas?.Invoke();
 
         // Adiciona sala boss
         roomsList.Add(new BoundsInt(new Vector3Int(1000 - 9, -9, 0), new Vector3Int(18, 18, 0)));
@@ -77,8 +83,15 @@ public class RoomDetector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        int offset = dungeonGenerator.Offset;
-        if (roomsList == null || playerTransform == null) return;
+        int offset = currentOffset;
+        jogadorSala = false;
+        inimigoSala = false;
+        if (roomsList == null || playerTransform == null)
+        {
+            currentRoom = null;
+            AtualizarSalaEmCombate(null);
+            return;
+        }
 
         Vector3Int playerPos = Vector3Int.FloorToInt(playerTransform.position);
 
@@ -90,8 +103,6 @@ public class RoomDetector : MonoBehaviour
             virtualCamera.Lens.OrthographicSize = 4f;
         }
 
-        jogadorSala = false;
-        inimigoSala = false;
         inimigosNoMapa = GameObject.FindGameObjectsWithTag("Enemy");
 
         foreach (var room in roomsList)
@@ -132,22 +143,12 @@ public class RoomDetector : MonoBehaviour
                 // Checa se o jogador E o inimigo estao na sala
                 bool condicaoTrancar = jogadorSala && inimigoSala;
 
-                if (condicaoTrancar != statusInimigoAnterior)
-                {
-                    statusInimigoAnterior = condicaoTrancar;
-
-                    if (condicaoTrancar)
-                    {
-                        if (currentRoom.HasValue) AoEntrarNaSalaComInimigos?.Invoke(currentRoom.Value);
-                    }
-                    else // Sala limpa
-                    {
-                        AoLimparSala?.Invoke();
-                    }
-                }
+                AtualizarSalaEmCombate(condicaoTrancar ? currentRoom : null);
                 return;
             }
         }
+
+        AtualizarSalaEmCombate(null);
 
         // Se saiu da área total da sala
         if (!jogadorSala && currentRoom != null)
@@ -160,6 +161,24 @@ public class RoomDetector : MonoBehaviour
         {
             // volta pro player qnd eh corredor
             cameraTarget.position = playerTransform.position;
+        }
+    }
+
+    private void AtualizarSalaEmCombate(BoundsInt? novaSala)
+    {
+        if (salaEmCombate == novaSala) return;
+
+        // Uma troca direta entre duas salas ocupadas tambem e uma transicao.
+        if (salaEmCombate.HasValue)
+        {
+            salaEmCombate = null;
+            AoLimparSala?.Invoke();
+        }
+
+        if (novaSala.HasValue)
+        {
+            salaEmCombate = novaSala;
+            AoEntrarNaSalaComInimigos?.Invoke(novaSala.Value);
         }
     }
 }
