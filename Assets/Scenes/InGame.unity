@@ -5401,6 +5401,28 @@ MonoBehaviour:
   playerInput: {fileID: 992072343}
   playerMovement: {fileID: 6206706722819151299}
   pauseManager: {fileID: 1027947509}
+  quadrosExplosao:
+  - {fileID: 21300000, guid: 4a8c63bfcc38fd44d8ba959242087433, type: 3}
+  - {fileID: 21300000, guid: d59df341551209041bab67d93877fea0, type: 3}
+  - {fileID: 21300000, guid: bec7d2cc43ed9e540a80840882b72e8a, type: 3}
+  - {fileID: 21300000, guid: 9653f936178808745830ed90a887f96b, type: 3}
+  - {fileID: 21300000, guid: abcc185479d3b95449d8afdc5d406151, type: 3}
+  - {fileID: 21300000, guid: e6332913cd973314a8fcaf7c30366e3d, type: 3}
+  - {fileID: 21300000, guid: bf71261f74ec3784c86e0b2b09f2b679, type: 3}
+  - {fileID: 21300000, guid: d3eeb4cdd08c9154cb57ae52f2241b93, type: 3}
+  - {fileID: 21300000, guid: bca9e703e6cf2854c901e68924b2ccde, type: 3}
+  - {fileID: 21300000, guid: f6c4112fb41ed814eb31d6c08b0f00a3, type: 3}
+  - {fileID: 21300000, guid: 6ef54b1b468aac64da36b14ff164a2cd, type: 3}
+  - {fileID: 21300000, guid: ad115a008e72dfb468886476e784a20a, type: 3}
+  - {fileID: 21300000, guid: 89ad401ab0b7c1e4a9ff6b56c8d70030, type: 3}
+  - {fileID: 21300000, guid: 692ea5a05a395c644bfac062a2f3ef2b, type: 3}
+  - {fileID: 21300000, guid: 9e94d71ef0c43b74cbafabefc82c295a, type: 3}
+  - {fileID: 21300000, guid: 2327e85e218181d42aa11861c3d024a2, type: 3}
+  - {fileID: 21300000, guid: 3cba0ed1fe675e94e88089b31e0ab075, type: 3}
+  quadrosPorSegundo: 12
+  tamanhoExplosao: 1
+  esperaAposExplosao: 0.75
+  duracaoFade: 1
 --- !u!82 &601799900
 AudioSource:
   m_ObjectHideFlags: 0
@@ -61723,7 +61745,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1645939860
 RectTransform:
   m_ObjectHideFlags: 0

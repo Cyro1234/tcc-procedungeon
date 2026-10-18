@@ -177,7 +177,7 @@ public class HeartSystem : MonoBehaviour
         if (spriteRenderer != null) spriteRenderer.enabled = true;
         if (gameOverManager != null)
         {
-            gameOverManager.ShowGameOver();
+            gameOverManager.ShowGameOver(transform);
         }
         AudioManager.Instance.PlaySFX("PlayerMorreu");
     }
