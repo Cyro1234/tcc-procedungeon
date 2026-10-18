@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Pes Escorregadios: igual a cobrinha. Depois que o jogador comeca a andar ele NUNCA para;
 // o input so troca a direcao. Pra compensar, anda um pouco mais rapido, mas pode ser lento tb, temos que testar kkk
-public class SlipperyToesModifier : IMovementModifier
+public class SlipperyToesModifier : IMovementModifier, IDashModifier
 {
     private readonly float speedBonus;
     private Vector2 heading = Vector2.zero;
@@ -22,6 +22,13 @@ public class SlipperyToesModifier : IMovementModifier
             if (direction.sqrMagnitude > 1.02f) return direction * speedBonus;
         }
         return heading * speedBonus;
+    }
+
+    // Dash escorregadio: depois do dash voce continua deslizando nessa direcao
+    public Vector2 ModifyDash(Vector2 direction, float progress, float dt)
+    {
+        if (direction.sqrMagnitude > 0.01f) heading = direction.normalized;
+        return direction * speedBonus;
     }
 }
 

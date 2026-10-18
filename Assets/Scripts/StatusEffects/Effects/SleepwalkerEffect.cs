@@ -1,7 +1,8 @@
 using UnityEngine;
 
-// Sonambulo: quando o jogador solta as teclas, o corpo continua andando mais um pouquinho
-// na ultima direcao antes de parar. Combina com o Recuo: depois do empurrao ele continua deslizando pra tras.
+// Sonambulo: quando o jogador solta as teclas, o corpo continua andando na ultima direcao
+// e vai desacelerando ate parar (sai na velocidade normal e freia aos poucos).
+// Combina com o Recuo: depois do empurrao ele continua deslizando pra tras.
 public class SleepwalkerModifier : IMovementModifier
 {
     private readonly float extraTime;
@@ -28,7 +29,11 @@ public class SleepwalkerModifier : IMovementModifier
         }
 
         idleTime += dt;
-        return idleTime < extraTime ? lastDirection * peakMagnitude : Vector2.zero;
+        if (idleTime >= extraTime) return Vector2.zero;
+
+        // Desaceleracao suave (ease-out): comeca rapido e vai freando ate zero
+        float restante = 1f - idleTime / extraTime;
+        return lastDirection * peakMagnitude * restante * restante;
     }
 }
 
@@ -36,7 +41,7 @@ public class SleepwalkerEffect : StatusEffect
 {
     private readonly SleepwalkerModifier modifier;
 
-    public SleepwalkerEffect(float duration, float extraTime = 0.5f)
+    public SleepwalkerEffect(float duration, float extraTime = 1.2f)
     {
         Duration = duration;
         modifier = new SleepwalkerModifier(extraTime);

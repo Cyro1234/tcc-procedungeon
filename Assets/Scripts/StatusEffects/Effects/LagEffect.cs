@@ -3,12 +3,14 @@ using UnityEngine;
 
 // Lag: o movimento acontece segundos depois do comando, como jogar online com ping alto!!!
 // Guarda uma fila com o historico do input e devolve o que foi apertado la atras.
-public class LagModifier : IMovementModifier
+public class LagModifier : IMovementModifier, IInputDelay
 {
     private readonly float delay;
     private readonly Queue<(float time, Vector2 direction)> history = new Queue<(float, Vector2)>();
     private float clock;
     private Vector2 current = Vector2.zero;
+
+    public float Delay => delay;
 
     public LagModifier(float delay)
     {

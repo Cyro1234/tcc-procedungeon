@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // Roda a direcao do input num angulo que oscila com o tempo, entao o jogador fica andando torto o tempo todo (esse e meio irado eu gosto dele)
-public class DrunkennessModifier : IMovementModifier
+public class DrunkennessModifier : IMovementModifier, IDashModifier
 {
     private readonly float wobbleSpeed;
     private readonly float wobbleAmplitudeDegrees;
@@ -18,6 +18,14 @@ public class DrunkennessModifier : IMovementModifier
         phase += dt * wobbleSpeed;
         float angle = Mathf.Sin(phase) * wobbleAmplitudeDegrees;
         return Quaternion.Euler(0f, 0f, angle) * direction;
+    }
+
+    // Dash bebado: sai em zigue-zague
+    public Vector2 ModifyDash(Vector2 direction, float progress, float dt)
+    {
+        phase += dt * wobbleSpeed;
+        float zigzag = Mathf.Sin(progress * Mathf.PI * 4f) * 55f;
+        return Quaternion.Euler(0f, 0f, zigzag + Mathf.Sin(phase) * wobbleAmplitudeDegrees * 0.5f) * direction;
     }
 }
 

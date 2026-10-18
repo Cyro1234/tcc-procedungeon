@@ -11,13 +11,16 @@ public class PlayerMovement : MonoBehaviour
 
     public Transform Aim;
 
+    // Input cru do jogador (usado pelo dash para saber a direcao)
+    public Vector2 MoveInput => moveInput;
+
     // Ultima direcao para onde o jogador olhou, usado pelo debuff de recuo
     public Vector2 FacingDirection { get; private set; } = Vector2.down;
 
     // Debuffs de complexos de movimento (bebum, perneta, etc) se registram aqui em vez deste script precisar saber que eles existem.
     public readonly ModifierPipeline<IMovementModifier> MovementModifiers = new ModifierPipeline<IMovementModifier>();
 
-    // Velocidade forcada por um curto periodo (knockback ao tomar dano)
+    // Velocidade forcada por um curto periodo (dash, knockback ao tomar dano)
     // Enquanto estiver ativa, o input normal nao controla o rigidbody
     private Vector2 overrideVelocity;
     private float overrideStart;
@@ -32,6 +35,27 @@ public class PlayerMovement : MonoBehaviour
 
     // Direcao final depois dos modificadores que e usada pela animacao
     private Vector2 effectiveDirection;
+
+    // Dash: em vez de forcar a velocidade, a direcao do dash entra no pipeline de modificadores,
+    // assim cada debuff pode mudar o dash (Bebum = o dhash faz tipo um zig-zag, Perneta = sem diagonal e interrompe o dash mais rapido, etc)
+    private Vector2 dashVector;
+    private float dashStart;
+    private float dashEnd;
+    public bool IsDashWindow => Time.time < dashEnd;
+
+    // Soma dos atrasos de input dos modificadores ativos (ex: Lag)
+    public float InputDelay
+    {
+        get
+        {
+            float total = 0f;
+            foreach (var modifier in MovementModifiers.Modifiers)
+            {
+                if (modifier is IInputDelay delay) total += delay.Delay;
+            }
+            return total;
+        }
+    }
 
     private void Awake()
     {
@@ -51,6 +75,7 @@ public class PlayerMovement : MonoBehaviour
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         stats = GetComponent<PlayerStatsHandler>();
+        if (GetComponent<PlayerDash>() == null) gameObject.AddComponent<PlayerDash>();
     }
 
     // Update is called once per frame
@@ -71,11 +96,17 @@ public class PlayerMovement : MonoBehaviour
         if (!GameFlow.CanPlay || Time.timeScale == 0f) return;
 
         // moveInput cru continua guiando a mira, so a velocidade real e modificada quando um debuff ou buff e ativado, assim nao muda pra onde o jogador mira!!
-        Vector2 moveDirection = moveInput + push;
+        bool dashing = IsDashWindow;
+        float dashProgress = dashing ? Mathf.InverseLerp(dashStart, dashEnd, Time.time) : 0f;
+
+        Vector2 moveDirection = dashing ? dashVector : moveInput + push;
         push = Vector2.MoveTowards(push, Vector2.zero, pushDecay * Time.fixedDeltaTime);
         foreach (var modifier in MovementModifiers.Modifiers)
         {
-            moveDirection = modifier.ModifyDirection(moveDirection, Time.fixedDeltaTime);
+            if (dashing && modifier is IDashModifier dashModifier)
+                moveDirection = dashModifier.ModifyDash(moveDirection, dashProgress, Time.fixedDeltaTime);
+            else
+                moveDirection = modifier.ModifyDirection(moveDirection, Time.fixedDeltaTime);
         }
         effectiveDirection = moveDirection;
 
@@ -117,6 +148,15 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("LastInputY", animDirection.y);
     }
 
+    // Comeca um dash. "direction" ja vem multiplicada pela forca do dash (ex: 2.6 = 2.6x a velocidade de andar).
+    public void BeginDash(Vector2 direction, float duration)
+    {
+        dashVector = direction;
+        dashStart = Time.time;
+        dashEnd = Time.time + duration;
+        overrideEnd = 0f; // o dash tem prioridade sobre um knockback em andamento
+    }
+
     // Empurra o jogador "como se fosse input". Passa pelos modificadores de movimento!!
     public void AddPush(Vector2 amount)
     {
@@ -143,6 +183,7 @@ public class PlayerMovement : MonoBehaviour
         moveInput = Vector2.zero;
         push = Vector2.zero;
         effectiveDirection = Vector2.zero;
+        dashEnd = 0f;
         overrideEnd = 0f;
         if (rb != null) rb.linearVelocity = Vector2.zero;
         if (animator != null) animator.SetBool("isWalking", false);

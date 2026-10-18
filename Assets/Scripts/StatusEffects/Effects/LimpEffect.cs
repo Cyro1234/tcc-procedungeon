@@ -1,13 +1,15 @@
 using UnityEngine;
 
 // A ideia desse buff e de limitar o movimento do jogador como se fosse de um rpg antigo pq eu achei a ideia engracada.
-public class HeavyLimpModifier : IMovementModifier
+public class HeavyLimpModifier : IMovementModifier, IDashModifier
 {
     private readonly float hopDuration;
     private readonly float pauseDuration;
 
     private float timer;
     private bool paused;
+    private bool wasDashing;
+    private const float StumbleTime = 0.35f;
 
     public HeavyLimpModifier(float hopDuration, float pauseDuration)
     {
@@ -17,6 +19,14 @@ public class HeavyLimpModifier : IMovementModifier
 
     public Vector2 ModifyDirection(Vector2 direction, float dt)
     {
+        // Acabou de dar um dash: tropeca e fica parado um instante
+        if (wasDashing)
+        {
+            wasDashing = false;
+            paused = true;
+            timer = pauseDuration - StumbleTime;
+        }
+
         // Esse aqui faz com que nao de pra andar na diagonal!
         if (Mathf.Abs(direction.x) >= Mathf.Abs(direction.y))
         {
@@ -37,6 +47,15 @@ public class HeavyLimpModifier : IMovementModifier
         }
 
         return paused ? Vector2.zero : direction;
+    }
+
+    // Dash perneta: sem diagonal, e no fim ele tropeca
+    public Vector2 ModifyDash(Vector2 direction, float progress, float dt)
+    {
+        wasDashing = true;
+        if (Mathf.Abs(direction.x) >= Mathf.Abs(direction.y)) direction.y = 0f;
+        else direction.x = 0f;
+        return direction;
     }
 }
 
