@@ -190,14 +190,24 @@ public class InventoryManager : MonoBehaviour
     public bool AdicionarItem(Chest.ItemType novoItem)
     {
         // Equipamentos passivos nao ocupam slots, mesmo quando recebidos por este metodo.
-        if (novoItem == Chest.ItemType.SpeedBoots)
+        if (novoItem == Chest.ItemType.SpeedBoots || novoItem == Chest.ItemType.LegendarySpeedBoots)
         {
             var atributos = FindAnyObjectByType<PlayerStatsHandler>();
             if (atributos == null) return false;
-            atributos.EquiparBota();
+            if (novoItem == Chest.ItemType.LegendarySpeedBoots) atributos.EquiparBotaLendaria();
+            else atributos.EquiparBota();
             UltimoSlotAdicionado = -1;
             return true;
         }
+        // Equipamentos passivos nao ocupam slots, mesmo quando recebidos por este metodo.
+        //if (novoItem == Chest.ItemType.SpeedBoots)
+        //{
+        //    var atributos = FindAnyObjectByType<PlayerStatsHandler>();
+        //    if (atributos == null) return false;
+        //    atributos.EquiparBota();
+        //    UltimoSlotAdicionado = -1;
+        //    return true;
+        //}
         for (int i = 0; i < itensNoInventario.Length; i++)
         {
             if (itensNoInventario[i] == Chest.ItemType.None)

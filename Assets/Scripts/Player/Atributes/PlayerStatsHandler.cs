@@ -25,6 +25,8 @@ public class PlayerStatsHandler : MonoBehaviour
 
     [Header("Equipamento passivo")]
     [SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.5f;
+    [Tooltip("Fracao somada a velocidade (0.6 = +60%). Deve ser bem maior que a da bota comum.")]
+    [SerializeField, Min(0f)] private float bonusVelocidadeBotaLendaria = 0.6f;
     private StatModifier modificadorBota;
     public bool TemBotaEquipada => modificadorBota != null;
 
@@ -33,11 +35,37 @@ public class PlayerStatsHandler : MonoBehaviour
 
     public void EquiparBota()
     {
+        AdicionarBota("Bota de velocidade", bonusVelocidadeBota);
+    }
+
+    public void EquiparBotaLendaria()
+    {
+        AdicionarBota("Bota lendaria de velocidade", bonusVelocidadeBotaLendaria);
+    }
+
+    private void AdicionarBota(string nome, float bonus)
+    {
         // Cada bota adiciona seu proprio modificador permanente de velocidade.
-        modificadorBota = new StatModifier("Bota de velocidade", StatType.Speed,
-            ModifierSource.Item, ModifierType.Percent, bonusVelocidadeBota);
+        modificadorBota = new StatModifier(nome, StatType.Speed,
+            ModifierSource.Item, ModifierType.Percent, bonus);
         AddSimpleModifier(modificadorBota);
     }
+
+    //[Header("Equipamento passivo")]
+    //[SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.5f;
+    //private StatModifier modificadorBota;
+    //public bool TemBotaEquipada => modificadorBota != null;
+
+    //// Lista de modificadores permanentes
+    //private List<StatModifier> modifiers = new List<StatModifier>();
+
+    //public void EquiparBota()
+    //{
+    //    // Cada bota adiciona seu proprio modificador permanente de velocidade.
+    //    modificadorBota = new StatModifier("Bota de velocidade", StatType.Speed,
+    //        ModifierSource.Item, ModifierType.Percent, bonusVelocidadeBota);
+    //    AddSimpleModifier(modificadorBota);
+    //}
 
     public void AddSimpleModifier(StatModifier modifier)    // Adiciona um modificador permanente!!
     {

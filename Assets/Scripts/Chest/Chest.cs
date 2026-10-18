@@ -3,7 +3,7 @@ using UnityEngine;
 public class Chest : MonoBehaviour
 {
     // NOVO: Tipos de itens atualizados com as qualidades dos escudos
-    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion }
+    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots }
 
     [Header("Configurações do Baú")]
     // Cada Prefab de baú terá sua própria tabela de loot configurada no Inspector
@@ -85,6 +85,10 @@ public class Chest : MonoBehaviour
             case ItemType.SpeedBoots:
                 player.GetComponent<PlayerStatsHandler>()?.EquiparBota();
                 GameEffects.Instance.ItemObtained(transform.position, "Bota da Velocidade!", new Color(0.6f, 1f, 0.6f));
+                break;
+            case ItemType.LegendarySpeedBoots:
+                player.GetComponent<PlayerStatsHandler>()?.EquiparBotaLendaria();
+                GameEffects.Instance.ItemObtained(transform.position, "Bota Lendária da Velocidade!", new Color(1f, 0.7f, 0.2f));
                 break;
 
             // Armas agora vão para o Inventário!
