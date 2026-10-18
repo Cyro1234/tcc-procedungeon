@@ -57,6 +57,13 @@ public class Intro : MonoBehaviour
         new Fala("Hora de voltar para casa...", Personagem.Alex)
     };
 
+    [Header("Avanço automático")]
+    [SerializeField] private bool avancoAutomatico = true;
+    [Tooltip("Tempo de espera após a fala terminar de ser digitada.")]
+    [SerializeField, Min(0f)] private float esperaAutoAvanco = 1.5f;
+    [Tooltip("Tempo extra por caractere, para falas longas ficarem mais tempo na tela.")]
+    [SerializeField, Min(0f)] private float esperaPorCaractere = 0.04f;
+
     [Header("Pular introdução")]
     [SerializeField, Min(0.2f)] private float tempoParaPular = 1.5f;
     [SerializeField] private CanvasGroup indicadorPular;
@@ -75,6 +82,7 @@ public class Intro : MonoBehaviour
     private ButtonControl botaoSegurado;
     private float inicioPressao;
     private bool entradaLiberada;
+    private float prazoAutoAvanco;
     private const string DicaPular = "Segure o botão de avançar para pular";
 
     private void Awake()
@@ -137,21 +145,35 @@ public class Intro : MonoBehaviour
                 StopCoroutine(digitacao);
             digitacao = null;
             text.maxVisibleCharacters = text.textInfo.characterCount;
-            estado = Estado.AguardandoClique;
-        }
-        else if (++indice < falas.Length)
-        {
-            StartCoroutine(ApresentarFala());
+            AguardarClique();
         }
         else
         {
-            EncerrarIntro(false);
+            AvancarFala();
         }
+    }
+
+    private void AvancarFala()
+    {
+        if (++indice < falas.Length)
+            StartCoroutine(ApresentarFala());
+        else
+            EncerrarIntro(false);
+    }
+
+    private void AguardarClique()
+    {
+        estado = Estado.AguardandoClique;
+        prazoAutoAvanco = Time.unscaledTime + esperaAutoAvanco +
+                          esperaPorCaractere * text.textInfo.characterCount;
     }
 
     private void Update()
     {
         if (!inicializado || estado == Estado.Finalizando) return;
+
+        if (avancoAutomatico && estado == Estado.AguardandoClique && Time.unscaledTime >= prazoAutoAvanco)
+            AvancarFala();
 
         // Nao aproveitar um botao que veio segurado do menu anterior.
         if (!entradaLiberada)
@@ -259,8 +281,8 @@ public class Intro : MonoBehaviour
             }
         }
         text.maxVisibleCharacters = quantidade;
-        estado = Estado.AguardandoClique;
         digitacao = null;
+        AguardarClique();
     }
 
     private IEnumerator FinalizarIntro(float tempoFade)
