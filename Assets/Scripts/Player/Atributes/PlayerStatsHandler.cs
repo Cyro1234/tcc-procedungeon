@@ -68,7 +68,8 @@ public class PlayerStatsHandler : MonoBehaviour
     public void BeberPocaoPoder()
     {
         // Beber outra com o efeito ativo renova a duracao em vez de acumular o bonus.
-        if (PocaoPoderAtiva)
+        // Permanente (duracao 0): cada pocao soma um novo bonus.
+        if (duracaoPocaoPoder > 0f && PocaoPoderAtiva)
         {
             modificadorPocaoPoder.duration = duracaoPocaoPoder;
             GameEffects.Instance.Popup(transform.position + Vector3.up * 0.8f, "Poder renovado!", CorPocaoPoder);
