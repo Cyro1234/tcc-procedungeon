@@ -105,6 +105,7 @@ public class InventoryManager : MonoBehaviour
     public Sprite spriteAdaga;
     public Sprite spritePocaoVida;
     public Sprite spritePocaoPoder;
+    public Sprite spriteMachado;
     private Sprite spriteProvisorio;
 
     // Itens que sao gastos ao usar em vez de servirem como arma
@@ -282,6 +283,8 @@ public class InventoryManager : MonoBehaviour
                 cor = new Color(1f, 0.2f, 0.3f);
             if (itensNoInventario[i] == Chest.ItemType.PowerPotion && spritePocaoPoder == null)
                 cor = PlayerStatsHandler.CorPocaoPoder;
+            if (itensNoInventario[i] == Chest.ItemType.Axe && spriteMachado == null)
+                cor = new Color(0.65f, 0.7f, 0.75f);
             slots[i].AtualizarSlot(itensNoInventario[i], icone, estaSelecionado, cor);
         }
     }
@@ -292,7 +295,9 @@ public class InventoryManager : MonoBehaviour
         if (tipo == Chest.ItemType.Dagger) return spriteAdaga;
         if (tipo == Chest.ItemType.HealthPotion && spritePocaoVida != null) return spritePocaoVida;
         if (tipo == Chest.ItemType.PowerPotion && spritePocaoPoder != null) return spritePocaoPoder;
-        if (tipo == Chest.ItemType.HealthPotion || tipo == Chest.ItemType.PowerPotion)
+        if (tipo == Chest.ItemType.Axe && spriteMachado != null) return spriteMachado;
+        if (tipo == Chest.ItemType.HealthPotion || tipo == Chest.ItemType.PowerPotion
+            || tipo == Chest.ItemType.Axe)
         {
             if (spriteProvisorio == null)
                 spriteProvisorio = Sprite.Create(Texture2D.whiteTexture,

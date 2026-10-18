@@ -3,7 +3,7 @@ using UnityEngine;
 public class Chest : MonoBehaviour
 {
     // NOVO: Tipos de itens atualizados com as qualidades dos escudos
-    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion }
+    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion, Axe }
 
     [Header("Configurações do Baú")]
     // Cada Prefab de baú terá sua própria tabela de loot configurada no Inspector
@@ -55,7 +55,7 @@ public class Chest : MonoBehaviour
     {
         // Um inventário cheio não deve fazer o item desaparecer dentro de um baú aberto.
         bool vaiParaInventario = itemInside == ItemType.LongSword || itemInside == ItemType.Dagger ||
-            itemInside == ItemType.HealthPotion || itemInside == ItemType.PowerPotion;
+            itemInside == ItemType.HealthPotion || itemInside == ItemType.PowerPotion || itemInside == ItemType.Axe;
         if (vaiParaInventario && (InventoryManager.Instance == null ||
             !InventoryManager.Instance.AdicionarItem(itemInside)))
         {
@@ -97,13 +97,16 @@ public class Chest : MonoBehaviour
             case ItemType.Dagger:
             case ItemType.HealthPotion:
             case ItemType.PowerPotion:
+            case ItemType.Axe:
                 Debug.Log(itemInside + " adicionado ao inventário!");
                 string nome = itemInside switch
                 {
                     ItemType.LongSword => "Espada Longa",
                     ItemType.Dagger => "Adaga",
                     ItemType.HealthPotion => "Poção de Vida",
-                    _ => "Poção de Poder"
+                    ItemType.PowerPotion => "Poção de Poder",
+                    ItemType.Axe => "Machado",
+                    _ => itemInside.ToString()
                 };
                 Color cor = itemInside switch
                 {

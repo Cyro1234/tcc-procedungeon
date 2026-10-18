@@ -159,12 +159,14 @@ MonoBehaviour:
     - item: 2
       weight: 25
     - item: 5
-      weight: 25
-    - item: 7
       weight: 20
-    - item: 8
+    - item: 7
       weight: 15
+    - item: 8
+      weight: 10
     - item: 10
+      weight: 15
+    - item: 11
       weight: 15
   itemInside: 0
 --- !u!95 &896005281407797099

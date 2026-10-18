@@ -9,6 +9,8 @@ public class Attack : MonoBehaviour
     public SpriteRenderer armaRender;
     [SerializeField] private Sprite espadaLonga;
     [SerializeField] private Sprite adaga;
+    [Tooltip("Opcional. Vazio mantem o sprite base enquanto a arte do machado nao fica pronta.")]
+    [SerializeField] private Sprite machado;
     public float rotationSpeed = 360f;
     bool isAttacking = false;
     bool isCooldown = false;
@@ -21,6 +23,7 @@ public class Attack : MonoBehaviour
 
     private PlayerStatsHandler stats;
     private Sprite spriteBaseOriginal;
+    private AxeSpin machadoGiro;
 
 
     // Guardamos os valores originais para usar como base
@@ -32,6 +35,7 @@ public class Attack : MonoBehaviour
     private void Awake()
     {
         stats = GetComponent<PlayerStatsHandler>();
+        machadoGiro = GetComponent<AxeSpin>();
     }
 
     private void OnEnable() => GameFlow.Changed += AoAlterarEstado;
@@ -59,6 +63,7 @@ public class Attack : MonoBehaviour
         }
         if (Melee != null) Melee.SetActive(false);
         if (Pivot != null) Pivot.SetActive(false);
+        if (machadoGiro != null) machadoGiro.Parar();
     }
 
     void Start()
@@ -97,8 +102,16 @@ public class Attack : MonoBehaviour
             PrepararArma(itemAtual);
 
             AudioManager.Instance.PlaySFX("Ataque");
-            Melee.SetActive(true);
-            Pivot.SetActive(true);
+            // O machado acerta em circulo pelo AxeSpin, entao a hitbox triangular da espada fica desligada
+            if (itemAtual == Chest.ItemType.Axe && machadoGiro != null)
+            {
+                machadoGiro.Comecar(atkDuration);
+            }
+            else
+            {
+                Melee.SetActive(true);
+                Pivot.SetActive(true);
+            }
             isAttacking = true;
             Swung?.Invoke(); // Avisa quem estiver ouvindo que o ataque começou, para aplicar efeitos de debuff de recuo por exemplo
         }
@@ -146,6 +159,7 @@ public class Attack : MonoBehaviour
                 isAttacking = false;
                 Melee.SetActive(false);
                 Pivot.SetActive(false);
+                if (machadoGiro != null) machadoGiro.Parar();
                 isCooldown = true; // Começa o cooldown do ataque depois que a hitbox é desativada
             }
         }
@@ -178,6 +192,13 @@ public class Attack : MonoBehaviour
             pivotTransform.transform.localScale = new Vector3(originalMeleeScale.x * 0.7f, originalMeleeScale.y * 0.9f, originalMeleeScale.z);
             atkDuration = originalAtkDuration * 0.5f;
             if (armaRender != null) armaRender.sprite = adaga;
+        }
+        else if (weaponType == Chest.ItemType.Axe)
+        {
+            // Um pouco mais lento que o golpe base, o alcance vem do raio no AxeSpin
+            pivotTransform.transform.localScale = originalMeleeScale;
+            atkDuration = originalAtkDuration * 1.5f;
+            if (armaRender != null) armaRender.sprite = machado != null ? machado : spriteBaseOriginal;
         }
         else // Se for Chest.ItemType.None (mãos vazias) ou poção
         {

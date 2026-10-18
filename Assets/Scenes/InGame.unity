@@ -6781,6 +6781,7 @@ MonoBehaviour:
     type: 3}
   spritePocaoVida: {fileID: 0}
   spritePocaoPoder: {fileID: 0}
+  spriteMachado: {fileID: 0}
 --- !u!4 &878909396
 Transform:
   m_ObjectHideFlags: 0
@@ -7789,6 +7790,7 @@ MonoBehaviour:
   espadaLonga: {fileID: 8953792446637478238, guid: 91842188fa611ce44936be896abfc6f1,
     type: 3}
   adaga: {fileID: -8370915199016746703, guid: 8059310dcd4b29248adfc9f3a6ea3978, type: 3}
+  machado: {fileID: 0}
   rotationSpeed: 360
   swordSound: {fileID: 8300000, guid: a089cb00aef07f3489478d1f4fb87cc9, type: 3}
 --- !u!114 &992072343
@@ -61921,7 +61923,7 @@ MonoBehaviour:
   manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
     type: 3}
   forceStartingItem: 1
-  startingChestItem: 10
+  startingChestItem: 11
 --- !u!4 &1942525113
 Transform:
   m_ObjectHideFlags: 0
@@ -63805,7 +63807,7 @@ PrefabInstance:
     - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
         type: 3}
       propertyPath: m_ActionEvents.Array.size
-      value: 20
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 2226908969140712477, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
         type: 3}
@@ -64009,6 +64011,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6206706722819151300}
+    - targetCorrespondingSourceObject: {fileID: 2492088174279128530, guid: abe2bb6ffaa41d1449d7952ca0c370f1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6206706722819151306}
   m_SourcePrefab: {fileID: 100100000, guid: abe2bb6ffaa41d1449d7952ca0c370f1, type: 3}
 --- !u!114 &6206706722819151299 stripped
 MonoBehaviour:
@@ -64047,6 +64053,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 790a7ad3ce241ba478bc03295477785d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectManager
+--- !u!114 &6206706722819151306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 992072324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f20f10e354a81ea49963a7f866974341, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AxeSpin
+  raio: 1.75
+  incluirTriggers: 0
+  corIndicador: {r: 1, g: 0.85, b: 0.4, a: 0.8}
+  espessura: 0.06
+  voltas: 1
+  materialIndicador: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
