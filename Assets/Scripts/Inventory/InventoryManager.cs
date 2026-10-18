@@ -104,19 +104,50 @@ public class InventoryManager : MonoBehaviour
     public Sprite spriteEspadaLonga;
     public Sprite spriteAdaga;
     public Sprite spritePocaoVida;
+    public Sprite spritePocaoPoder;
     private Sprite spriteProvisorio;
+
+    // Itens que sao gastos ao usar em vez de servirem como arma
+    public static bool EhConsumivel(Chest.ItemType tipo)
+    {
+        return tipo == Chest.ItemType.HealthPotion || tipo == Chest.ItemType.PowerPotion;
+    }
 
     public bool UsarItemSelecionado()
     {
-        if (!GameFlow.CanPlay || Time.timeScale == 0f ||
-            ObterItemSelecionado() != Chest.ItemType.HealthPotion) return false;
-        var vida = FindAnyObjectByType<HeartSystem>();
-        if (vida == null || vida.IsDead || vida.IsFullHealth) return false;
-        vida.RestaurarVidaInteira();
+        if (!GameFlow.CanPlay || Time.timeScale == 0f) return false;
+
+        Chest.ItemType item = ObterItemSelecionado();
+        if (item == Chest.ItemType.HealthPotion)
+        {
+            var vida = FindAnyObjectByType<HeartSystem>();
+            if (vida == null || vida.IsDead || vida.IsFullHealth) return false;
+            vida.RestaurarVidaInteira();
+        }
+        else if (item == Chest.ItemType.PowerPotion)
+        {
+            var atributos = FindAnyObjectByType<PlayerStatsHandler>();
+            if (atributos == null) return false;
+            atributos.BeberPocaoPoder();
+        }
+        else return false;
+
         itensNoInventario[slotSelecionadoIndex] = Chest.ItemType.None;
         AtualizarUI();
         return true;
     }
+
+    //public bool UsarItemSelecionado()
+    //{
+    //    if (!GameFlow.CanPlay || Time.timeScale == 0f ||
+    //        ObterItemSelecionado() != Chest.ItemType.HealthPotion) return false;
+    //    var vida = FindAnyObjectByType<HeartSystem>();
+    //    if (vida == null || vida.IsDead || vida.IsFullHealth) return false;
+    //    vida.RestaurarVidaInteira();
+    //    itensNoInventario[slotSelecionadoIndex] = Chest.ItemType.None;
+    //    AtualizarUI();
+    //    return true;
+    //}
 
     private void OnDestroy()
     {
@@ -249,6 +280,8 @@ public class InventoryManager : MonoBehaviour
             Color cor = Color.white;
             if (itensNoInventario[i] == Chest.ItemType.HealthPotion && spritePocaoVida == null)
                 cor = new Color(1f, 0.2f, 0.3f);
+            if (itensNoInventario[i] == Chest.ItemType.PowerPotion && spritePocaoPoder == null)
+                cor = PlayerStatsHandler.CorPocaoPoder;
             slots[i].AtualizarSlot(itensNoInventario[i], icone, estaSelecionado, cor);
         }
     }
@@ -258,7 +291,8 @@ public class InventoryManager : MonoBehaviour
         if (tipo == Chest.ItemType.LongSword) return spriteEspadaLonga;
         if (tipo == Chest.ItemType.Dagger) return spriteAdaga;
         if (tipo == Chest.ItemType.HealthPotion && spritePocaoVida != null) return spritePocaoVida;
-        if (tipo == Chest.ItemType.HealthPotion)
+        if (tipo == Chest.ItemType.PowerPotion && spritePocaoPoder != null) return spritePocaoPoder;
+        if (tipo == Chest.ItemType.HealthPotion || tipo == Chest.ItemType.PowerPotion)
         {
             if (spriteProvisorio == null)
                 spriteProvisorio = Sprite.Create(Texture2D.whiteTexture,

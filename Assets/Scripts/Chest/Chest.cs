@@ -3,7 +3,7 @@ using UnityEngine;
 public class Chest : MonoBehaviour
 {
     // NOVO: Tipos de itens atualizados com as qualidades dos escudos
-    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots }
+    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion }
 
     [Header("Configurações do Baú")]
     // Cada Prefab de baú terá sua própria tabela de loot configurada no Inspector
@@ -55,7 +55,7 @@ public class Chest : MonoBehaviour
     {
         // Um inventário cheio não deve fazer o item desaparecer dentro de um baú aberto.
         bool vaiParaInventario = itemInside == ItemType.LongSword || itemInside == ItemType.Dagger ||
-            itemInside == ItemType.HealthPotion;
+            itemInside == ItemType.HealthPotion || itemInside == ItemType.PowerPotion;
         if (vaiParaInventario && (InventoryManager.Instance == null ||
             !InventoryManager.Instance.AdicionarItem(itemInside)))
         {
@@ -91,17 +91,41 @@ public class Chest : MonoBehaviour
                 GameEffects.Instance.ItemObtained(transform.position, "Bota Lendária da Velocidade!", new Color(1f, 0.7f, 0.2f));
                 break;
 
-            // Armas agora vão para o Inventário!
+
+            // Armas e pocoes vão para o Inventário!
             case ItemType.LongSword:
             case ItemType.Dagger:
             case ItemType.HealthPotion:
+            case ItemType.PowerPotion:
                 Debug.Log(itemInside + " adicionado ao inventário!");
-                string nome = itemInside == ItemType.LongSword ? "Espada Longa"
-                    : itemInside == ItemType.Dagger ? "Adaga" : "Poção de Vida";
-                Color cor = itemInside == ItemType.HealthPotion ? new Color(1f, 0.45f, 0.55f) : WeaponColor;
+                string nome = itemInside switch
+                {
+                    ItemType.LongSword => "Espada Longa",
+                    ItemType.Dagger => "Adaga",
+                    ItemType.HealthPotion => "Poção de Vida",
+                    _ => "Poção de Poder"
+                };
+                Color cor = itemInside switch
+                {
+                    ItemType.HealthPotion => new Color(1f, 0.45f, 0.55f),
+                    ItemType.PowerPotion => PlayerStatsHandler.CorPocaoPoder,
+                    _ => WeaponColor
+                };
                 int slot = InventoryManager.Instance.UltimoSlotAdicionado + 1;
                 GameEffects.Instance.ItemObtained(transform.position, slot > 0 ? $"{nome}! [{slot}]" : $"{nome}!", cor);
                 break;
+
+                // Armas agora vão para o Inventário!
+                //case ItemType.LongSword:
+                //case ItemType.Dagger:
+                //case ItemType.HealthPotion:
+                //    Debug.Log(itemInside + " adicionado ao inventário!");
+                //    string nome = itemInside == ItemType.LongSword ? "Espada Longa"
+                //        : itemInside == ItemType.Dagger ? "Adaga" : "Poção de Vida";
+                //    Color cor = itemInside == ItemType.HealthPotion ? new Color(1f, 0.45f, 0.55f) : WeaponColor;
+                //    int slot = InventoryManager.Instance.UltimoSlotAdicionado + 1;
+                //    GameEffects.Instance.ItemObtained(transform.position, slot > 0 ? $"{nome}! [{slot}]" : $"{nome}!", cor);
+                //    break;
         }
     }
 

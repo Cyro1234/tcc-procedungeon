@@ -84,7 +84,7 @@ public class Attack : MonoBehaviour
         if (!enabled || !GameFlow.CanPlay || Time.timeScale == 0f) return;
 
         if (InventoryManager.Instance != null &&
-            InventoryManager.Instance.ObterItemSelecionado() == Chest.ItemType.HealthPotion)
+            InventoryManager.EhConsumivel(InventoryManager.Instance.ObterItemSelecionado()))
         {
             InventoryManager.Instance.UsarItemSelecionado();
             return;

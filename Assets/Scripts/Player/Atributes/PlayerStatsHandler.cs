@@ -30,6 +30,19 @@ public class PlayerStatsHandler : MonoBehaviour
     private StatModifier modificadorBota;
     public bool TemBotaEquipada => modificadorBota != null;
 
+
+    [Header("Pocao de poder")]
+    [Tooltip("Fracao somada ao dano (0.5 = +50%).")]
+    [SerializeField, Min(0f)] private float bonusDanoPocaoPoder = 0.5f;
+    [Tooltip("Duracao em segundos. 0 deixa o efeito permanente.")]
+    [SerializeField, Min(0f)] private float duracaoPocaoPoder = 30f;
+    private StatModifier modificadorPocaoPoder;
+    public bool PocaoPoderAtiva => modificadorPocaoPoder != null && tempModifiers.Contains(modificadorPocaoPoder);
+
+    // Cor usada no popup, no texto do bau e no placeholder da hotbar
+    public static readonly Color CorPocaoPoder = new Color(1f, 0.55f, 0.2f);
+
+
     // Lista de modificadores permanentes
     private List<StatModifier> modifiers = new List<StatModifier>();
 
@@ -51,21 +64,24 @@ public class PlayerStatsHandler : MonoBehaviour
         AddSimpleModifier(modificadorBota);
     }
 
-    //[Header("Equipamento passivo")]
-    //[SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.5f;
-    //private StatModifier modificadorBota;
-    //public bool TemBotaEquipada => modificadorBota != null;
 
-    //// Lista de modificadores permanentes
-    //private List<StatModifier> modifiers = new List<StatModifier>();
+    public void BeberPocaoPoder()
+    {
+        // Beber outra com o efeito ativo renova a duracao em vez de acumular o bonus.
+        if (PocaoPoderAtiva)
+        {
+            modificadorPocaoPoder.duration = duracaoPocaoPoder;
+            GameEffects.Instance.Popup(transform.position + Vector3.up * 0.8f, "Poder renovado!", CorPocaoPoder);
+            return;
+        }
 
-    //public void EquiparBota()
-    //{
-    //    // Cada bota adiciona seu proprio modificador permanente de velocidade.
-    //    modificadorBota = new StatModifier("Bota de velocidade", StatType.Speed,
-    //        ModifierSource.Item, ModifierType.Percent, bonusVelocidadeBota);
-    //    AddSimpleModifier(modificadorBota);
-    //}
+        modificadorPocaoPoder = new StatModifier("Pocao de poder", StatType.Damage,
+            ModifierSource.Buff, ModifierType.Percent, bonusDanoPocaoPoder, duracaoPocaoPoder);
+        AddTemporaryModifier(modificadorPocaoPoder);
+        GameEffects.Instance.Popup(transform.position + Vector3.up * 0.8f, $"+{bonusDanoPocaoPoder * 100f:0}% Dano!", CorPocaoPoder);
+        Debug.Log($"Pocao de poder! Dano atual: {GetPlayerDamage()}");
+    }
+
 
     public void AddSimpleModifier(StatModifier modifier)    // Adiciona um modificador permanente!!
     {
@@ -115,6 +131,8 @@ public class PlayerStatsHandler : MonoBehaviour
                 if (tempModifiers[i].duration <= 0)     // Quando a duração acabar ele remove!!
                 {
                     string expiredName = tempModifiers[i].statName;     // Salva o nome antes de remover ele da lista, usado em DEBUG!!!!
+                    if (tempModifiers[i] == modificadorPocaoPoder)
+                        GameEffects.Instance.Popup(transform.position + Vector3.up * 0.8f, "O poder acabou...", CorPocaoPoder);
                     tempModifiers.RemoveAt(i);
                     print($"Modificador {expiredName} expirou e foi removido!");
                 }

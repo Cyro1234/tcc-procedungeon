@@ -6780,6 +6780,7 @@ MonoBehaviour:
   spriteAdaga: {fileID: -8370915199016746703, guid: 8059310dcd4b29248adfc9f3a6ea3978,
     type: 3}
   spritePocaoVida: {fileID: 0}
+  spritePocaoPoder: {fileID: 0}
 --- !u!4 &878909396
 Transform:
   m_ObjectHideFlags: 0
@@ -7935,6 +7936,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsHandler
   bonusVelocidadeBota: 0.2
   bonusVelocidadeBotaLendaria: 0.8
+  bonusDanoPocaoPoder: 0.5
+  duracaoPocaoPoder: 0
 --- !u!114 &992072369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61915,10 +61918,10 @@ MonoBehaviour:
         type: 3}
       weight: 5
   randomStartingChest: 0
-  manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
+  manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
     type: 3}
   forceStartingItem: 1
-  startingChestItem: 9
+  startingChestItem: 10
 --- !u!4 &1942525113
 Transform:
   m_ObjectHideFlags: 0
