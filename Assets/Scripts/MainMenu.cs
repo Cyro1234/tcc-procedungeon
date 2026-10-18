@@ -51,12 +51,14 @@ public class MainMenu : MonoBehaviour
     public void RetornarMenu()
     {
         optionsMenu.SetActive(false);
+        controlsMenu.SetActive(false);
         mainMenu.SetActive(true);
     }
 
     public void AbrirControles()
     {
         optionsMenu.SetActive(false);
+        mainMenu.SetActive(false);
         controlsMenu.SetActive(true);
     }
 
