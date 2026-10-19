@@ -19,6 +19,23 @@ public class InventoryManager : MonoBehaviour
     public bool PodeEditarInventario => inventarioAberto && GameFlow.Current == GameFlow.State.Inventory;
     private InputActionAsset controles;
     private int origemTroca = -1;
+    private readonly Dictionary<Chest.ItemType, int> pocoes = new Dictionary<Chest.ItemType, int>();
+    private readonly Dictionary<Chest.ItemType, int> repeticoesArmas = new Dictionary<Chest.ItemType, int>();
+    public int ObterRepeticoes(Chest.ItemType tipo) => repeticoesArmas.TryGetValue(tipo, out int valor) ? valor : 0;
+    // Bonus aditivo por tipo: uma copia extra = 1.1x; duas = 1.2x.
+    public float ObterMultiplicadorDano(Chest.ItemType tipo) => 1f + ObterRepeticoes(tipo) * 0.1f;
+    public int ObterQuantidade(Chest.ItemType tipo) => pocoes.TryGetValue(tipo, out int valor) ? valor : 0;
+    public bool PossuiItem(Chest.ItemType tipo) => tipo != Chest.ItemType.None &&
+        (ObterQuantidade(tipo) > 0 || System.Array.IndexOf(itensNoInventario, tipo) >= 0);
+    public Chest.ItemType ObterVizinho(int direcao)
+    {
+        for (int passo = 1; passo < itensNoInventario.Length; passo++)
+        {
+            int indice = (slotSelecionadoIndex + direcao * passo + itensNoInventario.Length) % itensNoInventario.Length;
+            if (itensNoInventario[indice] != Chest.ItemType.None) return itensNoInventario[indice];
+        }
+        return Chest.ItemType.None;
+    }
 
     // Indice do ultimo slot que recebeu um item ou -1 se nenhum slot recebeu item recentemente
     public int UltimoSlotAdicionado { get; private set; } = -1;
@@ -76,7 +93,13 @@ public class InventoryManager : MonoBehaviour
     private void SelecionarSlotRelativo(int deslocamento)
     {
         if (!GameFlow.CanPlay && !PodeEditarInventario) return;
-        slotSelecionadoIndex = (slotSelecionadoIndex + deslocamento + itensNoInventario.Length) % itensNoInventario.Length;
+        for (int passo = 1; passo <= itensNoInventario.Length; passo++)
+        {
+            int indice = (slotSelecionadoIndex + deslocamento * passo + itensNoInventario.Length) % itensNoInventario.Length;
+            if (itensNoInventario[indice] == Chest.ItemType.None) continue;
+            slotSelecionadoIndex = indice;
+            break;
+        }
     }
 
     private void AoConfirmarTroca(InputAction.CallbackContext context)
@@ -102,6 +125,7 @@ public class InventoryManager : MonoBehaviour
 
     [Header("Banco de Sprites")]
     public Sprite spriteEspadaLonga;
+    private Sprite spriteEspadaInicial;
     public Sprite spriteAdaga;
     public Sprite spritePocaoVida;
     public Sprite spritePocaoPoder;
@@ -118,7 +142,12 @@ public class InventoryManager : MonoBehaviour
     {
         if (!GameFlow.CanPlay || Time.timeScale == 0f) return false;
 
-        Chest.ItemType item = ObterItemSelecionado();
+        return UsarPocao(ObterItemSelecionado());
+    }
+
+    public bool UsarPocao(Chest.ItemType item)
+    {
+        if (!GameFlow.CanPlay || Time.timeScale == 0f || ObterQuantidade(item) <= 0) return false;
         if (item == Chest.ItemType.HealthPotion)
         {
             var vida = FindAnyObjectByType<HeartSystem>();
@@ -133,7 +162,7 @@ public class InventoryManager : MonoBehaviour
         }
         else return false;
 
-        itensNoInventario[slotSelecionadoIndex] = Chest.ItemType.None;
+        pocoes[item]--;
         AtualizarUI();
         return true;
     }
@@ -159,19 +188,32 @@ public class InventoryManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        else { Destroy(gameObject); return; }
 
         for (int i = 0; i < itensNoInventario.Length; i++)
         {
             itensNoInventario[i] = Chest.ItemType.None;
             slots[i].slotIndex = i; // Configura o ID de cada slot automaticamente
         }
+        AdicionarItem(Chest.ItemType.BasicSword);
     }
 
     private void Update()
     {
         LidarComInputsDeTeclado();
+        if (GameFlow.CanPlay && Gamepad.current != null)
+        {
+            if (Gamepad.current.dpad.up.wasPressedThisFrame) UsarPocao(Chest.ItemType.HealthPotion);
+            if (Gamepad.current.dpad.down.wasPressedThisFrame) UsarPocao(Chest.ItemType.PowerPotion);
+        }
         AtualizarUI();
+    }
+
+    private void Start()
+    {
+        var ataque = FindAnyObjectByType<Attack>();
+        if (ataque != null && ataque.armaRender != null) spriteEspadaInicial = ataque.armaRender.sprite;
+        gameObject.AddComponent<CircularInventoryHUD>().Inicializar(this, hotbarPanel);
     }
 
     private void LidarComInputsDeTeclado()
@@ -186,15 +228,8 @@ public class InventoryManager : MonoBehaviour
             else if (scroll < -0.01f) SelecionarSlotRelativo(1);
         }
 
-        // Seleção de Slots (Teclas 1 a 8)
-        if (Keyboard.current.digit1Key.wasPressedThisFrame) slotSelecionadoIndex = 0;
-        if (Keyboard.current.digit2Key.wasPressedThisFrame) slotSelecionadoIndex = 1;
-        if (Keyboard.current.digit3Key.wasPressedThisFrame) slotSelecionadoIndex = 2;
-        if (Keyboard.current.digit4Key.wasPressedThisFrame) slotSelecionadoIndex = 3;
-        if (Keyboard.current.digit5Key.wasPressedThisFrame) slotSelecionadoIndex = 4;
-        if (Keyboard.current.digit6Key.wasPressedThisFrame) slotSelecionadoIndex = 5;
-        if (Keyboard.current.digit7Key.wasPressedThisFrame) slotSelecionadoIndex = 6;
-        if (Keyboard.current.digit8Key.wasPressedThisFrame) slotSelecionadoIndex = 7;
+        if (Keyboard.current.zKey.wasPressedThisFrame) UsarPocao(Chest.ItemType.HealthPotion);
+        if (Keyboard.current.xKey.wasPressedThisFrame) UsarPocao(Chest.ItemType.PowerPotion);
     }
 
     private void AlternarInventario()
@@ -221,6 +256,20 @@ public class InventoryManager : MonoBehaviour
 
     public bool AdicionarItem(Chest.ItemType novoItem)
     {
+        UltimoSlotAdicionado = -1;
+        if (novoItem == Chest.ItemType.None) return false;
+        if (EhConsumivel(novoItem))
+        {
+            pocoes[novoItem] = ObterQuantidade(novoItem) + 1;
+            return true;
+        }
+        int existente = System.Array.IndexOf(itensNoInventario, novoItem);
+        if (existente >= 0)
+        {
+            repeticoesArmas[novoItem] = ObterRepeticoes(novoItem) + 1;
+            UltimoSlotAdicionado = existente;
+            return true;
+        }
         // Equipamentos passivos nao ocupam slots, mesmo quando recebidos por este metodo.
         if (novoItem == Chest.ItemType.SpeedBoots || novoItem == Chest.ItemType.LegendarySpeedBoots)
         {
@@ -289,8 +338,9 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    private Sprite ObterSprite(Chest.ItemType tipo)
+    public Sprite ObterSprite(Chest.ItemType tipo)
     {
+        if (tipo == Chest.ItemType.BasicSword) return spriteEspadaInicial != null ? spriteEspadaInicial : spriteEspadaLonga;
         if (tipo == Chest.ItemType.LongSword) return spriteEspadaLonga;
         if (tipo == Chest.ItemType.Dagger) return spriteAdaga;
         if (tipo == Chest.ItemType.HealthPotion && spritePocaoVida != null) return spritePocaoVida;
@@ -306,5 +356,151 @@ public class InventoryManager : MonoBehaviour
             return spriteProvisorio;
         }
         return null;
+    }
+}
+
+/// <summary>HUD circular criado no Canvas existente, sem depender de ajustes manuais na cena.</summary>
+public class CircularInventoryHUD : MonoBehaviour
+{
+    private InventoryManager inventario;
+    private RectTransform raiz;
+    private UnityEngine.UI.Image centro, anterior, proximo;
+    private UnityEngine.UI.Text nome, vida, poder, esquerda, direita;
+    private Sprite disco;
+    private Texture2D textura;
+
+    public void Inicializar(InventoryManager manager, RectTransform painel)
+    {
+        if (painel == null) return;
+        inventario = manager;
+        // O painel antigo fica disponível somente para reorganizar o inventário.
+        var objeto = new GameObject("Seletor circular", typeof(RectTransform));
+        raiz = objeto.GetComponent<RectTransform>();
+        raiz.SetParent(painel.parent, false);
+        raiz.anchorMin = raiz.anchorMax = new Vector2(0, 0);
+        raiz.pivot = new Vector2(0, 0);
+        raiz.anchoredPosition = new Vector2(24, 24);
+        raiz.sizeDelta = new Vector2(250, 280);
+        textura = new Texture2D(128, 128, TextureFormat.RGBA32, false);
+        var pixels = new Color[128 * 128];
+        for (int y = 0; y < 128; y++)
+            for (int x = 0; x < 128; x++)
+            {
+                float distancia = Vector2.Distance(new Vector2(x, y), new Vector2(63.5f, 63.5f));
+                pixels[y * 128 + x] = new Color(1, 1, 1, Mathf.Clamp01(63.5f - distancia));
+            }
+        textura.SetPixels(pixels);
+        textura.Apply();
+        disco = Sprite.Create(textura, new Rect(0, 0, 128, 128), Vector2.one * .5f);
+        centro = Bolha("Arma", new Vector2(125, 130), 188);
+        anterior = Bolha("Anterior", new Vector2(45, 55), 70);
+        proximo = Bolha("Proximo", new Vector2(205, 55), 70);
+        nome = Texto(centro.transform.parent, new Vector2(0, -61), new Vector2(155, 26), 15);
+        esquerda = Texto(anterior.transform.parent, new Vector2(0, -48), new Vector2(100, 24), 14);
+        direita = Texto(proximo.transform.parent, new Vector2(0, -48), new Vector2(100, 24), 14);
+        CriarPocao(Chest.ItemType.HealthPotion, new Vector2(158, 235), out vida);
+        CriarPocao(Chest.ItemType.PowerPotion, new Vector2(218, 202), out poder);
+    }
+
+    private UnityEngine.UI.Image Bolha(string titulo, Vector2 posicao, float tamanho)
+    {
+        var borda = Imagem(titulo, raiz, posicao, Vector2.one * tamanho);
+        borda.sprite = disco;
+        borda.color = new Color(.72f, .57f, .31f);
+        var fundo = Imagem("Fundo", borda.transform, Vector2.zero, Vector2.one * (tamanho - 5));
+        fundo.sprite = disco;
+        fundo.color = new Color(.055f, .07f, .10f, .97f);
+        return Imagem("Icone", fundo.transform, Vector2.zero, Vector2.one * (tamanho * .56f));
+    }
+
+    private UnityEngine.UI.Image Imagem(string titulo, Transform pai, Vector2 posicao, Vector2 tamanho)
+    {
+        var go = new GameObject(titulo, typeof(RectTransform), typeof(UnityEngine.UI.Image));
+        go.transform.SetParent(pai, false);
+        var rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = pai == raiz ? Vector2.zero : Vector2.one * .5f;
+        rect.anchoredPosition = posicao;
+        rect.sizeDelta = tamanho;
+        var imagem = go.GetComponent<UnityEngine.UI.Image>();
+        imagem.preserveAspect = true;
+        imagem.raycastTarget = false;
+        return imagem;
+    }
+
+    private UnityEngine.UI.Text Texto(Transform pai, Vector2 posicao, Vector2 tamanho, int fonte)
+    {
+        var go = new GameObject("Legenda", typeof(RectTransform), typeof(UnityEngine.UI.Text));
+        go.transform.SetParent(pai, false);
+        var rect = go.GetComponent<RectTransform>();
+        rect.anchoredPosition = posicao;
+        rect.sizeDelta = tamanho;
+        var texto = go.GetComponent<UnityEngine.UI.Text>();
+        texto.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        texto.fontSize = fonte;
+        texto.alignment = TextAnchor.MiddleCenter;
+        texto.color = new Color(.95f, .89f, .73f);
+        texto.raycastTarget = false;
+        return texto;
+    }
+
+    private void CriarPocao(Chest.ItemType tipo, Vector2 posicao, out UnityEngine.UI.Text contador)
+    {
+        var icone = Bolha(tipo.ToString(), posicao, 58);
+        var sprite = tipo == Chest.ItemType.HealthPotion ? inventario.spritePocaoVida : inventario.spritePocaoPoder;
+        if (sprite != null) icone.sprite = sprite;
+        else
+        {
+            // Frasco desenhado com UI enquanto não há sprite de poção configurado.
+            icone.sprite = disco;
+            icone.color = tipo == Chest.ItemType.HealthPotion ? new Color(.95f, .22f, .32f) : PlayerStatsHandler.CorPocaoPoder;
+            icone.rectTransform.sizeDelta = new Vector2(21, 25);
+            var gargalo = Imagem("Gargalo", icone.transform, new Vector2(0, 15), new Vector2(9, 12));
+            gargalo.color = icone.color;
+            var rolha = Imagem("Rolha", icone.transform, new Vector2(0, 22), new Vector2(13, 5));
+            rolha.color = new Color(.76f, .59f, .32f);
+        }
+        contador = Texto(icone.transform.parent, new Vector2(0, -40), new Vector2(110, 24), 13);
+    }
+
+    private void LateUpdate()
+    {
+        if (raiz == null || inventario == null) return;
+        inventario.hotbarPanel.gameObject.SetActive(inventario.inventarioAberto);
+        raiz.gameObject.SetActive(!inventario.inventarioAberto);
+        Mostrar(centro, inventario.ObterItemSelecionado());
+        Mostrar(anterior, inventario.ObterVizinho(-1));
+        Mostrar(proximo, inventario.ObterVizinho(1));
+        var selecionado = inventario.ObterItemSelecionado();
+        int repeticoes = inventario.ObterRepeticoes(selecionado);
+        nome.text = Nome(selecionado) + (repeticoes > 0 ? $"\n+{repeticoes * 10}% dano" : "");
+        nome.rectTransform.sizeDelta = new Vector2(155, 44);
+        bool controle = Gamepad.current != null;
+        esquerda.text = controle ? "L1 / LB" : "1 / Scroll";
+        direita.text = controle ? "R1 / RB" : "2 / Scroll";
+        vida.text = (controle ? "↑" : "Z") + "  ×" + inventario.ObterQuantidade(Chest.ItemType.HealthPotion);
+        poder.text = (controle ? "↓" : "X") + "  ×" + inventario.ObterQuantidade(Chest.ItemType.PowerPotion);
+    }
+
+    private void Mostrar(UnityEngine.UI.Image imagem, Chest.ItemType tipo)
+    {
+        imagem.sprite = inventario.ObterSprite(tipo);
+        imagem.enabled = tipo != Chest.ItemType.None && imagem.sprite != null;
+    }
+
+    private static string Nome(Chest.ItemType tipo) => tipo switch
+    {
+        Chest.ItemType.BasicSword => "Espada inicial",
+        Chest.ItemType.LongSword => "Espada longa",
+        Chest.ItemType.Dagger => "Adaga",
+        Chest.ItemType.Axe => "Machado",
+        Chest.ItemType.None => "Sem arma",
+        _ => tipo.ToString()
+    };
+
+    private void OnDestroy()
+    {
+        if (raiz != null) Destroy(raiz.gameObject);
+        if (disco != null) Destroy(disco);
+        if (textura != null) Destroy(textura);
     }
 }

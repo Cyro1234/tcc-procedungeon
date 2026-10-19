@@ -644,17 +644,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""06ee2eb1-7b4d-4a9e-a30a-b4f621c0d51c"",
-                    ""path"": ""<Gamepad>/dpad"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""c24f9cb8-8955-4ea9-8258-7d26ed27144a"",
                     ""path"": ""<Gamepad>/buttonNorth"",
                     ""interactions"": """",

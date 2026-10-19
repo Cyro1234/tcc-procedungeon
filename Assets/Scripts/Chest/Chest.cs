@@ -3,7 +3,7 @@ using UnityEngine;
 public class Chest : MonoBehaviour
 {
     // NOVO: Tipos de itens atualizados com as qualidades dos escudos
-    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion, Axe }
+    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion, Axe, BasicSword }
 
     [Header("Configurações do Baú")]
     // Cada Prefab de baú terá sua própria tabela de loot configurada no Inspector
@@ -114,8 +114,9 @@ public class Chest : MonoBehaviour
                     ItemType.PowerPotion => PlayerStatsHandler.CorPocaoPoder,
                     _ => WeaponColor
                 };
-                int slot = InventoryManager.Instance.UltimoSlotAdicionado + 1;
-                GameEffects.Instance.ItemObtained(transform.position, slot > 0 ? $"{nome}! [{slot}]" : $"{nome}!", cor);
+                int repeticoes = InventoryManager.Instance.ObterRepeticoes(itemInside);
+                string mensagem = repeticoes > 0 ? $"{nome}! +10% dano (total +{repeticoes * 10}%)" : $"{nome}!";
+                GameEffects.Instance.ItemObtained(transform.position, mensagem, cor);
                 break;
 
                 // Armas agora vão para o Inventário!

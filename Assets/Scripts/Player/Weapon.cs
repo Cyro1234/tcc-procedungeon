@@ -5,6 +5,7 @@ public class Weapon : MonoBehaviour
 {
     private PlayerStatsHandler stats;
     private GameObject player;
+    private float multiplicadorArma = 1f;
     private readonly HashSet<EnemyMovement> hitEnemies = new HashSet<EnemyMovement>();
 
     private void Awake()
@@ -17,6 +18,8 @@ public class Weapon : MonoBehaviour
     {
         // A hitbox e reativada a cada golpe. Cada alvo recebe dano uma unica vez nesse golpe.
         hitEnemies.Clear();
+        var inventario = InventoryManager.Instance;
+        multiplicadorArma = inventario != null ? inventario.ObterMultiplicadorDano(inventario.ObterItemSelecionado()) : 1f;
     }
 
     // Quando entra na colisao
@@ -29,7 +32,7 @@ public class Weapon : MonoBehaviour
         // Sair e entrar novamente (ou atingir outro collider do mesmo alvo) nao e um novo golpe.
         if (enemy != null && hitEnemies.Add(enemy))
         {
-            enemy.takeDamage(stats.GetPlayerDamage(), player);
+            enemy.takeDamage(stats.GetPlayerDamage() * multiplicadorArma, player);
         }
     }
 }

@@ -33,6 +33,7 @@ public class AxeSpin : MonoBehaviour
     private readonly HashSet<EnemyMovement> atingidos = new HashSet<EnemyMovement>();
     private float inicio;
     private float duracao;
+    private float bonusArma = 1f;
 
     public bool Girando { get; private set; }
 
@@ -60,6 +61,8 @@ public class AxeSpin : MonoBehaviour
     // Chamado pelo Attack quando o golpe comeca
     public void Comecar(float duracaoGolpe)
     {
+        bonusArma = InventoryManager.Instance != null
+            ? InventoryManager.Instance.ObterMultiplicadorDano(Chest.ItemType.Axe) : 1f;
         inicio = Time.time;
         duracao = Mathf.Max(0.01f, duracaoGolpe);
         atingidos.Clear();
@@ -100,7 +103,7 @@ public class AxeSpin : MonoBehaviour
             // Varios colliders do mesmo inimigo nao contam como golpes extras.
             if (enemy != null && atingidos.Add(enemy))
             {
-                enemy.takeDamage(stats.GetPlayerDamage() * multiplicadorDano, gameObject);
+                enemy.takeDamage(stats.GetPlayerDamage() * multiplicadorDano * bonusArma, gameObject);
             }
         }
     }
