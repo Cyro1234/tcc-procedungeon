@@ -8,6 +8,8 @@ public class SpawnPlacement
     private readonly HashSet<Vector2Int> reserved = new HashSet<Vector2Int>();
 
     public int RoomCount => rooms.Count;
+    public int TeleportRoomIndex => rooms.Count - 1;
+    private Vector2Int? posicaoInimigoTeleport;
 
     public SpawnPlacement(List<HashSet<Vector2Int>> rooms, IEnumerable<Vector2Int> corridors,
         IEnumerable<Vector2Int> entrances, Vector2Int playerSpawn, Vector2Int teleport)
@@ -18,6 +20,30 @@ public class SpawnPlacement
         foreach (Vector2Int cell in entrances) ReserveArea(cell, 2);
         ReserveArea(playerSpawn, 1);
         ReserveArea(teleport, 1);
+        // Reserva antes dos baus, para a sala do teleporte nunca ficar sem espaco para combate.
+        if (TryTakeClosestPosition(TeleportRoomIndex, teleport + Vector2Int.right * 3, out var posicao))
+            posicaoInimigoTeleport = posicao;
+        else
+        {
+            // Salas estreitas podem nao ter o bloco de piso 3x3 exigido pelo posicionamento comum.
+            foreach (var candidata in Rng.OrderPositions(rooms[TeleportRoomIndex]))
+            {
+                if (reserved.Contains(candidata)) continue;
+                posicaoInimigoTeleport = candidata;
+                ReserveArea(candidata, 1);
+                break;
+            }
+            if (!posicaoInimigoTeleport.HasValue)
+                throw new System.InvalidOperationException("Sala do teleporte sem espaco seguro para um inimigo obrigatorio.");
+        }
+    }
+
+    public bool TryTakeTeleportEnemyPosition(out Vector2Int position)
+    {
+        position = posicaoInimigoTeleport.GetValueOrDefault();
+        if (!posicaoInimigoTeleport.HasValue) return false;
+        posicaoInimigoTeleport = null;
+        return true;
     }
 
     public List<Vector2Int> GetAvailablePositions(int roomIndex)

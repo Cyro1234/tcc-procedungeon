@@ -20,6 +20,8 @@ public class RoomDetector : MonoBehaviour
     private GameObject[] inimigosNoMapa;
     private BoundsInt? salaEmCombate = null;
     private int currentOffset;
+    private EnemySpawner enemySpawner;
+    private readonly BoundsInt limitesSalaBoss = new BoundsInt(new Vector3Int(991, -9, 0), new Vector3Int(18, 18, 0));
 
     [SerializeField] private RoomFirstDungeonGenerator dungeonGenerator;
     [SerializeField] private Transform cameraTarget;
@@ -40,6 +42,7 @@ public class RoomDetector : MonoBehaviour
     {
         this.roomsList = new List<BoundsInt>(rooms);
         this.currentOffset = offset;
+        enemySpawner = FindAnyObjectByType<EnemySpawner>();
         currentRoom = null;
         salaEmCombate = null;
         jogadorSala = false;
@@ -50,7 +53,7 @@ public class RoomDetector : MonoBehaviour
         AoReiniciarSalas?.Invoke();
 
         // Adiciona sala boss
-        roomsList.Add(new BoundsInt(new Vector3Int(1000 - 9, -9, 0), new Vector3Int(18, 18, 0)));
+        roomsList.Add(limitesSalaBoss);
 
         foreach (var room in roomsList)
         {
@@ -111,8 +114,12 @@ public class RoomDetector : MonoBehaviour
             if (playerPos.x >= room.xMin && playerPos.x < room.xMax &&
                 playerPos.y >= room.yMin && playerPos.y < room.yMax)
             {
+                // A arena pronta do boss nao possui a margem de corredores das salas BSP.
+                int margemSala = room == limitesSalaBoss ? 0 : offset;
+                jogadorSala = (playerPos.x >= room.xMin + margemSala && playerPos.x < room.xMax - margemSala &&
+                               playerPos.y >= room.yMin + margemSala && playerPos.y < room.yMax - margemSala);
                 // Define a sala atual para a câmera e referências
-                if (currentRoom != room)
+                if (currentRoom != room && jogadorSala)
                 {
                     currentRoom = room;
 
@@ -123,6 +130,14 @@ public class RoomDetector : MonoBehaviour
                         virtualCamera.Lens.OrthographicSize = room.size.y / 2.2f;
                     }
                 }
+                else if (!jogadorSala)
+                {
+                    currentRoom = null;
+                    cameraTarget.position = playerTransform.position;
+                    virtualCamera.Lens.OrthographicSize = 4f;
+                }
+
+                if (jogadorSala && enemySpawner != null) enemySpawner.EntrarNaSala(room);
                 
                     // aqui ele usa offset nos inimigos, pegando o tamanho real
                     foreach (GameObject inimigo in inimigosNoMapa)
@@ -137,8 +152,7 @@ public class RoomDetector : MonoBehaviour
                         }
                     }
 
-                jogadorSala = (playerPos.x >= room.xMin + offset && playerPos.x < room.xMax - offset &&
-                               playerPos.y >= room.yMin + offset && playerPos.y < room.yMax - offset);
+                if (enemySpawner != null && enemySpawner.TemInimigos(room)) inimigoSala = true;
 
                 // Checa se o jogador E o inimigo estao na sala
                 bool condicaoTrancar = jogadorSala && inimigoSala;

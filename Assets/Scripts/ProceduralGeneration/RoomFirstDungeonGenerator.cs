@@ -98,6 +98,7 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         WallGenerator.CreateWalls(floor, tileMapVisualizer);
 
         SpawnBossRoom();
+        enemySpawner.PrepararRecompensas(roomDetector.GetRoomsList());
 
     }
 

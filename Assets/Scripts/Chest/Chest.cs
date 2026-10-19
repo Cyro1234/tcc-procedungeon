@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Chest : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class Chest : MonoBehaviour
 
     private bool isOpen = false;
     private Animator animator;
+    [SerializeField, Min(0f)] private float tempoAntesDeSumir = 1.5f;
+    [SerializeField, Min(.1f)] private float duracaoFade = .8f;
 
     private bool itemPreConfigurado = false; // NOVO: Trava para não sobrescrever o item manual
 
@@ -65,6 +68,8 @@ public class Chest : MonoBehaviour
 
         isOpen = true;
         if (animator != null) animator.SetTrigger("Open");
+        foreach (var collider in GetComponentsInChildren<Collider2D>()) collider.enabled = false;
+        StartCoroutine(Sumir());
 
         switch (itemInside)
         {
@@ -84,11 +89,11 @@ public class Chest : MonoBehaviour
 
             case ItemType.SpeedBoots:
                 player.GetComponent<PlayerStatsHandler>()?.EquiparBota();
-                GameEffects.Instance.ItemObtained(transform.position, "Bota da Velocidade!", new Color(0.6f, 1f, 0.6f));
+                GameEffects.Instance.ItemObtained(transform.position, "Bota da Velocidade!", new Color(0.6f, 1f, 0.6f), itemInside);
                 break;
             case ItemType.LegendarySpeedBoots:
                 player.GetComponent<PlayerStatsHandler>()?.EquiparBotaLendaria();
-                GameEffects.Instance.ItemObtained(transform.position, "Bota Lendária da Velocidade!", new Color(1f, 0.7f, 0.2f));
+                GameEffects.Instance.ItemObtained(transform.position, "Bota Lendária da Velocidade!", new Color(1f, 0.7f, 0.2f), itemInside);
                 break;
 
 
@@ -116,7 +121,7 @@ public class Chest : MonoBehaviour
                 };
                 int repeticoes = InventoryManager.Instance.ObterRepeticoes(itemInside);
                 string mensagem = repeticoes > 0 ? $"{nome}! +10% dano (total +{repeticoes * 10}%)" : $"{nome}!";
-                GameEffects.Instance.ItemObtained(transform.position, mensagem, cor);
+                GameEffects.Instance.ItemObtained(transform.position, mensagem, cor, itemInside);
                 break;
 
                 // Armas agora vão para o Inventário!
@@ -145,7 +150,27 @@ public class Chest : MonoBehaviour
         hs.EquipShield(amount);
 
         string texto = antes >= amount ? $"{nome} (já tem um melhor)" : $"{nome}! +{amount}";
-        GameEffects.Instance.ItemObtained(transform.position, texto, color);
+        GameEffects.Instance.ItemObtained(transform.position, texto, color, itemInside);
+    }
+
+    private IEnumerator Sumir()
+    {
+        yield return new WaitForSeconds(tempoAntesDeSumir);
+        if (animator != null) animator.enabled = false;
+        var sprites = GetComponentsInChildren<SpriteRenderer>();
+        var cores = new Color[sprites.Length];
+        for (int i = 0; i < sprites.Length; i++) cores[i] = sprites[i].color;
+        for (float t = 0; t < duracaoFade; t += Time.deltaTime)
+        {
+            for (int i = 0; i < sprites.Length; i++)
+            {
+                var cor = cores[i];
+                cor.a *= 1f - t / duracaoFade;
+                sprites[i].color = cor;
+            }
+            yield return null;
+        }
+        Destroy(gameObject);
     }
 
     //private void OpenChest(GameObject player)

@@ -42,11 +42,7 @@ public class Xiter : MonoBehaviour
 
     private void tpTeleport()
     {
-        GameObject teleporter = GameObject.FindWithTag("Teleporter");
-        if (teleporter != null)
-        {
-            playerObj.transform.position = teleporter.transform.position;
-        }
+        if (playerObj != null) StartCoroutine(Teleporter.TeleportarParaBoss(playerObj));
     }
     private void maxStr()
     {

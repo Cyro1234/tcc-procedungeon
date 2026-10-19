@@ -26,23 +26,22 @@ public class Teleporter : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             used = true;
-
-            if (cinemachineFollow != null)
-            {
-                cinemachineFollow.TrackerSettings.PositionDamping = Vector3.zero;
-            }
-
-            GameManager.setDeuTeleport(true);
-
-            collision.transform.position = new Vector2(1000, 0);
-            GameEffects.Instance.OnEnterBossRoom();
-
-            yield return new WaitForEndOfFrame();
-
-            if (cinemachineFollow != null)
-            {
-                cinemachineFollow.TrackerSettings.PositionDamping = new Vector3(1f, 1f, 1f);
-            }
+            yield return TeleportarParaBoss(collision.gameObject);
         }
+    }
+
+    // Tambem usado pelo F5, mesmo com o portal oculto ou ja utilizado.
+    public static IEnumerator TeleportarParaBoss(GameObject player)
+    {
+        if (player == null) yield break;
+        var camera = FindAnyObjectByType<CinemachineCamera>();
+        var follow = camera != null ? camera.GetComponent<CinemachineFollow>() : null;
+        Vector3 dampingAnterior = follow != null ? follow.TrackerSettings.PositionDamping : Vector3.zero;
+        if (follow != null) follow.TrackerSettings.PositionDamping = Vector3.zero;
+        GameManager.setDeuTeleport(true);
+        player.transform.position = new Vector2(1000, 0);
+        GameEffects.Instance.OnEnterBossRoom();
+        yield return new WaitForEndOfFrame();
+        if (follow != null) follow.TrackerSettings.PositionDamping = dampingAnterior;
     }
 }

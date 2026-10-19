@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -69,7 +70,10 @@ public class GameEffects : MonoBehaviour
     private AudioClip[] clips;
 
     private static Sprite whiteSprite;
-
+    private readonly Dictionary<Chest.ItemType, Sprite> iconesItens = new Dictionary<Chest.ItemType, Sprite>();
+    private readonly Queue<(Vector3 posicao, string texto, Color cor, Chest.ItemType tipo)> coletas = new Queue<(Vector3, string, Color, Chest.ItemType)>();
+    private Coroutine rotinaColeta;
+    private GameObject coletaVisual;
     // Sprite branco 4x4 usado nas particulas
     public static Sprite WhiteSprite
     {
@@ -115,6 +119,7 @@ public class GameEffects : MonoBehaviour
 
     private void OnDestroy()
     {
+        foreach (var icone in iconesItens.Values) { Destroy(icone.texture); Destroy(icone); }
         if (roomDetector != null)
         {
             roomDetector.AoEntrarNaSalaComInimigos -= OnRoomLocked;
@@ -264,10 +269,115 @@ public class GameEffects : MonoBehaviour
         PlaySfx(Sfx.Heal, 1f, 0f);
     }
 
-    public void ItemObtained(Vector3 position, string text, Color color)
+    public void ItemObtained(Vector3 position, string text, Color color, Chest.ItemType tipo = Chest.ItemType.None)
     {
-        Popup(position + Vector3.up * 0.9f, text, color, 1.1f);
         Burst(position, color, 18, 4.5f, null);
+        coletas.Enqueue((position, text, color, tipo));
+        if (rotinaColeta == null) rotinaColeta = StartCoroutine(AnimarColetas());
+    }
+
+    private IEnumerator AnimarColetas()
+    {
+        while (coletas.Count > 0)
+        {
+            var coleta = coletas.Dequeue();
+            coletaVisual = new GameObject("Item obtido", typeof(RectTransform), typeof(CanvasGroup));
+            coletaVisual.transform.SetParent(canvas.transform, false);
+            var grupo = coletaVisual.GetComponent<CanvasGroup>();
+            grupo.blocksRaycasts = false;
+            grupo.interactable = false;
+            var imagemGo = new GameObject("Imagem do item", typeof(RectTransform), typeof(Image));
+            imagemGo.transform.SetParent(coletaVisual.transform, false);
+            var imagem = imagemGo.GetComponent<Image>();
+            imagem.sprite = IconeItem(coleta.tipo, coleta.cor);
+            imagem.preserveAspect = true;
+            imagem.raycastTarget = false;
+            var rect = imagem.rectTransform;
+            rect.sizeDelta = new Vector2(120, 120);
+            var texto = CreateText("Nome do item", coletaVisual.transform, Vector2.one * .5f, 30);
+            texto.textWrappingMode = TextWrappingModes.Normal;
+            texto.rectTransform.sizeDelta = new Vector2(900, 110);
+            texto.rectTransform.anchoredPosition = new Vector2(0, -48);
+            texto.text = coleta.texto;
+            texto.color = coleta.cor;
+            texto.alpha = 0;
+            Vector2 inicio = Vector2.zero;
+            var camera = Camera.main;
+            if (camera != null)
+                RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)coletaVisual.transform,
+                    camera.WorldToScreenPoint(coleta.posicao), null, out inicio);
+            var destino = new Vector2(0, 60);
+            for (float t = 0; t < .55f; t += Time.deltaTime)
+            {
+                float p = Mathf.Clamp01(t / .55f);
+                float suave = 1f - Mathf.Pow(1f - p, 3);
+                rect.anchoredPosition = Vector2.Lerp(inicio, destino, suave) + Vector2.up * Mathf.Sin(p * Mathf.PI) * 100;
+                rect.localScale = Vector3.one * Mathf.Lerp(.35f, 1.15f, suave);
+                yield return null;
+            }
+            rect.anchoredPosition = destino;
+            for (float t = 0; t < .18f; t += Time.deltaTime)
+            {
+                rect.localScale = Vector3.one * Mathf.Lerp(1.15f, 1f, t / .18f);
+                texto.alpha = Mathf.Clamp01(t / .18f);
+                yield return null;
+            }
+            rect.localScale = Vector3.one;
+            texto.alpha = 1;
+            yield return new WaitForSeconds(1.5f);
+            for (float t = 0; t < .4f; t += Time.deltaTime)
+            {
+                grupo.alpha = 1f - t / .4f;
+                yield return null;
+            }
+            Destroy(coletaVisual);
+        }
+        rotinaColeta = null;
+    }
+
+    private Sprite IconeItem(Chest.ItemType tipo, Color cor)
+    {
+        var inventario = InventoryManager.Instance;
+        if (inventario != null)
+        {
+            Sprite sprite = tipo switch
+            {
+                Chest.ItemType.LongSword => inventario.spriteEspadaLonga,
+                Chest.ItemType.Dagger => inventario.spriteAdaga,
+                Chest.ItemType.Axe => inventario.spriteMachado,
+                Chest.ItemType.HealthPotion => inventario.spritePocaoVida,
+                Chest.ItemType.PowerPotion => inventario.spritePocaoPoder,
+                Chest.ItemType.BasicSword => inventario.ObterSprite(tipo),
+                _ => null
+            };
+            if (sprite != null) return sprite;
+        }
+        if (iconesItens.TryGetValue(tipo, out var existente)) return existente;
+        // Arte simples para os itens que ainda nao possuem sprite configurado na cena.
+        var textura = new Texture2D(32, 32, TextureFormat.RGBA32, false);
+        textura.filterMode = FilterMode.Point;
+        bool pocao = InventoryManager.EhConsumivel(tipo);
+        bool bota = tipo == Chest.ItemType.SpeedBoots || tipo == Chest.ItemType.LegendarySpeedBoots;
+        for (int y = 0; y < 32; y++)
+            for (int x = 0; x < 32; x++)
+            {
+                bool preenchido;
+                if (pocao) preenchido = (x >= 12 && x <= 19 && y >= 21 && y <= 28) ||
+                    (Vector2.Distance(new Vector2(x, y), new Vector2(15.5f, 13)) < 10);
+                else if (bota) preenchido = (x >= 10 && x <= 19 && y >= 8 && y <= 27) ||
+                    (x >= 10 && x <= 26 && y >= 4 && y <= 12);
+                else if (tipo == Chest.ItemType.Axe) preenchido = (x >= 14 && x <= 17 && y >= 3 && y <= 28) ||
+                    (x >= 5 && x <= 24 && y >= 18 && y <= 26);
+                else preenchido = y >= 4 && y <= 27 && Mathf.Abs(x - 15.5f) <= Mathf.Min(11, (y - 2) * .65f);
+                Color pixel = cor;
+                if (pocao && y >= 25) pixel = new Color(.65f, .43f, .22f);
+                else if (x <= 12 && preenchido) pixel = Color.Lerp(cor, Color.white, .45f);
+                textura.SetPixel(x, y, preenchido ? pixel : Color.clear);
+            }
+        textura.Apply();
+        var resultado = Sprite.Create(textura, new Rect(0, 0, 32, 32), Vector2.one * .5f, 32);
+        iconesItens[tipo] = resultado;
+        return resultado;
     }
 
     public void EnemyNoticed(Vector3 position)
@@ -277,6 +387,10 @@ public class GameEffects : MonoBehaviour
 
     public void OnNewFloor(int floor, TileMapVisualizer.Biomas bioma)
     {
+        if (rotinaColeta != null) StopCoroutine(rotinaColeta);
+        rotinaColeta = null;
+        coletas.Clear();
+        if (coletaVisual != null) Destroy(coletaVisual);
         RunStats.SetFloor(floor);
         roomLocked = false;
         HeartPickup.ClearAll();
