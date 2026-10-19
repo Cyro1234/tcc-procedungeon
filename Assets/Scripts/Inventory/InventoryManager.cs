@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 using System.Collections.Generic;
 
 public class InventoryManager : MonoBehaviour
@@ -162,6 +163,8 @@ public class InventoryManager : MonoBehaviour
         }
         else return false;
 
+        GameEffects.Instance.ItemConsumed(item == Chest.ItemType.HealthPotion
+            ? new Color(1f, .4f, .5f) : PlayerStatsHandler.CorPocaoPoder);
         pocoes[item]--;
         AtualizarUI();
         return true;
@@ -374,10 +377,20 @@ public class CircularInventoryHUD : MonoBehaviour
     private Sprite disco;
     private Texture2D textura;
 
+    // Flash ao trocar/usar items na hotbar
+    private readonly Dictionary<UnityEngine.UI.Image, UnityEngine.UI.Image> brilhos = new Dictionary<UnityEngine.UI.Image, UnityEngine.UI.Image>();
+    private readonly Dictionary<UnityEngine.UI.Image, Coroutine> piscadas = new Dictionary<UnityEngine.UI.Image, Coroutine>();
+    private UnityEngine.UI.Image iconeVida, iconePoder;
+    private Chest.ItemType ultimaArma;
+    private int ultimaQtdVida, ultimaQtdPoder;
+
     public void Inicializar(InventoryManager manager, RectTransform painel)
     {
         if (painel == null) return;
         inventario = manager;
+        ultimaArma = manager.ObterItemSelecionado();
+        ultimaQtdVida = manager.ObterQuantidade(Chest.ItemType.HealthPotion);
+        ultimaQtdPoder = manager.ObterQuantidade(Chest.ItemType.PowerPotion);
         // O painel antigo fica disponível somente para reorganizar o inventário.
         var objeto = new GameObject("Seletor circular", typeof(RectTransform));
         raiz = objeto.GetComponent<RectTransform>();
@@ -403,8 +416,8 @@ public class CircularInventoryHUD : MonoBehaviour
         nome = Texto(centro.transform.parent, new Vector2(0, -61), new Vector2(155, 26), 15);
         esquerda = Texto(anterior.transform.parent, new Vector2(0, -48), new Vector2(100, 24), 14);
         direita = Texto(proximo.transform.parent, new Vector2(0, -48), new Vector2(100, 24), 14);
-        CriarPocao(Chest.ItemType.HealthPotion, new Vector2(158, 235), out vida);
-        CriarPocao(Chest.ItemType.PowerPotion, new Vector2(218, 202), out poder);
+        iconeVida = CriarPocao(Chest.ItemType.HealthPotion, new Vector2(158, 235), out vida);
+        iconePoder = CriarPocao(Chest.ItemType.PowerPotion, new Vector2(218, 202), out poder);
     }
 
     private UnityEngine.UI.Image Bolha(string titulo, Vector2 posicao, float tamanho)
@@ -415,7 +428,39 @@ public class CircularInventoryHUD : MonoBehaviour
         var fundo = Imagem("Fundo", borda.transform, Vector2.zero, Vector2.one * (tamanho - 5));
         fundo.sprite = disco;
         fundo.color = new Color(.055f, .07f, .10f, .97f);
-        return Imagem("Icone", fundo.transform, Vector2.zero, Vector2.one * (tamanho * .56f));
+        var icone = Imagem("Icone", fundo.transform, Vector2.zero, Vector2.one * (tamanho * .56f));
+        // Criado depois do fundo para ficar por cima do icone
+        var brilho = Imagem("Brilho", borda.transform, Vector2.zero, Vector2.one * tamanho);
+        brilho.sprite = disco;
+        brilho.color = Color.clear;
+        brilhos[icone] = brilho;
+        return icone;
+    }
+
+    // Acende o disco da bolha na cor pedida e da um "pulo" de escala, depois volta ao normal
+    private void Piscar(UnityEngine.UI.Image icone, Color cor)
+    {
+        if (icone == null || !brilhos.TryGetValue(icone, out var brilho)) return;
+        if (piscadas.TryGetValue(icone, out var rotina) && rotina != null) StopCoroutine(rotina);
+        piscadas[icone] = StartCoroutine(AnimarPiscada(brilho, cor));
+    }
+
+    private IEnumerator AnimarPiscada(UnityEngine.UI.Image brilho, Color cor)
+    {
+        const float duracao = .35f;
+        Transform borda = brilho.transform.parent;
+        // Tempo sem escala: o flash nao trava durante hit-stop
+        for (float t = 0; t < duracao; t += Time.unscaledDeltaTime)
+        {
+            float p = t / duracao;
+            float suave = 1f - (1f - p) * (1f - p);
+            cor.a = Mathf.Lerp(.85f, 0f, suave);
+            brilho.color = cor;
+            borda.localScale = Vector3.one * Mathf.Lerp(1.2f, 1f, suave);
+            yield return null;
+        }
+        brilho.color = Color.clear;
+        borda.localScale = Vector3.one;
     }
 
     private UnityEngine.UI.Image Imagem(string titulo, Transform pai, Vector2 posicao, Vector2 tamanho)
@@ -448,7 +493,7 @@ public class CircularInventoryHUD : MonoBehaviour
         return texto;
     }
 
-    private void CriarPocao(Chest.ItemType tipo, Vector2 posicao, out UnityEngine.UI.Text contador)
+    private UnityEngine.UI.Image CriarPocao(Chest.ItemType tipo, Vector2 posicao, out UnityEngine.UI.Text contador)
     {
         var icone = Bolha(tipo.ToString(), posicao, 58);
         var sprite = tipo == Chest.ItemType.HealthPotion ? inventario.spritePocaoVida : inventario.spritePocaoPoder;
@@ -465,6 +510,7 @@ public class CircularInventoryHUD : MonoBehaviour
             rolha.color = new Color(.76f, .59f, .32f);
         }
         contador = Texto(icone.transform.parent, new Vector2(0, -40), new Vector2(110, 24), 13);
+        return icone;
     }
 
     private void LateUpdate()
@@ -484,6 +530,29 @@ public class CircularInventoryHUD : MonoBehaviour
         direita.text = controle ? "R1 / RB" : "2 / Scroll";
         vida.text = (controle ? "↑" : "Z") + "  ×" + inventario.ObterQuantidade(Chest.ItemType.HealthPotion);
         poder.text = (controle ? "↓" : "X") + "  ×" + inventario.ObterQuantidade(Chest.ItemType.PowerPotion);
+        DetectarMudancas(selecionado);
+    }
+
+    // Compara com o frame anterior pro flash aparece de onde a troca vier (scroll, item novo equipado, reorganizar o inventario, etc)
+    private void DetectarMudancas(Chest.ItemType selecionado)
+    {
+        // Com o inventario aberto o HUD fica escondido; a troca e mostrada ao fechar
+        if (inventario.inventarioAberto) return;
+
+        if (selecionado != ultimaArma)
+        {
+            ultimaArma = selecionado;
+            Piscar(centro, Color.white);
+            GameEffects.Instance.WeaponSwitched(Nome(selecionado));
+        }
+
+        int qtdVida = inventario.ObterQuantidade(Chest.ItemType.HealthPotion);
+        int qtdPoder = inventario.ObterQuantidade(Chest.ItemType.PowerPotion);
+        // So pisca quando a quantidade diminui, ou seja, a pocao foi consumida
+        if (qtdVida < ultimaQtdVida) Piscar(iconeVida, new Color(1f, .4f, .5f));
+        if (qtdPoder < ultimaQtdPoder) Piscar(iconePoder, PlayerStatsHandler.CorPocaoPoder);
+        ultimaQtdVida = qtdVida;
+        ultimaQtdPoder = qtdPoder;
     }
 
     private void Mostrar(UnityEngine.UI.Image imagem, Chest.ItemType tipo)

@@ -269,6 +269,24 @@ public class GameEffects : MonoBehaviour
         PlaySfx(Sfx.Heal, 1f, 0f);
     }
 
+    // Chamado pelo HUD circular quando a arma na mao muda
+    public void WeaponSwitched(string nome)
+    {
+        Transform p = GetPlayer();
+        if (p == null) return;
+        Burst(p.position, Color.white, 8, 3f, null);
+        Popup(p.position + Vector3.up * 0.8f, nome, Color.white, 0.8f, 0.6f);
+    }
+
+    // Chamado pelo inventario quando uma pocao (ou outro consumivel) e gasta
+    public void ItemConsumed(Color color)
+    {
+        Transform p = GetPlayer();
+        if (p == null) return;
+        Burst(p.position, color, 14, 3.5f, null);
+        FlashScreen(new Color(color.r, color.g, color.b, 0.18f), 0.3f);
+    }
+
     public void ItemObtained(Vector3 position, string text, Color color, Chest.ItemType tipo = Chest.ItemType.None)
     {
         Burst(position, color, 18, 4.5f, null);

@@ -17,7 +17,7 @@ public class PlayerStatsHandler : MonoBehaviour
     // Ele tem suporte para modificadores permanentes e temporarios, modificadores flat e percentuais, e modificadores de diferentes fontes (itens, buffs e debuffs)
 
     // Status padrão do jogador
-    private int basePlayerMaxHearts = 3;
+    private int basePlayerMaxHearts = 5;
     private int maxPossibleHealth = 5; // Vida maxima possivel do jogador. Se quiser aumentar, criar mais coracoes no canvas e adicionar no heartsystem
     private float basePlayerSpeed = 10f;
     private float basePlayerDamage = 1f;
