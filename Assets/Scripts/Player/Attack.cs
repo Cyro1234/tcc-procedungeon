@@ -34,6 +34,7 @@ public class Attack : MonoBehaviour
 
     private void Awake()
     {
+        if (machado == null) machado = ItemSprites.Obter(Chest.ItemType.Axe);
         stats = GetComponent<PlayerStatsHandler>();
         machadoGiro = GetComponent<AxeSpin>();
     }

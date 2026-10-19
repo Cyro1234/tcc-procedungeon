@@ -337,6 +337,8 @@ public class GameEffects : MonoBehaviour
 
     private Sprite IconeItem(Chest.ItemType tipo, Color cor)
     {
+        Sprite arte = ItemSprites.Obter(tipo);
+        if (arte != null) return arte;
         var inventario = InventoryManager.Instance;
         if (inventario != null)
         {

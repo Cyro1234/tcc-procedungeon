@@ -2618,6 +2618,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   maxEnemiesPerRoom: 3
+  atrasoAparecimento: 1.2
   enemyTable:
     items:
     - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
@@ -10422,7 +10423,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   seedText: {fileID: 1645939861}
   useRandomSeed: 1
-  seed: 1
+  seed: 937948209
 --- !u!114 &1101588032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -66694,6 +66695,7 @@ MonoBehaviour:
   raio: 1.75
   multiplicadorDano: 2
   incluirTriggers: 0
+  anguloSprite: 45
   corIndicador: {r: 1, g: 0.85, b: 0.4, a: 0.8}
   espessura: 0.06
   voltas: 1

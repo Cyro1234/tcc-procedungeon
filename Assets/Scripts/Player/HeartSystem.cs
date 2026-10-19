@@ -47,6 +47,8 @@ public class HeartSystem : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         AtualizarVidaMaxima();
+        gameObject.AddComponent<ShieldCounterHUD>().Inicializar(this);
+        gameObject.AddComponent<BootBonusHUD>().Inicializar(this, stats);
     }
 
     void Update()
@@ -180,5 +182,147 @@ public class HeartSystem : MonoBehaviour
             gameOverManager.ShowGameOver(transform);
         }
         AudioManager.Instance.PlaySFX("PlayerMorreu");
+    }
+}
+
+/// <summary>Quantidade atual de escudo, independente da qualidade do item coletado.</summary>
+public class ShieldCounterHUD : MonoBehaviour
+{
+    private HeartSystem vida;
+    private UnityEngine.UI.Image icone;
+    private UnityEngine.UI.Text quantidade;
+    private GameObject painel;
+    private int ultimoValor = -1;
+
+    public void Inicializar(HeartSystem sistema)
+    {
+        vida = sistema;
+        Canvas canvas = null;
+        foreach (var coracao in vida.hearts)
+        {
+            if (coracao == null) continue;
+            canvas = coracao.GetComponentInParent<Canvas>();
+            if (canvas != null) break;
+        }
+        if (canvas == null) return;
+        painel = new GameObject("Escudo - quantidade", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+        painel.transform.SetParent(canvas.transform, false);
+        var rect = painel.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = new Vector2(1, 1);
+        rect.anchoredPosition = new Vector2(-85, -80);
+        rect.sizeDelta = new Vector2(100, 100);
+        icone = painel.GetComponent<UnityEngine.UI.Image>();
+        icone.sprite = ItemSprites.Obter(Chest.ItemType.ShieldSmall);
+        icone.preserveAspect = true;
+        icone.raycastTarget = false;
+
+        var texto = new GameObject("Quantidade", typeof(RectTransform), typeof(UnityEngine.UI.Text), typeof(UnityEngine.UI.Outline));
+        texto.transform.SetParent(painel.transform, false);
+        var textoRect = texto.GetComponent<RectTransform>();
+        textoRect.anchorMin = new Vector2(.12f, .2f);
+        textoRect.anchorMax = new Vector2(.88f, .8f);
+        textoRect.offsetMin = textoRect.offsetMax = Vector2.zero;
+        quantidade = texto.GetComponent<UnityEngine.UI.Text>();
+        quantidade.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        quantidade.fontSize = 32;
+        quantidade.fontStyle = FontStyle.Bold;
+        quantidade.resizeTextForBestFit = true;
+        quantidade.resizeTextMinSize = 10;
+        quantidade.resizeTextMaxSize = 32;
+        quantidade.alignment = TextAnchor.MiddleCenter;
+        quantidade.color = Color.white;
+        quantidade.raycastTarget = false;
+        var contorno = texto.GetComponent<UnityEngine.UI.Outline>();
+        contorno.effectColor = Color.black;
+        contorno.effectDistance = new Vector2(2, -2);
+        LateUpdate();
+    }
+
+    private void LateUpdate()
+    {
+        if (quantidade == null || vida == null) return;
+        int valor = Mathf.Max(0, vida.shieldHealth);
+        if (ultimoValor == valor) return;
+        ultimoValor = valor;
+        quantidade.text = valor.ToString();
+        icone.color = new Color(1, 1, 1, valor > 0 ? 1f : .4f);
+    }
+
+    private void OnDestroy()
+    {
+        if (painel != null) Destroy(painel);
+    }
+}
+
+/// <summary>Mostra o bonus acumulado das botas, sem outros efeitos de velocidade.</summary>
+public class BootBonusHUD : MonoBehaviour
+{
+    private PlayerStatsHandler atributos;
+    private GameObject painel;
+    private UnityEngine.UI.Image icone;
+    private UnityEngine.UI.Text legenda;
+    private float ultimoBonus = -1f;
+    private bool ultimaLendaria;
+
+    public void Inicializar(HeartSystem vida, PlayerStatsHandler stats)
+    {
+        atributos = stats;
+        Canvas canvas = null;
+        foreach (var coracao in vida.hearts)
+        {
+            if (coracao == null) continue;
+            canvas = coracao.GetComponentInParent<Canvas>();
+            if (canvas != null) break;
+        }
+        if (canvas == null || atributos == null) return;
+        painel = new GameObject("Botas - bonus de velocidade", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+        painel.transform.SetParent(canvas.transform, false);
+        var rect = painel.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = new Vector2(1, 1);
+        rect.anchoredPosition = new Vector2(-85, -210);
+        rect.sizeDelta = new Vector2(80, 80);
+        icone = painel.GetComponent<UnityEngine.UI.Image>();
+        icone.preserveAspect = true;
+        icone.raycastTarget = false;
+        var texto = new GameObject("Bonus acumulado", typeof(RectTransform), typeof(UnityEngine.UI.Text), typeof(UnityEngine.UI.Outline));
+        texto.transform.SetParent(painel.transform, false);
+        var textoRect = texto.GetComponent<RectTransform>();
+        textoRect.anchoredPosition = new Vector2(-10, -66);
+        textoRect.sizeDelta = new Vector2(150, 50);
+        legenda = texto.GetComponent<UnityEngine.UI.Text>();
+        legenda.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        legenda.fontSize = 20;
+        legenda.fontStyle = FontStyle.Bold;
+        legenda.alignment = TextAnchor.MiddleCenter;
+        legenda.color = Color.white;
+        legenda.raycastTarget = false;
+        legenda.resizeTextForBestFit = true;
+        legenda.resizeTextMinSize = 12;
+        legenda.resizeTextMaxSize = 20;
+        var contorno = texto.GetComponent<UnityEngine.UI.Outline>();
+        contorno.effectColor = Color.black;
+        contorno.effectDistance = new Vector2(1, -1);
+        painel.SetActive(false);
+        LateUpdate();
+    }
+
+    private void LateUpdate()
+    {
+        if (painel == null || atributos == null) return;
+        bool visivel = atributos.PossuiBotasAtivas;
+        if (painel.activeSelf != visivel) painel.SetActive(visivel);
+        if (!visivel) return;
+        float bonus = atributos.BonusTotalBotas;
+        bool lendaria = atributos.TemBotaLendaria;
+        if (ultimoBonus == bonus && ultimaLendaria == lendaria) return;
+        ultimoBonus = bonus;
+        ultimaLendaria = lendaria;
+        icone.sprite = ItemSprites.Obter(lendaria ? Chest.ItemType.LegendarySpeedBoots : Chest.ItemType.SpeedBoots);
+        legenda.text = $"+{bonus * 100f:0.#}%\nVelocidade";
+    }
+
+    private void OnDestroy()
+    {
+        if (painel != null) Destroy(painel);
     }
 }

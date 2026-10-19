@@ -15,6 +15,8 @@ public class AxeSpin : MonoBehaviour
     [SerializeField] private bool incluirTriggers = false;
 
     [Header("Indicador")]
+    [Tooltip("Ajuste da orientacao da arte do machado durante o giro, em graus.")]
+    [SerializeField] private float anguloSprite = 45f;
     [SerializeField] private Color corIndicador = new Color(1f, 0.85f, 0.4f, 0.8f);
     [SerializeField, Min(0.01f)] private float espessura = 0.06f;
     [Tooltip("Quantas voltas a lamina do indicador da durante um golpe.")]
@@ -26,7 +28,7 @@ public class AxeSpin : MonoBehaviour
 
     private PlayerStatsHandler stats;
     private LineRenderer circulo;
-    private LineRenderer lamina;
+    private SpriteRenderer lamina;
     private Material materialCriado;
     private ContactFilter2D filtro;
     private readonly List<Collider2D> resultados = new List<Collider2D>();
@@ -47,7 +49,17 @@ public class AxeSpin : MonoBehaviour
             materialIndicador = materialCriado;
         }
         circulo = CriarLinha("AxeIndicator_Circulo", Segmentos, true);
-        lamina = CriarLinha("AxeIndicator_Lamina", 2, false);
+        var objetoLamina = new GameObject("Machado girando");
+        objetoLamina.transform.SetParent(transform, false);
+        lamina = objetoLamina.AddComponent<SpriteRenderer>();
+        lamina.sprite = ItemSprites.Obter(Chest.ItemType.Axe);
+        var jogador = GetComponent<SpriteRenderer>();
+        if (jogador != null)
+        {
+            lamina.sortingLayerID = jogador.sortingLayerID;
+            lamina.sortingOrder = jogador.sortingOrder + 2;
+            lamina.sharedMaterial = jogador.sharedMaterial;
+        }
         EsconderIndicador();
     }
 
@@ -68,7 +80,7 @@ public class AxeSpin : MonoBehaviour
         atingidos.Clear();
         Girando = true;
         circulo.enabled = true;
-        lamina.enabled = true;
+        lamina.enabled = lamina.sprite != null;
         Desenhar(0f);
         AcertarInimigos();
     }
@@ -119,15 +131,27 @@ public class AxeSpin : MonoBehaviour
         }
 
         // A lamina comeca longe do centro pra nao cobrir o sprite do jogador
-        float angulo = progresso * voltas * Mathf.PI * 2f;
+        float angulo = -progresso * voltas * Mathf.PI * 2f;
         Vector3 dir = new Vector3(Mathf.Cos(angulo), Mathf.Sin(angulo));
-        lamina.SetPosition(0, centro + dir * raio * 0.45f);
-        lamina.SetPosition(1, centro + dir * raio);
+        if (lamina.sprite != null)
+        {
+            float comprimento = raio * .65f;
+            float escala = comprimento / Mathf.Max(.001f, lamina.sprite.bounds.size.y);
+            Vector3 escalaPai = transform.lossyScale;
+            lamina.transform.localScale = new Vector3(
+                escala / Mathf.Max(.001f, Mathf.Abs(escalaPai.x)),
+                escala / Mathf.Max(.001f, Mathf.Abs(escalaPai.y)), 1f);
+            Quaternion rotacao = Quaternion.Euler(0, 0, angulo * Mathf.Rad2Deg - 90f + anguloSprite);
+            lamina.transform.rotation = rotacao;
+            // Centraliza a arte independentemente do pivot importado e alinha a ponta ao alcance.
+            lamina.transform.position = centro + dir * (raio - comprimento * .5f)
+                - rotacao * (lamina.sprite.bounds.center * escala);
+        }
 
         Color corCirculo = corIndicador;
         corCirculo.a *= 1f - progresso * 0.6f; // vai sumindo ate o fim do golpe
         circulo.startColor = circulo.endColor = corCirculo;
-        lamina.startColor = lamina.endColor = corIndicador;
+        lamina.color = Color.white;
     }
 
     private void EsconderIndicador()

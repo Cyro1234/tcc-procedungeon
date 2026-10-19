@@ -29,6 +29,35 @@ public class PlayerStatsHandler : MonoBehaviour
     [SerializeField, Min(0f)] private float bonusVelocidadeBotaLendaria = 0.6f;
     private StatModifier modificadorBota;
     public bool TemBotaEquipada => modificadorBota != null;
+    private readonly List<(StatModifier modificador, bool lendaria)> botas = new List<(StatModifier, bool)>();
+    public bool TemBotaLendaria
+    {
+        get
+        {
+            foreach (var bota in botas)
+                if (bota.lendaria && modifiers.Contains(bota.modificador)) return true;
+            return false;
+        }
+    }
+    public float BonusTotalBotas
+    {
+        get
+        {
+            float fator = 1f;
+            foreach (var bota in botas)
+                if (modifiers.Contains(bota.modificador)) fator *= 1f + bota.modificador.value;
+            return fator - 1f;
+        }
+    }
+    public bool PossuiBotasAtivas
+    {
+        get
+        {
+            foreach (var bota in botas)
+                if (modifiers.Contains(bota.modificador)) return true;
+            return false;
+        }
+    }
 
 
     [Header("Pocao de poder")]
@@ -48,20 +77,21 @@ public class PlayerStatsHandler : MonoBehaviour
 
     public void EquiparBota()
     {
-        AdicionarBota("Bota de velocidade", bonusVelocidadeBota);
+        AdicionarBota("Bota de velocidade", bonusVelocidadeBota, false);
     }
 
     public void EquiparBotaLendaria()
     {
-        AdicionarBota("Bota lendaria de velocidade", bonusVelocidadeBotaLendaria);
+        AdicionarBota("Bota lendaria de velocidade", bonusVelocidadeBotaLendaria, true);
     }
 
-    private void AdicionarBota(string nome, float bonus)
+    private void AdicionarBota(string nome, float bonus, bool lendaria)
     {
         // Cada bota adiciona seu proprio modificador permanente de velocidade.
         modificadorBota = new StatModifier(nome, StatType.Speed,
             ModifierSource.Item, ModifierType.Percent, bonus);
         AddSimpleModifier(modificadorBota);
+        botas.Add((modificadorBota, lendaria));
     }
 
 

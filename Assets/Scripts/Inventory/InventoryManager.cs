@@ -189,6 +189,9 @@ public class InventoryManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else { Destroy(gameObject); return; }
+        if (spriteMachado == null) spriteMachado = ItemSprites.Obter(Chest.ItemType.Axe);
+        if (spritePocaoVida == null) spritePocaoVida = ItemSprites.Obter(Chest.ItemType.HealthPotion);
+        if (spritePocaoPoder == null) spritePocaoPoder = ItemSprites.Obter(Chest.ItemType.PowerPotion);
 
         for (int i = 0; i < itensNoInventario.Length; i++)
         {
@@ -340,6 +343,8 @@ public class InventoryManager : MonoBehaviour
 
     public Sprite ObterSprite(Chest.ItemType tipo)
     {
+        Sprite arte = ItemSprites.Obter(tipo);
+        if (arte != null) return arte;
         if (tipo == Chest.ItemType.BasicSword) return spriteEspadaInicial != null ? spriteEspadaInicial : spriteEspadaLonga;
         if (tipo == Chest.ItemType.LongSword) return spriteEspadaLonga;
         if (tipo == Chest.ItemType.Dagger) return spriteAdaga;
@@ -502,5 +507,39 @@ public class CircularInventoryHUD : MonoBehaviour
         if (raiz != null) Destroy(raiz.gameObject);
         if (disco != null) Destroy(disco);
         if (textura != null) Destroy(textura);
+    }
+}
+
+/// <summary>Sprites dos itens importados pelo Aseprite; todas as qualidades de escudo compartilham o icone.</summary>
+public static class ItemSprites
+{
+    private static readonly Dictionary<string, Sprite> cache = new Dictionary<string, Sprite>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void Resetar() => cache.Clear();
+
+    public static Sprite Obter(Chest.ItemType tipo)
+    {
+        string nome = tipo switch
+        {
+            Chest.ItemType.Axe => "machado-heroi",
+            Chest.ItemType.HealthPotion => "pocao-vida",
+            Chest.ItemType.PowerPotion => "pocao-poder",
+            Chest.ItemType.SpeedBoots => "bota-velocidade",
+            Chest.ItemType.LegendarySpeedBoots => "bota-lendaria",
+            Chest.ItemType.ShieldSmall or Chest.ItemType.ShieldMedium or
+                Chest.ItemType.ShieldLarge or Chest.ItemType.ShieldLegendary => "escudo-icon",
+            _ => null
+        };
+        if (nome == null) return null;
+        if (cache.TryGetValue(nome, out Sprite sprite) && sprite != null) return sprite;
+        var sprites = Resources.LoadAll<Sprite>("Itens/" + nome);
+        if (sprites.Length == 0)
+        {
+            Debug.LogWarning("Sprite do item nao encontrado: Itens/" + nome);
+            return null;
+        }
+        cache[nome] = sprites[0];
+        return sprites[0];
     }
 }
