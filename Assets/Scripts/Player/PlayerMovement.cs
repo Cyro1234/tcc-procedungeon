@@ -8,6 +8,8 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private Vector2 moveInput;
     private Animator animator;
+    private Cannon cannon;
+    private bool usandoMira;
 
     public Transform Aim;
 
@@ -88,6 +90,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if (moveInput.sqrMagnitude > 0.0001f) FacingDirection = moveInput.normalized;
+        if (cannon == null) cannon = GetComponent<Cannon>();
+        Vector2 direcaoMira = Vector2.zero;
+        usandoMira = cannon != null && cannon.isActiveAndEnabled &&
+            cannon.TentarObterDirecaoMira(out direcaoMira);
+        if (usandoMira) FacingDirection = direcaoMira;
         UpdateAnimationAndAim();
     }
 
@@ -124,22 +131,23 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = moveDirection * stats.GetPlayerWalkSpeed();
     }
 
-    // A mira continua seguindo so o input cru A animacao usa o movimento real, assim o
-    // Sonambulo e os Pes Escorregadios continuam "andando" mesmo sem tecla apertada
+    // A arma de fogo olha para a mira; as demais armas seguem o movimento.
+    // A animacao de caminhada continua usando o movimento real.
     private void UpdateAnimationAndAim()
     {
-        if (moveInput != Vector2.zero)
+        if (Aim != null && (usandoMira || moveInput != Vector2.zero))
         {
-            Vector3 vector3 = Vector3.left * moveInput.x + Vector3.down * moveInput.y;
+            Vector2 direcao = usandoMira ? FacingDirection : moveInput;
+            Vector3 vector3 = Vector3.left * direcao.x + Vector3.down * direcao.y;
             Aim.rotation = Quaternion.LookRotation(Vector3.forward, vector3);
         }
 
         bool moving = moveInput != Vector2.zero || effectiveDirection.sqrMagnitude > 0.0001f;
         animator.SetBool("isWalking", moving);
-        if (!moving) return;
+        if (!moving && !usandoMira) return;
 
         // Sendo empurrado pelo recuo: continua olhando pra frente, fazendo a animacao fazer o alex andar de costas wow
-        Vector2 animDirection = moveInput != Vector2.zero ? moveInput
+        Vector2 animDirection = usandoMira ? FacingDirection : moveInput != Vector2.zero ? moveInput
             : (push.sqrMagnitude > 0.01f ? FacingDirection : effectiveDirection.normalized);
 
         animator.SetFloat("InputX", animDirection.x);

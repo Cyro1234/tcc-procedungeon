@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // Canhao: dispara uma bala em linha reta pra onde o jogador esta olhando.
 // Dano alto, mas cada tiro empurra o jogador pra tras. A lentidao de segurar o canhao
 // fica no PesoDasArmas, junto com a das outras armas pesadas.
-// O Attack.cs chama Disparar(), esse script nao le input nenhum.
+// O Attack.cs chama Disparar(); o analogico direito define a mira.
 public class Cannon : MonoBehaviour
 {
     [Header("Tiro")]
@@ -22,6 +23,18 @@ public class Cannon : MonoBehaviour
     private PlayerMovement movement;
     private SpriteRenderer spriteJogador;
 
+    [Header("Mira")]
+    [SerializeField, Min(0.1f)] private float alcanceMira = 7f;
+    [SerializeField, Range(0.05f, 0.9f)] private float deadzoneMira = 0.2f;
+    [SerializeField] private Color corMira = new Color(1f, 0.12f, 0.12f, 1f);
+
+    private Vector2 direcaoMira = Vector2.down;
+    private bool mirandoComAnalogico;
+    private Transform guiaMira;
+    private Sprite spriteTraco;
+    private const int QuantidadeTracos = 18;
+    private readonly Transform[] tracos = new Transform[QuantidadeTracos];
+
     private static Sprite icone;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -34,10 +47,101 @@ public class Cannon : MonoBehaviour
         spriteJogador = GetComponent<SpriteRenderer>();
     }
 
+    private bool EstaEquipado => InventoryManager.Instance != null &&
+        InventoryManager.Instance.ObterItemSelecionado() == Chest.ItemType.Cannon;
+
+    public bool TentarObterDirecaoMira(out Vector2 direcao)
+    {
+        if (!EstaEquipado)
+        {
+            mirandoComAnalogico = false;
+            direcao = Vector2.zero;
+            return false;
+        }
+        direcao = AtualizarDirecaoMira();
+        return true;
+    }
+
+    private Vector2 AtualizarDirecaoMira()
+    {
+        Gamepad controle = Gamepad.current;
+        Vector2 analogico = controle != null ? controle.rightStick.ReadValue() : Vector2.zero;
+        if (analogico.sqrMagnitude > deadzoneMira * deadzoneMira)
+        {
+            direcaoMira = analogico.normalized;
+            mirandoComAnalogico = true;
+        }
+        else if (!mirandoComAnalogico || controle == null)
+        {
+            direcaoMira = movement != null ? movement.FacingDirection : Vector2.down;
+            mirandoComAnalogico = false;
+        }
+        return direcaoMira;
+    }
+
+    private void LateUpdate()
+    {
+        bool equipado = EstaEquipado;
+        if (!equipado) mirandoComAnalogico = false;
+        bool visivel = equipado && GameFlow.CanPlay && Time.timeScale > 0f &&
+            movement != null && movement.enabled;
+        if (guiaMira != null) guiaMira.gameObject.SetActive(visivel);
+        if (!visivel) return;
+
+        Vector2 direcao = AtualizarDirecaoMira();
+        if (guiaMira == null) CriarGuiaMira();
+        Vector2 boca = (Vector2)transform.position + direcao * 0.6f;
+        Quaternion rotacao = Quaternion.Euler(0f, 0f, Mathf.Atan2(direcao.y, direcao.x) * Mathf.Rad2Deg);
+        float passo = alcanceMira / QuantidadeTracos;
+        for (int i = 0; i < tracos.Length; i++)
+        {
+            tracos[i].SetPositionAndRotation(boca + direcao * (passo * (i + 0.3f)), rotacao);
+            // Compensa a escala do jogador para manter tracos finos no mundo.
+            Vector3 escala = guiaMira.lossyScale;
+            tracos[i].localScale = new Vector3(
+                passo * 0.4f / Mathf.Max(Mathf.Abs(escala.x), 0.0001f),
+                0.045f / Mathf.Max(Mathf.Abs(escala.y), 0.0001f), 1f);
+        }
+    }
+
+    private void CriarGuiaMira()
+    {
+        guiaMira = new GameObject("Mira tracejada").transform;
+        guiaMira.SetParent(transform, false);
+        spriteTraco = Sprite.Create(Texture2D.whiteTexture,
+            new Rect(0f, 0f, Texture2D.whiteTexture.width, Texture2D.whiteTexture.height),
+            Vector2.one * 0.5f, Texture2D.whiteTexture.width);
+        for (int i = 0; i < tracos.Length; i++)
+        {
+            var traco = new GameObject("Traco " + i);
+            tracos[i] = traco.transform;
+            tracos[i].SetParent(guiaMira, false);
+            var render = traco.AddComponent<SpriteRenderer>();
+            render.sprite = spriteTraco;
+            render.color = corMira;
+            if (spriteJogador != null)
+            {
+                render.sortingLayerID = spriteJogador.sortingLayerID;
+                render.sortingOrder = spriteJogador.sortingOrder + 4;
+            }
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (guiaMira != null) guiaMira.gameObject.SetActive(false);
+        mirandoComAnalogico = false;
+    }
+
+    private void OnDestroy()
+    {
+        if (spriteTraco != null) Destroy(spriteTraco);
+    }
+
     // Chamado pelo Attack quando o jogador ataca com o canhao na mao
     public void Disparar()
     {
-        Vector2 direcao = movement != null ? movement.FacingDirection : Vector2.down;
+        Vector2 direcao = AtualizarDirecaoMira();
         if (direcao.sqrMagnitude < 0.0001f) direcao = Vector2.down;
         direcao.Normalize();
 

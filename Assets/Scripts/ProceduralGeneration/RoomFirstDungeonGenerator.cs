@@ -45,6 +45,15 @@ public class RoomFirstDungeonGenerator : SimpleRandomWalkMapGenerator
         GameEffects.Instance.OnNewFloor(levelManager.GetAndar(), levelManager.GetBiomaAtual());
     }
 
+    public FinalBossSequence FinalSequence => bossRoomSpawner.FinalSequence;
+
+    public void GerarNivelFinalDebug()
+    {
+        GameManager.clean();
+        levelManager.PrepararNivelFinalDebug();
+        GenerateDungeon();
+    }
+
     public void Setup(int seed)
     {
         Rng.Init(seed);

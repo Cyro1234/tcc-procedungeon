@@ -150,7 +150,7 @@ public class EnemyMovement : MonoBehaviour
 
     public void takeDamage(float damage, GameObject sender)
     {
-        if (dead) return;
+        if (dead || !GameFlow.CanPlay) return;
 
         health -= damage;
         StartCoroutine(Knockback(sender));
@@ -175,7 +175,11 @@ public class EnemyMovement : MonoBehaviour
             GameEffects.Instance.EnemyKilled(transform.position, boss, mainRenderer);
             DropLoot(boss);
 
-            if (boss) { GameManager.setBossMorreu(true); }
+            if (boss)
+            {
+                GameManager.setBossMorreu(true);
+                GetComponentInParent<FinalBossSequence>()?.BossDefeated();
+            }
             Destroy(gameObject);
             return;
         }

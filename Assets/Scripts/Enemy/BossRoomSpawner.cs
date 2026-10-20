@@ -10,6 +10,7 @@ public class BossRoomSpawner : MonoBehaviour
     [SerializeField] private GameObject bossRoomInfinitoPrefab;
 
     private GameObject instanciaSala = null;
+    public FinalBossSequence FinalSequence { get; private set; }
     private GameObject prefabByBioma(TileMapVisualizer.Biomas bioma)
     {
         switch (bioma)
@@ -32,6 +33,7 @@ public class BossRoomSpawner : MonoBehaviour
     // Spawna bossRoom em 1000,0
     public void spawnBossRoom(TileMapVisualizer.Biomas biomaAtual, AbstractDungeonGenerator generator, TileMapVisualizer tileMap)
     {
+        FinalSequence = null;
         if (instanciaSala != null)
         {
             Destroy(instanciaSala);
@@ -43,6 +45,13 @@ public class BossRoomSpawner : MonoBehaviour
         instanciaSala = Instantiate(bossRoomPrefab, new Vector3(1000, 0, 0), Quaternion.identity);
         PrepareWallColliders(instanciaSala);
         EnemySpawner.InitializeEnemy(instanciaSala);
+
+        if (biomaAtual == TileMapVisualizer.Biomas.Caverna)
+        {
+            FinalSequence = instanciaSala.AddComponent<FinalBossSequence>();
+            FinalSequence.Initialize();
+            return; // O ultimo chefe encerra a partida, sem escada para outro andar.
+        }
 
         // Instanciar escada
         Vector2Int pos = new Vector2Int(1005, 0); // Mudar para algo melhor 

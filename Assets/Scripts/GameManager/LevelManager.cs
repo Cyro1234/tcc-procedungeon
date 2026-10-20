@@ -19,9 +19,16 @@ public class LevelManager : MonoBehaviour
         listaBiomas = new List<TileMapVisualizer.Biomas>();
         listaBiomas.Add(TileMapVisualizer.Biomas.Floresta);
         listaBiomas.Add(TileMapVisualizer.Biomas.Deserto);
-        listaBiomas.Add(TileMapVisualizer.Biomas.Caverna);
         listaBiomas.Add(TileMapVisualizer.Biomas.Abismo);
         Shuffle(listaBiomas);
+        listaBiomas.Add(TileMapVisualizer.Biomas.Caverna);
+    }
+
+    // O proximo GenerateDungeon incrementa para o quarto e ultimo andar.
+    public void PrepararNivelFinalDebug()
+    {
+        andar = 3;
+        listaBiomas = new List<TileMapVisualizer.Biomas> { TileMapVisualizer.Biomas.Caverna };
     }
 
     private void Shuffle<T>(IList<T> ts) // Shuffle na lista

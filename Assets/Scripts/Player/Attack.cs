@@ -17,6 +17,9 @@ public class Attack : MonoBehaviour
     float atkDuration = 0.3f; // Podemos deixar isso no PlayerStatsHandler.cs depois, pra gente ter a possibilidade de modificar o tempo de duração do ataque com buffs e debuffs (Xicote de Alex)
     float atkTimer = 0f;
     private float cancelledAttackDelay;
+    [SerializeField, Min(0.1f)] private float cannonCooldown = 2.5f;
+    public float CannonCooldownRemaining { get; private set; }
+    public float CannonCooldownFraction => Mathf.Clamp01(CannonCooldownRemaining / cannonCooldown);
 
     // Disparado toda vez que um golpe comeca. Debuffs de ataque se inscrevem aqui como debuff de recuo por exemplo!!
     public event System.Action Swung;
@@ -87,6 +90,8 @@ public class Attack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (GameFlow.CanPlay)
+            CannonCooldownRemaining = Mathf.Max(0f, CannonCooldownRemaining - Time.deltaTime);
         checkMeleeTimer();
     }
 
@@ -105,6 +110,8 @@ public class Attack : MonoBehaviour
         {
             // O jogador "pergunta" ao inventário qual item está na mão
             Chest.ItemType itemAtual = InventoryManager.Instance.ObterItemSelecionado();
+            if (itemAtual == Chest.ItemType.Cannon &&
+                (canhao == null || CannonCooldownRemaining > 0f)) return;
             PrepararArma(itemAtual);
 
             // O canhao tem som proprio (GameEffects.CannonFired)
@@ -114,10 +121,13 @@ public class Attack : MonoBehaviour
             {
                 machadoGiro.Comecar(atkDuration);
             }
-            // O canhao dispara uma bala; atkDuration vira o tempo de recarga
+            // A recarga do canhao persiste mesmo ao trocar de item.
             else if (itemAtual == Chest.ItemType.Cannon && canhao != null)
             {
                 canhao.Disparar();
+                CannonCooldownRemaining = cannonCooldown;
+                Swung?.Invoke();
+                return;
             }
             else
             {
@@ -214,7 +224,7 @@ public class Attack : MonoBehaviour
         }
         else if (weaponType == Chest.ItemType.Cannon)
         {
-            // Recarga lenta: compensa o dano alto
+            // A recarga do canhao e controlada pelo temporizador independente.
             pivotTransform.transform.localScale = originalMeleeScale;
             atkDuration = originalAtkDuration * 2.5f;
             if (armaRender != null) armaRender.sprite = spriteBaseOriginal;

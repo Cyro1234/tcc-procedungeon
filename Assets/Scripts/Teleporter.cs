@@ -31,7 +31,7 @@ public class Teleporter : MonoBehaviour
     }
 
     // Tambem usado pelo F5, mesmo com o portal oculto ou ja utilizado.
-    public static IEnumerator TeleportarParaBoss(GameObject player)
+    public static IEnumerator TeleportarParaBoss(GameObject player, FinalBossSequence finalSequence = null)
     {
         if (player == null) yield break;
         var camera = FindAnyObjectByType<CinemachineCamera>();
@@ -39,8 +39,20 @@ public class Teleporter : MonoBehaviour
         Vector3 dampingAnterior = follow != null ? follow.TrackerSettings.PositionDamping : Vector3.zero;
         if (follow != null) follow.TrackerSettings.PositionDamping = Vector3.zero;
         GameManager.setDeuTeleport(true);
-        player.transform.position = new Vector2(1000, 0);
-        GameEffects.Instance.OnEnterBossRoom();
+        Vector3 destino = finalSequence != null ? finalSequence.transform.position : new Vector3(1000, 0, 0);
+        player.GetComponent<PlayerMovement>()?.ForcarParada();
+        var body = player.GetComponent<Rigidbody2D>();
+        if (body != null)
+        {
+            body.linearVelocity = Vector2.zero;
+            body.position = destino;
+        }
+        player.transform.position = destino;
+        Physics2D.SyncTransforms();
+        FindAnyObjectByType<RoomDetector>()?.FocarSalaBossAposTeleporte();
+        var final = finalSequence != null ? finalSequence : FindAnyObjectByType<FinalBossSequence>();
+        if (final != null) final.Begin(player);
+        else GameEffects.Instance.OnEnterBossRoom();
         yield return new WaitForEndOfFrame();
         if (follow != null) follow.TrackerSettings.PositionDamping = dampingAnterior;
     }

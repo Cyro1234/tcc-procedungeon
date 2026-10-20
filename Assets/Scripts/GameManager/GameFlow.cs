@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public static class GameFlow
 {
     [Flags]
-    public enum State { Playing = 0, Inventory = 1, PauseMenu = 2, Downgrade = 4, GameOver = 8 }
+    public enum State { Playing = 0, Inventory = 1, PauseMenu = 2, Downgrade = 4, GameOver = 8, Cutscene = 16, Victory = 32, DebugMenu = 64 }
 
     private static State pauses;
     private static bool hitStopped;
@@ -19,6 +19,9 @@ public static class GameFlow
         get
         {
             if ((pauses & State.GameOver) != 0) return State.GameOver;
+            if ((pauses & State.Victory) != 0) return State.Victory;
+            if ((pauses & State.Cutscene) != 0) return State.Cutscene;
+            if ((pauses & State.DebugMenu) != 0) return State.DebugMenu;
             if ((pauses & State.Downgrade) != 0) return State.Downgrade;
             if ((pauses & State.PauseMenu) != 0) return State.PauseMenu;
             if ((pauses & State.Inventory) != 0) return State.Inventory;

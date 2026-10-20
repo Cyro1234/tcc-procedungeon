@@ -332,6 +332,24 @@ public class InventoryManager : MonoBehaviour
         return false;
     }
 
+    public bool EquiparArmaDebug(Chest.ItemType arma)
+    {
+        if (GameFlow.Current != GameFlow.State.DebugMenu ||
+            System.Array.IndexOf(Chest.ArmasDoBau, arma) < 0) return false;
+
+        int indice = System.Array.IndexOf(itensNoInventario, arma);
+        if (indice < 0)
+        {
+            indice = System.Array.IndexOf(itensNoInventario, Chest.ItemType.None);
+            if (indice < 0) indice = slotSelecionadoIndex;
+            itensNoInventario[indice] = arma;
+        }
+        // Selecionar uma arma ja existente nao concede bonus de copia.
+        slotSelecionadoIndex = indice;
+        AtualizarUI();
+        return true;
+    }
+
     public void TrocarItens(int indexOrigem, int indexDestino)
     {
         if (!PodeEditarInventario) return;
@@ -395,6 +413,10 @@ public class CircularInventoryHUD : MonoBehaviour
     private UnityEngine.UI.Text nome, vida, poder, esquerda, direita;
     private Sprite disco;
     private Texture2D textura;
+    private Attack ataqueJogador;
+    private UnityEngine.UI.Image coberturaRecarga;
+    private UnityEngine.UI.Text tempoRecarga;
+    private bool estavaRecarregando;
 
     // Flash ao trocar/usar items na hotbar
     private readonly Dictionary<UnityEngine.UI.Image, UnityEngine.UI.Image> brilhos = new Dictionary<UnityEngine.UI.Image, UnityEngine.UI.Image>();
@@ -432,6 +454,21 @@ public class CircularInventoryHUD : MonoBehaviour
         centro = Bolha("Arma", new Vector2(125, 130), 188);
         anterior = Bolha("Anterior", new Vector2(45, 55), 70);
         proximo = Bolha("Proximo", new Vector2(205, 55), 70);
+        ataqueJogador = FindAnyObjectByType<Attack>();
+        coberturaRecarga = Imagem("Recarga do canhao", brilhos[centro].transform.parent,
+            Vector2.zero, Vector2.one * 183f);
+        coberturaRecarga.sprite = disco;
+        coberturaRecarga.color = new Color(.4f, .4f, .4f, .78f);
+        coberturaRecarga.type = UnityEngine.UI.Image.Type.Filled;
+        coberturaRecarga.fillMethod = UnityEngine.UI.Image.FillMethod.Vertical;
+        coberturaRecarga.fillOrigin = (int)UnityEngine.UI.Image.OriginVertical.Bottom;
+        coberturaRecarga.gameObject.SetActive(false);
+        tempoRecarga = Texto(coberturaRecarga.transform.parent, Vector2.zero, new Vector2(155, 42), 28);
+        tempoRecarga.color = Color.white;
+        var sombra = tempoRecarga.gameObject.AddComponent<UnityEngine.UI.Shadow>();
+        sombra.effectColor = Color.black;
+        sombra.effectDistance = new Vector2(1f, -1f);
+        tempoRecarga.gameObject.SetActive(false);
         nome = Texto(centro.transform.parent, new Vector2(0, -61), new Vector2(155, 26), 15);
         esquerda = Texto(anterior.transform.parent, new Vector2(0, -48), new Vector2(100, 24), 14);
         direita = Texto(proximo.transform.parent, new Vector2(0, -48), new Vector2(100, 24), 14);
@@ -550,6 +587,25 @@ public class CircularInventoryHUD : MonoBehaviour
         vida.text = (controle ? "↑" : "Z") + "  ×" + inventario.ObterQuantidade(Chest.ItemType.HealthPotion);
         poder.text = (controle ? "↓" : "X") + "  ×" + inventario.ObterQuantidade(Chest.ItemType.PowerPotion);
         DetectarMudancas(selecionado);
+        AtualizarRecarga(selecionado);
+    }
+
+    private void AtualizarRecarga(Chest.ItemType selecionado)
+    {
+        if (ataqueJogador == null) ataqueJogador = FindAnyObjectByType<Attack>();
+        bool recarregando = ataqueJogador != null && ataqueJogador.CannonCooldownRemaining > 0f;
+        bool mostrar = selecionado == Chest.ItemType.Cannon && recarregando;
+        coberturaRecarga.gameObject.SetActive(mostrar);
+        tempoRecarga.gameObject.SetActive(mostrar);
+        if (mostrar)
+        {
+            coberturaRecarga.fillAmount = ataqueJogador.CannonCooldownFraction;
+            float segundos = Mathf.Ceil(ataqueJogador.CannonCooldownRemaining * 10f) / 10f;
+            tempoRecarga.text = segundos.ToString("0.0") + "s";
+        }
+        if (estavaRecarregando && !recarregando && selecionado == Chest.ItemType.Cannon)
+            Piscar(centro, new Color(.6f, 1f, .6f));
+        estavaRecarregando = recarregando;
     }
 
     // Compara com o frame anterior pro flash aparece de onde a troca vier (scroll, item novo equipado, reorganizar o inventario, etc)

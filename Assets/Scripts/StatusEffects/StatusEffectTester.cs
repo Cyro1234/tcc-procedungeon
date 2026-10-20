@@ -8,7 +8,7 @@ public class StatusEffectTester : MonoBehaviour
 
     private void Update()
     {
-        if (statusEffects == null || Keyboard.current == null) return;
+        if (statusEffects == null || Keyboard.current == null || !GameFlow.CanPlay) return;
 
         if (Keyboard.current.f1Key.wasPressedThisFrame)
         {
@@ -28,17 +28,17 @@ public class StatusEffectTester : MonoBehaviour
             Debug.Log("Aplicado: Labirintite (8s)");
         }
 
-        // F5-F8 ja sao do Xiter, por isso os novos ficam no F4 e F9-F11
+        // F5-F9 e F12 pertencem ao Xiter. Home testa Lag sem conflitar com o menu.
         if (Keyboard.current.f4Key.wasPressedThisFrame)
         {
             statusEffects.ApplyEffect(new SlipperyToesEffect(8f));
             Debug.Log("Aplicado: Pés Escorregadios (8s)");
         }
 
-        if (Keyboard.current.f9Key.wasPressedThisFrame)
+        if (Keyboard.current.homeKey.wasPressedThisFrame)
         {
             statusEffects.ApplyEffect(new LagEffect(8f));
-            Debug.Log("Aplicado: Lag (8s)");
+            Debug.Log("Aplicado: Lag (8s) — Home");
         }
 
         if (Keyboard.current.f10Key.wasPressedThisFrame)

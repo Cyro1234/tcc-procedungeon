@@ -21,6 +21,19 @@ public static class StatusEffectFactory
         }
     }
 
+    public static StatusEffectKind GetKind(StatusEffect effect) => effect switch
+    {
+        DrunkennessEffect _ => StatusEffectKind.Drunkenness,
+        LimpEffect _ => StatusEffectKind.HeavyLimp,
+        LabyrinthitisEffect _ => StatusEffectKind.Labyrinthitis,
+        SlipperyToesEffect _ => StatusEffectKind.SlipperyToes,
+        LagEffect _ => StatusEffectKind.Lag,
+        SleepwalkerEffect _ => StatusEffectKind.Sleepwalker,
+        RecoilEffect _ => StatusEffectKind.Recoil,
+        SnailEffect _ => StatusEffectKind.Snail,
+        _ => StatusEffectKind.None
+    };
+
     // Descricao curta mostrada no menu de downgrade, pro jogador saber o que esta escolhendo
     public static string Describe(StatusEffectKind kind)
     {

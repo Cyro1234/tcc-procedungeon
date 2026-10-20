@@ -44,6 +44,32 @@ public class StatusEffectManager : MonoBehaviour
         effect.OnApply(context);
     }
 
+    public int CountStacks(StatusEffectKind kind)
+    {
+        int count = 0;
+        foreach (var effect in activeEffects)
+            if (StatusEffectFactory.GetKind(effect) == kind) count++;
+        return count;
+    }
+
+    public void AddDebugStack(StatusEffectKind kind)
+    {
+        if (GameFlow.Current != GameFlow.State.DebugMenu || context == null) return;
+        var effect = StatusEffectFactory.Create(kind);
+        if (effect != null) ApplyEffect(effect);
+    }
+
+    public void RemoveDebugStack(StatusEffectKind kind)
+    {
+        if (GameFlow.Current != GameFlow.State.DebugMenu) return;
+        for (int i = activeEffects.Count - 1; i >= 0; i--)
+        {
+            if (StatusEffectFactory.GetKind(activeEffects[i]) != kind) continue;
+            RemoveEffect(activeEffects[i]);
+            return;
+        }
+    }
+
     // Podemos usar pra itens que removem um debuff especifico antes da duracao acabar ou algo assim tipo de shit.
     public void RemoveEffect(StatusEffect effect)
     {

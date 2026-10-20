@@ -66,6 +66,22 @@ public class RoomDetector : MonoBehaviour
         
     }
 
+    public void FocarSalaBossAposTeleporte()
+    {
+        currentRoom = limitesSalaBoss;
+        Vector3 centro = limitesSalaBoss.center;
+        bool focarCentro = dungeonGenerator != null && dungeonGenerator.FocarCentroSala;
+        Vector3 destino = focarCentro ? centro : playerTransform.position;
+        if (cameraTarget != null) cameraTarget.position = destino;
+        if (virtualCamera != null)
+        {
+            virtualCamera.Lens.OrthographicSize = focarCentro ? limitesSalaBoss.size.y / 2.2f : 4f;
+            virtualCamera.ForceCameraPosition(
+                new Vector3(destino.x, destino.y, virtualCamera.transform.position.z),
+                virtualCamera.transform.rotation);
+        }
+    }
+
     private void OnDrawGizmos()
     {
         if (roomsList == null || listaDeCentros.Count != roomsList.Count) return;

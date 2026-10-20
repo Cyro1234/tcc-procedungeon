@@ -111,7 +111,7 @@ public class HeartSystem : MonoBehaviour
     public void takeDamage(int damage, Transform source)
     {
         AtualizarVidaMaxima();
-        if (damage <= 0 || IsInvulnerable) return;
+        if (!GameFlow.CanPlay || damage <= 0 || IsInvulnerable) return;
 
         invincibleUntil = Time.time + invincibilityTime;
         ApplyKnockback(source);

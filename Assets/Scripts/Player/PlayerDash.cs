@@ -37,7 +37,19 @@ public class PlayerDash : MonoBehaviour
 
     private void Update()
     {
-        if (Time.timeScale <= 0f || movement == null || !movement.enabled || PauseManager.pausado) return;
+        if (!GameFlow.CanPlay || Time.timeScale <= 0f || movement == null || !movement.enabled || PauseManager.pausado) return;
+
+        // Com arma de fogo, R2 usa o ataque normal (incluindo sua recarga).
+        // Nenhum dos atalhos de dash pode esquivar enquanto ela estiver equipada.
+        bool armaDeFogo = InventoryManager.Instance != null &&
+            InventoryManager.Instance.ObterItemSelecionado() == Chest.ItemType.Cannon;
+        if (armaDeFogo)
+        {
+            Gamepad controle = Gamepad.current;
+            if (controle != null && controle.rightTrigger.wasPressedThisFrame)
+                GetComponent<Attack>()?.OnAttack();
+            return;
+        }
 
         Vector2 input = movement.MoveInput;
         if (input.sqrMagnitude > 0.01f) lastDirection = input.normalized;

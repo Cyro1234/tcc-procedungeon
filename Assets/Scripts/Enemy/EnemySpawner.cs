@@ -82,8 +82,12 @@ public class EnemySpawner : MonoBehaviour
             if (boss.CompareTag("Boss") && !enemies.Contains(boss.gameObject))
             {
                 enemies.Add(boss.gameObject);
-                aguardandoEntrada.Add(boss.gameObject);
-                boss.gameObject.SetActive(false);
+                // A cutscene controla a aparicao do chefe final, sem fumaca de invocacao.
+                if (boss.GetComponentInParent<FinalBossSequence>() == null)
+                {
+                    aguardandoEntrada.Add(boss.gameObject);
+                    boss.gameObject.SetActive(false);
+                }
             }
         foreach (var enemy in enemies)
             if (enemy != null)

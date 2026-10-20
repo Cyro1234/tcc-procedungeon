@@ -437,12 +437,12 @@ public class GameEffects : MonoBehaviour
         Banner($"Andar {floor}", BiomaDisplayName(bioma), BiomaColor(bioma), 2.2f);
     }
 
-    public void OnEnterBossRoom()
+    public void OnEnterBossRoom(bool finalBoss = false)
     {
         roomLocked = false;
         Shake(0.5f);
         FlashScreen(new Color(0.6f, 0f, 0.1f, 0.45f), 0.6f);
-        Banner(NomeDoChefe().ToUpper(), "Sobreviva e derrote-o para descer", new Color(1f, 0.3f, 0.3f), 2f);
+        Banner(NomeDoChefe().ToUpper(), finalBoss ? "Derrote-o para voltar para casa" : "Sobreviva e derrote-o para descer", new Color(1f, 0.3f, 0.3f), 2f);
     }
 
     // Descobre qual chefe esta na sala pelo script dele.
