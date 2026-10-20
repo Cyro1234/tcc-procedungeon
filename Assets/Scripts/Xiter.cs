@@ -38,12 +38,28 @@ public class Xiter : MonoBehaviour
             godMode();
             return;
         }
-        // F12: F9-F11 ja sao usados pelo StatusEffectTester
+        // F12: caracol
         if (Keyboard.current.f12Key.wasPressedThisFrame)
         {
             playerObj.GetComponent<StatusEffectManager>()?.ApplyEffect(new SnailEffect());
             return;
         }
+        // Insert: bau de raridade aleatoria na frente do jogador
+        if (Keyboard.current.insertKey.wasPressedThisFrame)
+        {
+            spawnarBauNaFrente();
+            return;
+        }
+    }
+
+    private void spawnarBauNaFrente()
+    {
+        var spawner = FindAnyObjectByType<ChestSpawner>();
+        if (spawner == null || playerObj == null) return;
+        var movimento = playerObj.GetComponent<PlayerMovement>();
+        Vector2 frente = movimento != null ? movimento.FacingDirection : Vector2.down;
+        // 2 tiles de distancia: perto o bastante pra ver, longe o bastante pra nao abrir sozinho em cima do jogador
+        spawner.SpawnarBauDeTeste(playerObj.transform.position + (Vector3)(frente.normalized * 2f));
     }
 
     private void tpTeleport()

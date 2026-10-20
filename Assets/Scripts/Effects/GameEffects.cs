@@ -41,7 +41,7 @@ public class GameEffects : MonoBehaviour
         whiteSprite = null;
     }
 
-    public enum Sfx { Kill, Heal }
+    public enum Sfx { Kill, Heal, Cannon }
 
     private const float MaxShakeOffset = 0.35f;
 
@@ -269,6 +269,22 @@ public class GameEffects : MonoBehaviour
         PlaySfx(Sfx.Heal, 1f, 0f);
     }
 
+    // Fogo saindo da boca do canhao
+    public void CannonFired(Vector3 position)
+    {
+        Shake(0.3f);
+        PlaySfx(Sfx.Cannon, 1f, 0.1f);
+        Burst(position, new Color(1f, 0.7f, 0.3f), 10, 4f, null);
+        Burst(position, new Color(0.6f, 0.6f, 0.6f), 6, 2f, null);
+    }
+
+    public void CannonImpact(Vector3 position)
+    {
+        Shake(0.15f);
+        Burst(position, new Color(1f, 0.6f, 0.25f), 12, 5f, null);
+        Burst(position, new Color(0.3f, 0.3f, 0.35f), 8, 3f, null);
+    }
+
     // Chamado pelo HUD circular quando a arma na mao muda
     public void WeaponSwitched(string nome)
     {
@@ -357,6 +373,7 @@ public class GameEffects : MonoBehaviour
     {
         Sprite arte = ItemSprites.Obter(tipo);
         if (arte != null) return arte;
+        if (tipo == Chest.ItemType.Cannon) return Cannon.Icone;
         var inventario = InventoryManager.Instance;
         if (inventario != null)
         {
@@ -737,6 +754,7 @@ public class GameEffects : MonoBehaviour
     {
         clips = new AudioClip[System.Enum.GetValues(typeof(Sfx)).Length];
         clips[(int)Sfx.Kill] = Tone("kill", 0.12f, 420f, 90f, 0.16f, Wave.Square);
+        clips[(int)Sfx.Cannon] = Tone("cannon", 0.3f, 140f, 35f, 0.35f, Wave.Noise);
         clips[(int)Sfx.Heal] = Arp("heal", new[] { 523f, 659f, 784f, 1047f, 1319f }, 0.055f, 0.12f);
     }
 

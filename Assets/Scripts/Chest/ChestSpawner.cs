@@ -96,4 +96,25 @@ public class ChestSpawner : MonoBehaviour
         InicializarBau(initialChest);
         spawnedChests.Add(initialChest);
     }
+
+    // Teste (Xiter): cria um bau de raridade aleatoria na posicao pedida. Usa o Random do Unity
+    // em vez do Rng da seed, pra nao mudar os baus e o mapa que a partida ja ia gerar
+    public GameObject SpawnarBauDeTeste(Vector3 posicao)
+    {
+        var raridades = new List<GameObject>();
+        foreach (var tabela in new[] { chestTableBaixo, chestTableMedio, chestTableAlto })
+        {
+            if (tabela == null) continue;
+            foreach (var entrada in tabela.items)
+                if (entrada != null && entrada.item != null && !raridades.Contains(entrada.item)) raridades.Add(entrada.item);
+        }
+        if (raridades.Count == 0) return null;
+
+        GameObject prefab = raridades[Random.Range(0, raridades.Count)];
+        GameObject chest = Instantiate(prefab, posicao, Quaternion.identity);
+        var conteudo = chest.GetComponent<Chest>();
+        if (conteudo != null) conteudo.InicializarConteudo(new System.Random(Random.Range(int.MinValue, int.MaxValue)));
+        spawnedChests.Add(chest);
+        return chest;
+    }
 }

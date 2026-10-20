@@ -24,6 +24,7 @@ public class Attack : MonoBehaviour
     private PlayerStatsHandler stats;
     private Sprite spriteBaseOriginal;
     private AxeSpin machadoGiro;
+    private Cannon canhao;
 
 
     // Guardamos os valores originais para usar como base
@@ -37,6 +38,10 @@ public class Attack : MonoBehaviour
         if (machado == null) machado = ItemSprites.Obter(Chest.ItemType.Axe);
         stats = GetComponent<PlayerStatsHandler>();
         machadoGiro = GetComponent<AxeSpin>();
+        canhao = GetComponent<Cannon>();
+        if (canhao == null) canhao = gameObject.AddComponent<Cannon>();
+        // Lentidao das armas pesadas (canhao e espada grande)
+        if (GetComponent<PesoDasArmas>() == null) gameObject.AddComponent<PesoDasArmas>();
     }
 
     private void OnEnable() => GameFlow.Changed += AoAlterarEstado;
@@ -102,11 +107,17 @@ public class Attack : MonoBehaviour
             Chest.ItemType itemAtual = InventoryManager.Instance.ObterItemSelecionado();
             PrepararArma(itemAtual);
 
-            AudioManager.Instance.PlaySFX("Ataque");
+            // O canhao tem som proprio (GameEffects.CannonFired)
+            if (itemAtual != Chest.ItemType.Cannon) AudioManager.Instance.PlaySFX("Ataque");
             // O machado acerta em circulo pelo AxeSpin, entao a hitbox triangular da espada fica desligada
             if (itemAtual == Chest.ItemType.Axe && machadoGiro != null)
             {
                 machadoGiro.Comecar(atkDuration);
+            }
+            // O canhao dispara uma bala; atkDuration vira o tempo de recarga
+            else if (itemAtual == Chest.ItemType.Cannon && canhao != null)
+            {
+                canhao.Disparar();
             }
             else
             {
@@ -200,6 +211,13 @@ public class Attack : MonoBehaviour
             pivotTransform.transform.localScale = originalMeleeScale;
             atkDuration = originalAtkDuration * 1.5f;
             if (armaRender != null) armaRender.sprite = machado != null ? machado : spriteBaseOriginal;
+        }
+        else if (weaponType == Chest.ItemType.Cannon)
+        {
+            // Recarga lenta: compensa o dano alto
+            pivotTransform.transform.localScale = originalMeleeScale;
+            atkDuration = originalAtkDuration * 2.5f;
+            if (armaRender != null) armaRender.sprite = spriteBaseOriginal;
         }
         else // Se for Chest.ItemType.None (mãos vazias) ou poção
         {

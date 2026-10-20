@@ -27,37 +27,28 @@ public class PlayerStatsHandler : MonoBehaviour
     [SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.5f;
     [Tooltip("Fracao somada a velocidade (0.6 = +60%). Deve ser bem maior que a da bota comum.")]
     [SerializeField, Min(0f)] private float bonusVelocidadeBotaLendaria = 0.6f;
+    [Tooltip("Ate esse bonus total as botas rendem inteiras (0.6 = +60%).")]
+    [SerializeField, Min(0f)] private float softCapBotas = 0.6f;
+    [Tooltip("Acima do soft cap, cada bota rende so essa fracao do bonus dela (0.5 = metade).")]
+    [SerializeField, Range(0f, 1f)] private float eficienciaAcimaSoftCap = 0.5f;
+    [Tooltip("Bonus maximo somando todas as botas (1 = +100%, o dobro da velocidade).")]
+    [SerializeField, Min(0f)] private float hardCapBotas = 1f;
+
     private StatModifier modificadorBota;
-    public bool TemBotaEquipada => modificadorBota != null;
-    private readonly List<(StatModifier modificador, bool lendaria)> botas = new List<(StatModifier, bool)>();
+    public bool TemBotaEquipada => botas.Count > 0;
+    private readonly List<(float bonus, bool lendaria)> botas = new List<(float, bool)>();
     public bool TemBotaLendaria
     {
         get
         {
             foreach (var bota in botas)
-                if (bota.lendaria && modifiers.Contains(bota.modificador)) return true;
+                if (bota.lendaria) return true;
             return false;
         }
     }
-    public float BonusTotalBotas
-    {
-        get
-        {
-            float fator = 1f;
-            foreach (var bota in botas)
-                if (modifiers.Contains(bota.modificador)) fator *= 1f + bota.modificador.value;
-            return fator - 1f;
-        }
-    }
-    public bool PossuiBotasAtivas
-    {
-        get
-        {
-            foreach (var bota in botas)
-                if (modifiers.Contains(bota.modificador)) return true;
-            return false;
-        }
-    }
+    public float BonusTotalBotas => modificadorBota != null ? modificadorBota.value : 0f;
+    public bool PossuiBotasAtivas => botas.Count > 0;
+    public bool BotasNoMaximo => botas.Count > 0 && BonusTotalBotas >= hardCapBotas - 0.0001f;
 
 
     [Header("Pocao de poder")]
@@ -77,21 +68,28 @@ public class PlayerStatsHandler : MonoBehaviour
 
     public void EquiparBota()
     {
-        AdicionarBota("Bota de velocidade", bonusVelocidadeBota, false);
+        AdicionarBota(bonusVelocidadeBota, false);
     }
 
     public void EquiparBotaLendaria()
     {
-        AdicionarBota("Bota lendaria de velocidade", bonusVelocidadeBotaLendaria, true);
+        AdicionarBota(bonusVelocidadeBotaLendaria, true);
     }
 
-    private void AdicionarBota(string nome, float bonus, bool lendaria)
+    private void AdicionarBota(float bonus, bool lendaria)
     {
-        // Cada bota adiciona seu proprio modificador permanente de velocidade.
-        modificadorBota = new StatModifier(nome, StatType.Speed,
-            ModifierSource.Item, ModifierType.Percent, bonus);
+        botas.Add((bonus, lendaria));
+
+        // As botas somam ate 100% (cap)
+        float bruto = 0f;
+        foreach (var bota in botas) bruto += bota.bonus;
+        float efetivo = bruto <= softCapBotas ? bruto : softCapBotas + (bruto - softCapBotas) * eficienciaAcimaSoftCap;
+        efetivo = Mathf.Min(efetivo, hardCapBotas);
+
+        if (modificadorBota != null) RemoveSimpleModifier(modificadorBota);
+        modificadorBota = new StatModifier("Botas de velocidade", StatType.Speed,
+            ModifierSource.Item, ModifierType.Percent, efetivo);
         AddSimpleModifier(modificadorBota);
-        botas.Add((modificadorBota, lendaria));
     }
 
 

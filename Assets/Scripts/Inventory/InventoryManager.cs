@@ -23,8 +23,26 @@ public class InventoryManager : MonoBehaviour
     private readonly Dictionary<Chest.ItemType, int> pocoes = new Dictionary<Chest.ItemType, int>();
     private readonly Dictionary<Chest.ItemType, int> repeticoesArmas = new Dictionary<Chest.ItemType, int>();
     public int ObterRepeticoes(Chest.ItemType tipo) => repeticoesArmas.TryGetValue(tipo, out int valor) ? valor : 0;
-    // Bonus aditivo por tipo: uma copia extra = 1.1x; duas = 1.2x.
-    public float ObterMultiplicadorDano(Chest.ItemType tipo) => 1f + ObterRepeticoes(tipo) * 0.1f;
+    // Bonus aditivo por tipo: uma copia extra = 1.05x; duas = 1.1x (no maximo 1.5x).
+    public float ObterMultiplicadorDano(Chest.ItemType tipo) => 1f + ObterBonusDano(tipo);
+
+    // Toda arma ganha o mesmo por copia repetida: +5%, +10%, +15%... ate +50% (10 copias)
+    private const float BonusPorCopia = 0.05f;
+    private const float BonusMaximoCopias = 0.5f;
+
+    public float ObterBonusDano(Chest.ItemType tipo) => BonusComCopias(ObterRepeticoes(tipo));
+
+    // Quanto a ultima copia pega somou (pro texto do bau)
+    public float ObterBonusUltimaCopia(Chest.ItemType tipo)
+    {
+        int copias = ObterRepeticoes(tipo);
+        return copias > 0 ? BonusComCopias(copias) - BonusComCopias(copias - 1) : 0f;
+    }
+
+    private static float BonusComCopias(int copias) => Mathf.Min(copias * BonusPorCopia, BonusMaximoCopias);
+
+    // "+12.5%", "+18.75%": ate duas casas, sem zeros sobrando
+    public static string TextoPorcentagem(float fracao) => "+" + (fracao * 100f).ToString("0.##") + "%";
     public int ObterQuantidade(Chest.ItemType tipo) => pocoes.TryGetValue(tipo, out int valor) ? valor : 0;
     public bool PossuiItem(Chest.ItemType tipo) => tipo != Chest.ItemType.None &&
         (ObterQuantidade(tipo) > 0 || System.Array.IndexOf(itensNoInventario, tipo) >= 0);
@@ -354,6 +372,7 @@ public class InventoryManager : MonoBehaviour
         if (tipo == Chest.ItemType.HealthPotion && spritePocaoVida != null) return spritePocaoVida;
         if (tipo == Chest.ItemType.PowerPotion && spritePocaoPoder != null) return spritePocaoPoder;
         if (tipo == Chest.ItemType.Axe && spriteMachado != null) return spriteMachado;
+        if (tipo == Chest.ItemType.Cannon) return Cannon.Icone;
         if (tipo == Chest.ItemType.HealthPotion || tipo == Chest.ItemType.PowerPotion
             || tipo == Chest.ItemType.Axe)
         {
@@ -523,7 +542,7 @@ public class CircularInventoryHUD : MonoBehaviour
         Mostrar(proximo, inventario.ObterVizinho(1));
         var selecionado = inventario.ObterItemSelecionado();
         int repeticoes = inventario.ObterRepeticoes(selecionado);
-        nome.text = Nome(selecionado) + (repeticoes > 0 ? $"\n+{repeticoes * 10}% dano" : "");
+        nome.text = Nome(selecionado) + (repeticoes > 0 ? $"\n{InventoryManager.TextoPorcentagem(inventario.ObterBonusDano(selecionado))} dano" : "");
         nome.rectTransform.sizeDelta = new Vector2(155, 44);
         bool controle = Gamepad.current != null;
         esquerda.text = controle ? "L1 / LB" : "1 / Scroll";
@@ -567,6 +586,7 @@ public class CircularInventoryHUD : MonoBehaviour
         Chest.ItemType.LongSword => "Espada longa",
         Chest.ItemType.Dagger => "Adaga",
         Chest.ItemType.Axe => "Machado",
+        Chest.ItemType.Cannon => "Canhão",
         Chest.ItemType.None => "Sem arma",
         _ => tipo.ToString()
     };

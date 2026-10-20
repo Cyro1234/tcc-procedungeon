@@ -3,8 +3,7 @@ using System.Collections;
 
 public class Chest : MonoBehaviour
 {
-    // NOVO: Tipos de itens atualizados com as qualidades dos escudos
-    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion, Axe, BasicSword }
+    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion, Axe, BasicSword, Cannon }
 
     [Header("Configurações do Baú")]
     // Cada Prefab de baú terá sua própria tabela de loot configurada no Inspector
@@ -37,13 +36,19 @@ public class Chest : MonoBehaviour
     {
         if (itemPreConfigurado) return;
         itemInside = itemTable.getRandom(rng);
+        // A tabela do bau decide se vem uma arma; qual arma e sorteada por igual entre todas (5 armas = 20% cada), pra nenhuma ser mais rara que as outras
+        if (System.Array.IndexOf(ArmasDoBau, itemInside) >= 0)
+            itemInside = ArmasDoBau[rng.Next(ArmasDoBau.Length)];
         itemPreConfigurado = true;
     }
+
+    // Armas que podem sair de bau. A espada inicial tambem: como o jogador ja tem ela, conta como copia (+dano)
+    public static readonly ItemType[] ArmasDoBau = { ItemType.BasicSword, ItemType.LongSword, ItemType.Dagger, ItemType.Axe, ItemType.Cannon };
 
     public void ConfigurarItem(ItemType item)
     {
         itemInside = item;
-        itemPreConfigurado = true; // Ativa a trava
+        itemPreConfigurado = true; 
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -58,7 +63,8 @@ public class Chest : MonoBehaviour
     {
         // Um inventário cheio não deve fazer o item desaparecer dentro de um baú aberto.
         bool vaiParaInventario = itemInside == ItemType.LongSword || itemInside == ItemType.Dagger ||
-            itemInside == ItemType.HealthPotion || itemInside == ItemType.PowerPotion || itemInside == ItemType.Axe;
+            itemInside == ItemType.HealthPotion || itemInside == ItemType.PowerPotion || itemInside == ItemType.Axe ||
+            itemInside == ItemType.Cannon || itemInside == ItemType.BasicSword;
         if (vaiParaInventario && (InventoryManager.Instance == null ||
             !InventoryManager.Instance.AdicionarItem(itemInside)))
         {
@@ -88,21 +94,27 @@ public class Chest : MonoBehaviour
                 break;
 
             case ItemType.SpeedBoots:
-                player.GetComponent<PlayerStatsHandler>()?.EquiparBota();
-                GameEffects.Instance.ItemObtained(transform.position, "Bota da Velocidade!", new Color(0.6f, 1f, 0.6f), itemInside);
-                break;
             case ItemType.LegendarySpeedBoots:
-                player.GetComponent<PlayerStatsHandler>()?.EquiparBotaLendaria();
-                GameEffects.Instance.ItemObtained(transform.position, "Bota Lendária da Velocidade!", new Color(1f, 0.7f, 0.2f), itemInside);
+                var atributos = player.GetComponent<PlayerStatsHandler>();
+                bool lendaria = itemInside == ItemType.LegendarySpeedBoots;
+                if (lendaria) atributos?.EquiparBotaLendaria();
+                else atributos?.EquiparBota();
+                string textoBota = lendaria ? "Bota Lendária da Velocidade!" : "Bota da Velocidade!";
+                // Avisa quando a velocidade ja chegou no limite (hard cap) e a bota nao soma mais
+                if (atributos != null && atributos.BotasNoMaximo) textoBota += " (velocidade no máximo)";
+                GameEffects.Instance.ItemObtained(transform.position, textoBota,
+                    lendaria ? new Color(1f, 0.7f, 0.2f) : new Color(0.6f, 1f, 0.6f), itemInside);
                 break;
 
 
-            // Armas e pocoes vão para o Inventário!
+            // Armas e pocoes vão para o Inventário
             case ItemType.LongSword:
             case ItemType.Dagger:
             case ItemType.HealthPotion:
             case ItemType.PowerPotion:
             case ItemType.Axe:
+            case ItemType.Cannon:
+            case ItemType.BasicSword:
                 Debug.Log(itemInside + " adicionado ao inventário!");
                 string nome = itemInside switch
                 {
@@ -111,6 +123,8 @@ public class Chest : MonoBehaviour
                     ItemType.HealthPotion => "Poção de Vida",
                     ItemType.PowerPotion => "Poção de Poder",
                     ItemType.Axe => "Machado",
+                    ItemType.Cannon => "Canhão",
+                    ItemType.BasicSword => "Espada Inicial",
                     _ => itemInside.ToString()
                 };
                 Color cor = itemInside switch
@@ -119,8 +133,13 @@ public class Chest : MonoBehaviour
                     ItemType.PowerPotion => PlayerStatsHandler.CorPocaoPoder,
                     _ => WeaponColor
                 };
-                int repeticoes = InventoryManager.Instance.ObterRepeticoes(itemInside);
-                string mensagem = repeticoes > 0 ? $"{nome}! +10% dano (total +{repeticoes * 10}%)" : $"{nome}!";
+                var inventario = InventoryManager.Instance;
+                int repeticoes = inventario.ObterRepeticoes(itemInside);
+                float bonusCopia = inventario.ObterBonusUltimaCopia(itemInside);
+                string mensagem = repeticoes == 0 ? $"{nome}!"
+                    : bonusCopia <= 0f ? $"{nome}! (dano no máximo: {InventoryManager.TextoPorcentagem(inventario.ObterBonusDano(itemInside))})"
+                    : $"{nome}! {InventoryManager.TextoPorcentagem(bonusCopia)} dano " +
+                      $"(total {InventoryManager.TextoPorcentagem(inventario.ObterBonusDano(itemInside))})";
                 GameEffects.Instance.ItemObtained(transform.position, mensagem, cor, itemInside);
                 break;
 
