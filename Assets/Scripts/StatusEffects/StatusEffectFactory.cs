@@ -14,6 +14,7 @@ public static class StatusEffectFactory
             case StatusEffectKind.Lag: return new LagEffect(duration);
             case StatusEffectKind.Sleepwalker: return new SleepwalkerEffect(duration);
             case StatusEffectKind.Recoil: return new RecoilEffect(duration);
+            case StatusEffectKind.Snail: return new SnailEffect(duration);
             default:
                 Debug.LogWarning($"StatusEffectFactory: sem StatusEffect mapeado pra {kind}");
                 return null;
@@ -32,6 +33,7 @@ public static class StatusEffectFactory
             case StatusEffectKind.Lag: return "Seus comandos chegam atrasados";
             case StatusEffectKind.Sleepwalker: return "Continua andando depois de soltar";
             case StatusEffectKind.Recoil: return "Cada golpe te joga pra trás";
+            case StatusEffectKind.Snail: return "Um caracol te persegue. Se encostar, você morre";
             default: return string.Empty;
         }
     }

@@ -38,6 +38,12 @@ public class Xiter : MonoBehaviour
             godMode();
             return;
         }
+        // F12: F9-F11 ja sao usados pelo StatusEffectTester
+        if (Keyboard.current.f12Key.wasPressedThisFrame)
+        {
+            playerObj.GetComponent<StatusEffectManager>()?.ApplyEffect(new SnailEffect());
+            return;
+        }
     }
 
     private void tpTeleport()

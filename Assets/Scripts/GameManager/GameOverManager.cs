@@ -82,15 +82,64 @@ public class GameOverManager : MonoBehaviour
         Destroy(explosao);
     }
 
+    // Move o painel pra um Canvas proprio em Screen Space - Overlay. O Unity desenha esse tipo de
+    // Canvas depois de tudo que a camera desenha (sprites, HUD, icone do caracol, textos flutuantes),
+    // entao o Game Over cobre a tela inteira sem depender de camadas de ordenacao
+    private void ColocarPainelPorCima()
+    {
+        Transform pai = gameOverPanel.transform.parent;
+        if (pai != null && pai.name == NomeCanvasGameOver) return; // ja foi movido
+
+        Canvas original = gameOverPanel.GetComponentInParent<Canvas>(true);
+        var raiz = new GameObject(NomeCanvasGameOver, typeof(RectTransform));
+        var canvas = raiz.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 1000;
+
+        // Mesma escala do Canvas de onde o painel veio, pra os botoes e textos nao mudarem de tamanho
+        var escala = raiz.AddComponent<UnityEngine.UI.CanvasScaler>();
+        var escalaOriginal = original != null ? original.rootCanvas.GetComponent<UnityEngine.UI.CanvasScaler>() : null;
+        if (escalaOriginal != null)
+        {
+            escala.uiScaleMode = escalaOriginal.uiScaleMode;
+            escala.referenceResolution = escalaOriginal.referenceResolution;
+            escala.screenMatchMode = escalaOriginal.screenMatchMode;
+            escala.matchWidthOrHeight = escalaOriginal.matchWidthOrHeight;
+            escala.scaleFactor = escalaOriginal.scaleFactor;
+            escala.referencePixelsPerUnit = escalaOriginal.referencePixelsPerUnit;
+            escala.physicalUnit = escalaOriginal.physicalUnit;
+            escala.fallbackScreenDPI = escalaOriginal.fallbackScreenDPI;
+            escala.defaultSpriteDPI = escalaOriginal.defaultSpriteDPI;
+            escala.dynamicPixelsPerUnit = escalaOriginal.dynamicPixelsPerUnit;
+        }
+
+        // Sem GraphicRaycaster os botoes nao respondem ao mouse
+        raiz.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+        gameOverPanel.transform.SetParent(raiz.transform, false);
+
+        // O fundo passa um pouco das bordas da tela: encostado exatamente nelas, sobrava uma fileira de pixels sem cobrir (dava pra ver pedacos dos inimigos nas beiradas na tela de game over, por exemplo)
+        var rect = (RectTransform)gameOverPanel.transform;
+        if (rect.anchorMin == Vector2.zero && rect.anchorMax == Vector2.one)
+        {
+            rect.offsetMin = new Vector2(-MargemForaDaTela, -MargemForaDaTela);
+            rect.offsetMax = new Vector2(MargemForaDaTela, MargemForaDaTela);
+        }
+    }
+
+    private const float MargemForaDaTela = 8f;
+
+    private const string NomeCanvasGameOver = "[Game Over]";
+
     private IEnumerator MostrarPainel()
     {
         var grupo = gameOverPanel.GetComponent<CanvasGroup>();
         if (grupo == null) grupo = gameOverPanel.AddComponent<CanvasGroup>();
 
-        // Os botões só respondem depois que o painel termina de aparecer.
+        // Os botões só respondem depois que o painel termina de aparecer
         grupo.alpha = 0f;
         grupo.interactable = false;
         grupo.blocksRaycasts = false;
+        ColocarPainelPorCima();
         gameOverPanel.SetActive(true);
 
         for (float tempo = 0f; tempo < duracaoFade; tempo += Time.unscaledDeltaTime)

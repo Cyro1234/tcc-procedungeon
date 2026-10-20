@@ -47,7 +47,25 @@ public class DowngradeMenuManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
+
+        // Entra no sorteio por codigo, sem precisar editar a lista salva na cena
+        GarantirNoSorteio(StatusEffectKind.Snail, "Caracol Imortal");
+    }
+
+    private void GarantirNoSorteio(StatusEffectKind kind, string nome)
+    {
+        if (gameStatusEffectDebuffPool == null) gameStatusEffectDebuffPool = new List<StatusEffectDowngradeOption>();
+        foreach (var opcao in gameStatusEffectDebuffPool)
+            if (opcao.statusEffectKind == kind) return;
+
+        gameStatusEffectDebuffPool.Add(new StatusEffectDowngradeOption
+        {
+            displayName = nome,
+            statusEffectKind = kind,
+            hasDuration = false // permanente
+        });
     }
 
     // hotkey pra que as teclas 1, 2, 3 escolhem a opcao correspondente no menu de downgrade

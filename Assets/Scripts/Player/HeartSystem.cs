@@ -171,6 +171,14 @@ public class HeartSystem : MonoBehaviour
         // Opcional: Atualizar a UI para mostrar o icone do escudo na tela
     }
 
+    // Morte na hora: ignora escudo e invencibilidade (usado pelo Caracol Imortal)
+    public void InstaKill()
+    {
+        if (dead) return;
+        GameEffects.Instance.PlayerHurt(transform.position);
+        Die();
+    }
+
     private void Die()
     {
         if (dead) return;

@@ -10,5 +10,6 @@ public enum StatusEffectKind
     SlipperyToes,
     Lag,
     Sleepwalker,
-    Recoil
+    Recoil,
+    Snail
 }
