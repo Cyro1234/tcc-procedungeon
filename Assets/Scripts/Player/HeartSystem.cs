@@ -133,6 +133,8 @@ public class HeartSystem : MonoBehaviour
             {
                 if (Escudo != null) Escudo.SetActive(false);
                 AudioManager.Instance.PlaySFX("EscudoQuebrou");
+                invincibleUntil = Time.time + invincibilityTime;
+                return;
             }
 
             if (damage == 0) return; // O escudo absorveu o impacto inteiro, mesmo se quebrou.

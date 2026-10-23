@@ -15,6 +15,8 @@ public class AxeSpin : MonoBehaviour
     [SerializeField] private bool incluirTriggers = false;
 
     [Header("Indicador")]
+    [Tooltip("Mostra o circulo da area do machado.")]
+    [SerializeField] private bool mostrarCirculo = false;
     [Tooltip("Ajuste da orientacao da arte do machado durante o giro, em graus.")]
     [SerializeField] private float anguloSprite = 45f;
     [SerializeField] private Color corIndicador = new Color(1f, 0.85f, 0.4f, 0.8f);
@@ -79,7 +81,7 @@ public class AxeSpin : MonoBehaviour
         duracao = Mathf.Max(0.01f, duracaoGolpe);
         atingidos.Clear();
         Girando = true;
-        circulo.enabled = true;
+        circulo.enabled = mostrarCirculo;
         lamina.enabled = lamina.sprite != null;
         Desenhar(0f);
         AcertarInimigos();
