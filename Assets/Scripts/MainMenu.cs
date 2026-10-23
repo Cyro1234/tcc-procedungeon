@@ -38,8 +38,7 @@ public class MainMenu : MonoBehaviour
 
     public void IniciarJogo()
     {
-        // Carrega a intro
-        SceneManager.LoadSceneAsync(2); // Carrega a cena no index X em File >> Build Profiles >> Scene List
+        SceneManager.LoadSceneAsync("Tutorial");
     }
 
     public void AbrirOpcoes()

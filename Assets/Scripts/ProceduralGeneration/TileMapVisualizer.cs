@@ -305,6 +305,13 @@ public class TileMapVisualizer : MonoBehaviour
     {
         var tilePosition = tileMap.WorldToCell((Vector3Int)position);
         tileMap.SetTile(tilePosition, tile);
+        if (tileMap == floorTileMap && tile != null)
+        {
+            // Fecha fissuras de rasterizacao com zoom/posicao fracionarios da camera.
+            // A sobreposicao e apenas visual (0,2% por borda); o grid continua com celulas de 1 tile.
+            tileMap.RemoveTileFlags(tilePosition, TileFlags.LockTransform);
+            tileMap.SetTransformMatrix(tilePosition, Matrix4x4.Scale(new Vector3(1.004f, 1.004f, 1f)));
+        }
 
         // Paredes e portas ocupam a celula inteira. O contorno do sprite pode
         // nao estar disponivel no Player quando a textura usa um atlas.
@@ -355,18 +362,18 @@ public class TileMapVisualizer : MonoBehaviour
             if (noiseValue < noiseThreshold)
             {
                 // Tile base
-                floorTileMap.SetTile(tilePosition, floorTilesNoise[0]);
+                PaintSingleTile(position, floorTileMap, floorTilesNoise[0]);
             }
             else
             {
                 // Para ClearTile, usar o tile de caminho simples (índice 1)
                 // Pois não temos contexto de vizinhos aqui
-                floorTileMap.SetTile(tilePosition, floorTilesNoise[1]);
+                PaintSingleTile(position, floorTileMap, floorTilesNoise[1]);
             }
         }
         else
         {
-            floorTileMap.SetTile(tilePosition, floorTileEscolhido);
+            PaintSingleTile(position, floorTileMap, floorTileEscolhido);
         }
     }
 

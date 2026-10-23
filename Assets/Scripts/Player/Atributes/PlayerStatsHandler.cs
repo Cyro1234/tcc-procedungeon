@@ -143,8 +143,27 @@ public class PlayerStatsHandler : MonoBehaviour
     // Lista de modificadores temporarios
     private List<StatModifier> tempModifiers = new List<StatModifier>();
 
+    public float TempoControlesInvertidos
+    {
+        get
+        {
+            float restante = 0f;
+            foreach (var modifier in tempModifiers)
+                if (modifier.statName == "MudarDirecao") restante = Mathf.Max(restante, modifier.duration);
+            return restante;
+        }
+    }
+
     public void AddTemporaryModifier(StatModifier modifier)
     {
+        // Reaplicar o encanto renova o prazo; dois fatores -1 anulariam a inversao.
+        if (modifier.statName == "MudarDirecao")
+            foreach (var ativo in tempModifiers)
+                if (ativo.statName == modifier.statName)
+                {
+                    ativo.duration = Mathf.Max(ativo.duration, modifier.duration);
+                    return;
+                }
         tempModifiers.Add(modifier);    // Adiciona um modificador temporario!!
     }
 
@@ -157,6 +176,7 @@ public class PlayerStatsHandler : MonoBehaviour
 
     private void Start()
     {
+        if (CompareTag("Player")) gameObject.AddComponent<InvertedControlsFeedback>();
         // Fiz isso so pra debugar mesmo!! Ta comentado por enquanto!
 
         //print($"Velocidade base do Player {GetPlayerWalkSpeed()}");

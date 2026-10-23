@@ -26,6 +26,12 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/Scenes/InGame.unity
     m_guid: bb8d29b7bf2f13f47bfff7fe9991900e
+  - m_enabled: 1
+    m_path: Assets/Scenes/Cutscene intro.unity
+    m_guid: 071675c606cb09a4bb2d62ad9ac06e1b
+  - m_enabled: 1
+    m_path: Assets/Scenes/Tutorial.unity
+    m_guid: 49d11003af2d417788b7b8b44d01fe07
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:

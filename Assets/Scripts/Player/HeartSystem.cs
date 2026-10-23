@@ -1,3 +1,5 @@
+using TMPro;
+using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -357,5 +359,103 @@ public class BootBonusHUD : MonoBehaviour
     private void OnDestroy()
     {
         if (painel != null) Destroy(painel);
+    }
+}
+
+// O prazo vem do proprio modificador: pausa, renovacao e fim do encanto ficam sincronizados.
+public class InvertedControlsFeedback : MonoBehaviour
+{
+    private PlayerStatsHandler stats;
+    private HeartSystem vida;
+    private SpriteRenderer personagem;
+    private Color corOriginal;
+    private bool tingido;
+    private GameObject interfaceEfeito, painel;
+    private TextMeshProUGUI texto;
+    private Image barra;
+    private float maiorPrazo = 5f;
+    private static readonly Color Roxo = new Color(.75f, .24f, 1f);
+
+    private void Start()
+    {
+        stats = GetComponent<PlayerStatsHandler>();
+        vida = GetComponent<HeartSystem>();
+        personagem = GetComponent<SpriteRenderer>();
+        interfaceEfeito = new GameObject("Aviso - controles invertidos", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+        var canvas = interfaceEfeito.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 250;
+        var scaler = interfaceEfeito.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        scaler.matchWidthOrHeight = .5f;
+        painel = new GameObject("Encanto da bruxinha", typeof(RectTransform), typeof(Image));
+        painel.transform.SetParent(interfaceEfeito.transform, false);
+        var rect = painel.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = new Vector2(.5f, 1);
+        rect.anchoredPosition = new Vector2(0, -92);
+        rect.sizeDelta = new Vector2(650, 92);
+        var fundo = painel.GetComponent<Image>();
+        fundo.color = new Color(.16f, .035f, .24f, .94f);
+        fundo.raycastTarget = false;
+        var label = new GameObject("Tempo restante", typeof(RectTransform), typeof(TextMeshProUGUI));
+        label.transform.SetParent(painel.transform, false);
+        texto = label.GetComponent<TextMeshProUGUI>();
+        texto.rectTransform.sizeDelta = new Vector2(620, 70);
+        texto.rectTransform.anchoredPosition = new Vector2(0, 4);
+        texto.fontSize = 27;
+        texto.alignment = TextAlignmentOptions.Center;
+        texto.color = new Color(.94f, .8f, 1f);
+        texto.raycastTarget = false;
+        var linha = new GameObject("Duracao", typeof(RectTransform), typeof(Image));
+        linha.transform.SetParent(painel.transform, false);
+        barra = linha.GetComponent<Image>();
+        barra.color = Roxo;
+        barra.raycastTarget = false;
+        barra.rectTransform.anchorMin = barra.rectTransform.anchorMax = new Vector2(0, 0);
+        barra.rectTransform.pivot = new Vector2(0, 0);
+        barra.rectTransform.anchoredPosition = new Vector2(10, 6);
+        painel.SetActive(false);
+    }
+
+    private void LateUpdate()
+    {
+        if (stats == null || painel == null) return;
+        float restante = stats.TempoControlesInvertidos;
+        bool ativo = restante > 0 && (vida == null || !vida.IsDead);
+        painel.SetActive(ativo);
+        if (ativo)
+        {
+            if (!tingido && personagem != null) { corOriginal = personagem.color; tingido = true; }
+            if (personagem != null)
+            {
+                Color cor = Color.Lerp(corOriginal, Roxo, .35f + .65f * Mathf.PingPong(Time.time * 4f, 1));
+                cor.a = corOriginal.a;
+                personagem.color = cor;
+            }
+            maiorPrazo = Mathf.Max(maiorPrazo, restante);
+            texto.text = $"CONTROLES INVERTIDOS  •  {restante:0.0}s\nEncanto da bruxinha: mova-se no sentido oposto!";
+            barra.rectTransform.sizeDelta = new Vector2(630 * Mathf.Clamp01(restante / maiorPrazo), 5);
+        }
+        else RestaurarCor();
+    }
+
+    private void RestaurarCor()
+    {
+        if (tingido && personagem != null) personagem.color = corOriginal;
+        tingido = false;
+        maiorPrazo = 5f;
+    }
+
+    private void OnDisable()
+    {
+        RestaurarCor();
+        if (painel != null) painel.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        RestaurarCor();
+        if (interfaceEfeito != null) Destroy(interfaceEfeito);
     }
 }

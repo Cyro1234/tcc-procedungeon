@@ -8,6 +8,46 @@ public class Chest : MonoBehaviour
     [Header("Configurações do Baú")]
     // Cada Prefab de baú terá sua própria tabela de loot configurada no Inspector
     [SerializeField] private WeightedTable<ItemType> itemTable;
+    [Header("Aparencia animada")]
+    [SerializeField] private string aparenciaBau;
+    private Sprite[] quadrosAbertura;
+    private SpriteRenderer renderBau;
+    private static readonly System.Collections.Generic.Dictionary<string, Sprite[]> animacoesBaus =
+        new System.Collections.Generic.Dictionary<string, Sprite[]>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetarAnimacoes() => animacoesBaus.Clear();
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+        renderBau = GetComponent<SpriteRenderer>();
+        if (string.IsNullOrEmpty(aparenciaBau) || renderBau == null) return;
+        if (!animacoesBaus.TryGetValue(aparenciaBau, out quadrosAbertura))
+        {
+            quadrosAbertura = Resources.LoadAll<Sprite>("Baus/" + aparenciaBau);
+            System.Array.Sort(quadrosAbertura, (a, b) => string.CompareOrdinal(a.name, b.name));
+            animacoesBaus[aparenciaBau] = quadrosAbertura;
+        }
+        if (quadrosAbertura.Length == 0)
+        {
+            Debug.LogWarning("Animacao do bau nao encontrada: Baus/" + aparenciaBau, this);
+            return;
+        }
+        // Os arquivos possuem quatro quadros de 100ms; o primeiro e o bau fechado.
+        if (animator != null) animator.enabled = false;
+        renderBau.sprite = quadrosAbertura[0];
+    }
+
+    private IEnumerator AnimarAbertura()
+    {
+        foreach (var quadro in quadrosAbertura)
+        {
+            renderBau.sprite = quadro;
+            yield return new WaitForSeconds(.1f);
+        }
+        // Mantem o ultimo quadro aberto ate o fade existente terminar.
+    }
 
     [Header("Apenas para depuração (Não alterar)")]
     public ItemType itemInside;
@@ -73,7 +113,8 @@ public class Chest : MonoBehaviour
         }
 
         isOpen = true;
-        if (animator != null) animator.SetTrigger("Open");
+        if (quadrosAbertura != null && quadrosAbertura.Length > 0) StartCoroutine(AnimarAbertura());
+        else if (animator != null) animator.SetTrigger("Open");
         foreach (var collider in GetComponentsInChildren<Collider2D>()) collider.enabled = false;
         StartCoroutine(Sumir());
 

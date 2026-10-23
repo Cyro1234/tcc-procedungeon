@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c8e5ac3c595efc41b8e16d5c0ab15c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Chest
+  aparenciaBau: comum
   itemTable:
     items:
     - item: 1

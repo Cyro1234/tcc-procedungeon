@@ -125,12 +125,30 @@ public class EnemySpawner : MonoBehaviour
     }
     private List<GameObject> enemies = new List<GameObject>();
     [SerializeField] private WeightedTable<GameObject> enemyTable;
+    private WeightedTable<GameObject> tabelaModular;
     private void OnValidate()
     {
         WeightedTable<GameObject>.ValidateInEditor(enemyTable, this, nameof(enemyTable));
     }
     public void SpawnEnemies(SpawnPlacement placement)
     {
+        // Filtra apenas o spawn comum. A inicializacao compartilhada com os bosses permanece livre.
+        tabelaModular = new WeightedTable<GameObject>();
+        if (enemyTable != null && enemyTable.items != null)
+            foreach (var entrada in enemyTable.items)
+            {
+                if (entrada == null || entrada.item == null || entrada.weight <= 0) continue;
+                var prefab = entrada.item;
+                if (prefab.GetComponentInChildren<EnemyModularBuilder>(true) == null &&
+                    prefab.GetComponentInChildren<FastEnemyModularBuilder>(true) == null)
+                {
+                    Debug.LogWarning("Prefab nao modular ignorado no spawn comum: " + prefab.name, this);
+                    continue;
+                }
+                tabelaModular.items.Add(entrada);
+            }
+        if (!tabelaModular.TryValidate(out string erro))
+            throw new System.InvalidOperationException("Spawn requer inimigos modulares configurados: " + erro);
         // A primeira sala fica livre, exceto se tambem for a sala do teleporte.
         for (int i = 0; i < placement.RoomCount; i++)
         {
@@ -174,7 +192,7 @@ public class EnemySpawner : MonoBehaviour
 
     private GameObject getRandomEnemy()
     {
-        return enemyTable.getRandom(Rng.enemyRng);
+        return tabelaModular.getRandom(Rng.enemyRng);
     }
 
     public void ClearEnemies()
