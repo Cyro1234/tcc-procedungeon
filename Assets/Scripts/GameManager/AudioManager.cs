@@ -36,7 +36,25 @@ public class AudioManager : MonoBehaviour
 
     musicSource.volume = musicVol;
     sfxSource.volume = sfxVol;
+    SincronizarSliders(musicVol, sfxVol);
 }
+    }
+    // fix slider sfx e musica
+    private void SincronizarSliders(float musicVol, float sfxVol)
+    {
+        foreach (var slider in FindObjectsByType<UnityEngine.UI.Slider>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            var evento = slider.onValueChanged;
+            for (int i = 0; i < evento.GetPersistentEventCount(); i++)
+            {
+                if (evento.GetPersistentTarget(i) != this) continue;
+                string metodo = evento.GetPersistentMethodName(i);
+                if (metodo == nameof(SetMusicVolume) || metodo == nameof(MusicVolume))
+                    slider.SetValueWithoutNotify(musicVol);
+                else if (metodo == nameof(SetSFXVolume) || metodo == nameof(SFXVolume))
+                    slider.SetValueWithoutNotify(sfxVol);
+            }
+        }
     }
 
 
@@ -71,8 +89,17 @@ public class AudioManager : MonoBehaviour
             sfxSource.PlayOneShot(s.clip);
         }
     }
-    
-    // adicionar toggle de music e sfx depois
+
+    public void PlaySFX(AudioClip clip)
+    {
+        if (clip != null) sfxSource.PlayOneShot(clip);
+    }
+
+    public AudioClip ObterSFX(string name)
+    {
+        Sound s = Array.Find(sfxSounds, x => x.name == name);
+        return s != null ? s.clip : null;
+    }
 
     // Scroller do áudio da música/sfx no menu de pause
     public void MusicVolume(float volume)

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Chest : MonoBehaviour
 {
-    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion, Axe, BasicSword, Cannon }
+    public enum ItemType { None, ShieldSmall, ShieldMedium, ShieldLarge, ShieldLegendary, LongSword, Dagger, SpeedBoots, HealthPotion, LegendarySpeedBoots, PowerPotion, Axe, BasicSword, Cannon, PenaFenix }
 
     [Header("Configurações do Baú")]
     // Cada Prefab de baú terá sua própria tabela de loot configurada no Inspector
@@ -104,6 +104,15 @@ public class Chest : MonoBehaviour
                 if (atributos != null && atributos.BotasNoMaximo) textoBota += " (velocidade no máximo)";
                 GameEffects.Instance.ItemObtained(transform.position, textoBota,
                     lendaria ? new Color(1f, 0.7f, 0.2f) : new Color(0.6f, 1f, 0.6f), itemInside);
+                break;
+
+            // Vida extra: passivo, vai direto pro HeartSystem
+            case ItemType.PenaFenix:
+                HeartSystem vida = player.GetComponent<HeartSystem>();
+                if (vida != null) vida.GanharPena();
+                int penas = vida != null ? vida.Penas : 1;
+                string textoPena = penas > 1 ? $"{PenaFenix.Nome}! ({penas} vidas extras)" : $"{PenaFenix.Nome}! Você revive uma vez";
+                GameEffects.Instance.ItemObtained(transform.position, textoPena, PenaFenix.Cor, itemInside);
                 break;
 
 

@@ -170,6 +170,14 @@ public class SnailChaser : MonoBehaviour
         if (vida != null) vida.InstaKill();
     }
 
+    // Depois do jogador reviver com uma pena: volta a perseguir, mas comeca longe para evitar instakill
+    public void RecomecarLonge()
+    {
+        if (alvo == null) return;
+        pegou = false;
+        Reposicionar();
+    }
+
     private void Reposicionar()
     {
         double angulo = rng.NextDouble() * System.Math.PI * 2.0;

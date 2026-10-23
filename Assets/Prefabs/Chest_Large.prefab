@@ -170,6 +170,8 @@ MonoBehaviour:
       weight: 20
     - item: 13
       weight: 15
+    - item: 14
+      weight: 10
   itemInside: 0
 --- !u!95 &896005281407797099
 Animator:

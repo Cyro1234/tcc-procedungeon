@@ -19,6 +19,8 @@ public class HeartSystem : MonoBehaviour
     [SerializeField] private float invincibilityTime = 0.9f;
     [Tooltip("Forca do empurrao que o jogador leva ao tomar dano.")]
     [SerializeField] private float knockbackForce = 12f;
+    [Tooltip("Tempo de invencibilidade depois de reviver com a Pena da Fenix.")]
+    [SerializeField] private float invencivelAoReviver = 2.5f;
 
     private GameOverManager gameOverManager;
     private AudioSource audioSource;
@@ -31,6 +33,7 @@ public class HeartSystem : MonoBehaviour
     public bool IsDead => dead;
     public bool IsFullHealth => life >= MaxLife;
     public int Life => life;
+    public int Penas { get; private set; } // Pena da Fenix: cada uma e uma vida extra
     public bool IsInvulnerable => dead || Time.time < invincibleUntil;
     private int MaxLife => stats != null ? Mathf.Max(0, (int)stats.GetPlayerMaxHearts()) : 3;
 
@@ -49,6 +52,7 @@ public class HeartSystem : MonoBehaviour
         AtualizarVidaMaxima();
         gameObject.AddComponent<ShieldCounterHUD>().Inicializar(this);
         gameObject.AddComponent<BootBonusHUD>().Inicializar(this, stats);
+        gameObject.AddComponent<PenaFenixHUD>().Inicializar(this);
     }
 
     void Update()
@@ -179,17 +183,36 @@ public class HeartSystem : MonoBehaviour
         Die();
     }
 
+    public void GanharPena() => Penas++;
+
     private void Die()
     {
         if (dead) return;
         dead = true;
         life = 0;
         if (spriteRenderer != null) spriteRenderer.enabled = true;
+        AudioManager.Instance.PlaySFX("PlayerMorreu");
+
+        // Pena da Fenix: so salva se ainda existe vida maxima pra voltar (debuff pode ter zerado)
+        if (Penas > 0 && MaxLife > 0 && gameOverManager != null)
+        {
+            Penas--;
+            gameOverManager.ReviverJogador(this);
+            return;
+        }
+
         if (gameOverManager != null)
         {
             gameOverManager.ShowGameOver(transform);
         }
-        AudioManager.Instance.PlaySFX("PlayerMorreu");
+    }
+
+    // Chamado pelo GameOverManager no fim da animacao de reviver
+    public void Reviver()
+    {
+        dead = false;
+        life = MaxLife;
+        invincibleUntil = Time.time + invencivelAoReviver;
     }
 }
 
@@ -287,7 +310,7 @@ public class BootBonusHUD : MonoBehaviour
         painel.transform.SetParent(canvas.transform, false);
         var rect = painel.GetComponent<RectTransform>();
         rect.anchorMin = rect.anchorMax = new Vector2(1, 1);
-        rect.anchoredPosition = new Vector2(-85, -210);
+        rect.anchoredPosition = new Vector2(-85, -170);
         rect.sizeDelta = new Vector2(80, 80);
         icone = painel.GetComponent<UnityEngine.UI.Image>();
         icone.preserveAspect = true;

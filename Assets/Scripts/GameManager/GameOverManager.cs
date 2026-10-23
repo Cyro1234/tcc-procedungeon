@@ -19,7 +19,15 @@ public class GameOverManager : MonoBehaviour
     [Tooltip("Duração do fade in da tela de Game Over.")]
     [SerializeField, Min(0f)] private float duracaoFade = 1f;
 
+    [Header("Reviver (Pena da Fênix)")]
+    [Tooltip("Pausa entre o fim da morte e o começo da volta.")]
+    [SerializeField, Min(0f)] private float pausaAntesDeVoltar = 0.3f;
+    [Tooltip("Limites da duração da explosão ao contrário. Dentro deles ela acompanha a voz invertida.")]
+    [SerializeField, Min(0.1f)] private float duracaoMinimaVolta = 0.8f;
+    [SerializeField, Min(0.1f)] private float duracaoMaximaVolta = 2.5f;
+
     private bool mostrandoGameOver;
+    private bool revivendo;
 
     public void Start()
     {
@@ -56,14 +64,30 @@ public class GameOverManager : MonoBehaviour
 
     private IEnumerator Explodir(Transform jogador)
     {
-        var referencia = jogador.GetComponent<SpriteRenderer>();
+        EsconderJogador(jogador);
+        yield return TocarExplosao(jogador, false, quadrosPorSegundo);
+    }
+
+    // Esconde o jogador e devolve as partes que estavam visiveis, pra mostrar de novo ao reviver
+    private System.Collections.Generic.List<Renderer> EsconderJogador(Transform jogador)
+    {
+        var escondidas = new System.Collections.Generic.List<Renderer>();
         foreach (Renderer parte in jogador.GetComponentsInChildren<Renderer>())
+        {
+            if (!parte.enabled) continue;
             parte.enabled = false;
+            escondidas.Add(parte);
+        }
         // As partículas do último dano congelariam com o jogo pausado.
         foreach (FxParticle particula in FindObjectsByType<FxParticle>(FindObjectsSortMode.None))
             Destroy(particula.gameObject);
+        return escondidas;
+    }
 
-        var explosao = new GameObject("Explosão da morte");
+    private IEnumerator TocarExplosao(Transform jogador, bool aoContrario, float qps)
+    {
+        var referencia = jogador.GetComponent<SpriteRenderer>();
+        var explosao = new GameObject(aoContrario ? "Explosão ao contrário" : "Explosão da morte");
         explosao.transform.position = jogador.position;
         explosao.transform.localScale = Vector3.one * tamanhoExplosao;
         var sprite = explosao.AddComponent<SpriteRenderer>();
@@ -73,13 +97,68 @@ public class GameOverManager : MonoBehaviour
             sprite.sortingOrder = referencia.sortingOrder + 1;
         }
 
-        var intervalo = new WaitForSecondsRealtime(1f / quadrosPorSegundo);
-        foreach (Sprite quadro in quadrosExplosao)
+        var intervalo = new WaitForSecondsRealtime(1f / qps);
+        for (int i = 0; i < quadrosExplosao.Length; i++)
         {
-            sprite.sprite = quadro;
+            sprite.sprite = quadrosExplosao[aoContrario ? quadrosExplosao.Length - 1 - i : i];
             yield return intervalo;
         }
         Destroy(explosao);
+    }
+
+    // Pena da Fênix: jogador explode, depois a explosão ocorre de forma reversa e então ele revive
+    public void ReviverJogador(HeartSystem vida)
+    {
+        if (mostrandoGameOver || revivendo) return;
+        revivendo = true;
+        StartCoroutine(SequenciaReviver(vida));
+    }
+
+    // O jogo fica pausado (timeScale 0) durante a sequência, então tudo usa tempo real
+    private IEnumerator SequenciaReviver(HeartSystem vida)
+    {
+        Transform jogador = vida.transform;
+        GameFlow.Pause(GameFlow.State.Revive);
+        if (playerMovement != null) playerMovement.ForcarParada();
+        float inicio = Time.realtimeSinceStartup;
+
+        var escondidas = EsconderJogador(jogador);
+        bool temQuadros = quadrosExplosao != null && quadrosExplosao.Length > 0;
+        if (temQuadros) yield return TocarExplosao(jogador, false, quadrosPorSegundo);
+
+        // Espera a voz da morte acabar antes de tocar ela ao contrário
+        AudioClip vozDaMorte = AudioManager.Instance.ObterSFX("PlayerMorreu");
+        float fimDaVoz = vozDaMorte != null ? inicio + vozDaMorte.length : 0f;
+        float espera = Mathf.Max(pausaAntesDeVoltar, fimDaVoz - Time.realtimeSinceStartup);
+        yield return new WaitForSecondsRealtime(espera);
+
+        AudioClip vozInvertida = PenaFenix.Invertido(vozDaMorte);
+        float duracaoVoz = vozInvertida != null ? vozInvertida.length : 0f;
+        float duracaoVolta = temQuadros
+            ? Mathf.Clamp(duracaoVoz > 0f ? duracaoVoz : quadrosExplosao.Length / quadrosPorSegundo,
+                duracaoMinimaVolta, Mathf.Max(duracaoMinimaVolta, duracaoMaximaVolta))
+            : 0f;
+        if (vozInvertida != null) AudioManager.Instance.PlaySFX(vozInvertida);
+
+        // A explosão ao contrário termina junto com a voz invertida
+        if (duracaoVoz > duracaoVolta) yield return new WaitForSecondsRealtime(duracaoVoz - duracaoVolta);
+        if (temQuadros) yield return TocarExplosao(jogador, true, quadrosExplosao.Length / duracaoVolta);
+
+        foreach (var parte in escondidas)
+            if (parte != null) parte.enabled = true;
+        vida.Reviver();
+
+        // O caracol imortal tinha pegado o jogador: recomeça longe
+        foreach (var caracol in FindObjectsByType<SnailChaser>(FindObjectsSortMode.None))
+            caracol.RecomecarLonge();
+
+        revivendo = false;
+        GameFlow.Resume(GameFlow.State.Revive);
+
+        AudioManager.Instance.PlaySFX(PenaFenix.SomReviver);
+        GameEffects.Instance.Burst(jogador.position, PenaFenix.Cor, 24, 5f, null);
+        GameEffects.Instance.FlashScreen(new Color(1f, 0.75f, 0.35f, 0.35f), 0.5f);
+        GameEffects.Instance.Popup(jogador.position + Vector3.up * 1.2f, "Reviveu!", PenaFenix.Cor, 1.3f, 1.2f);
     }
 
     private void ColocarPainelPorCima() => CanvasPorCima.Mover("[Game Over]", 1000, gameOverPanel);

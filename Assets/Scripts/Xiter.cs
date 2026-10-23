@@ -10,8 +10,10 @@ public class Xiter : MonoBehaviour
     private bool menuDebugAberto;
     private bool carregandoNivel;
     private string mensagemDebug = string.Empty;
-    private bool abaDebuffs;
+    private enum Aba { Niveis, Debuffs, Geracao }
+    private Aba abaAtual = Aba.Niveis;
     private StatusEffectKind debuffSelecionado = StatusEffectKind.Drunkenness;
+    private string campoSeed = string.Empty;
 
 
     void Start()
@@ -83,11 +85,24 @@ public class Xiter : MonoBehaviour
         float x = (Screen.width / escala - 440f) * .5f;
         float y = (Screen.height / escala - 610f) * .5f;
         GUI.Box(new Rect(x, y, 440, 610), "DEBUG — F9");
-        if (GUI.Button(new Rect(x + 24, y + 35, 190, 34), "Níveis / Armas")) abaDebuffs = false;
-        if (GUI.Button(new Rect(x + 226, y + 35, 190, 34), "Debuffs")) abaDebuffs = true;
-        if (abaDebuffs)
+        if (GUI.Button(new Rect(x + 24, y + 35, 124, 34), "Níveis / Armas" + (abaAtual == Aba.Niveis ? " ✓" : "")))
+            abaAtual = Aba.Niveis;
+        if (GUI.Button(new Rect(x + 158, y + 35, 124, 34), "Debuffs" + (abaAtual == Aba.Debuffs ? " ✓" : "")))
+            abaAtual = Aba.Debuffs;
+        if (GUI.Button(new Rect(x + 292, y + 35, 124, 34), "Geração" + (abaAtual == Aba.Geracao ? " ✓" : "")))
+        {
+            if (abaAtual != Aba.Geracao) campoSeed = Rng.baseSeed.ToString();
+            abaAtual = Aba.Geracao;
+        }
+        if (abaAtual == Aba.Debuffs)
         {
             DesenharDebuffs(x, y);
+            GUI.matrix = anterior;
+            return;
+        }
+        if (abaAtual == Aba.Geracao)
+        {
+            DesenharGeracao(x, y);
             GUI.matrix = anterior;
             return;
         }
@@ -95,15 +110,22 @@ public class Xiter : MonoBehaviour
             StartCoroutine(PularParaFinal(false));
         if (GUI.Button(new Rect(x + 24, y + 136, 392, 44), "Ir direto ao Cocô — iniciar cutscene"))
             StartCoroutine(PularParaFinal(true));
-        if (GUI.Button(new Rect(x + 24, y + 190, 392, 38), "Escudo infinito (F7)"))
+        if (GUI.Button(new Rect(x + 24, y + 190, 190, 38), "Escudo infinito (F7)"))
         {
             noDamage();
             mensagemDebug = "Escudo infinito ativado.";
         }
-        if (GUI.Button(new Rect(x + 24, y + 238, 392, 38), "Dano máximo (F6)"))
+        if (GUI.Button(new Rect(x + 226, y + 190, 190, 38), "Dano máximo (F6)"))
         {
             maxStr();
             mensagemDebug = "Dano máximo ativado.";
+        }
+        var vida = playerObj != null ? playerObj.GetComponent<HeartSystem>() : null;
+        int penas = vida != null ? vida.Penas : 0;
+        if (GUI.Button(new Rect(x + 24, y + 238, 392, 38), "+1 " + PenaFenix.Nome + " (tem " + penas + ")") && vida != null)
+        {
+            vida.GanharPena();
+            mensagemDebug = PenaFenix.Nome + " adicionada. Total: " + vida.Penas + ".";
         }
         GUI.Label(new Rect(x + 24, y + 288, 392, 28), "Equipar arma:");
         for (int i = 0; i < Chest.ArmasDoBau.Length; i++)
@@ -180,6 +202,53 @@ public class Xiter : MonoBehaviour
         GUI.Label(new Rect(x + 24, y + 454, 392, 28), "Stacks adicionados aqui duram até serem retirados.");
         GUI.Label(new Rect(x + 24, y + 488, 392, 48), mensagemDebug);
         if (GUI.Button(new Rect(x + 24, y + 550, 392, 42), "Voltar ao jogo — F9 / Esc")) FecharDebug();
+    }
+
+    // Aba Geração: reiniciar a partida e trocar a seed. Reiniciar recarrega a cena,
+    // entao vida, itens, debuffs e andar voltam ao comeco
+    private void DesenharGeracao(float x, float y)
+    {
+        GUI.Label(new Rect(x + 24, y + 82, 392, 28), "Seed atual: " + Rng.baseSeed + "   •   Andar " + Rng.CurrentFloor);
+        if (GUI.Button(new Rect(x + 24, y + 116, 392, 38), "Copiar seed atual"))
+        {
+            GUIUtility.systemCopyBuffer = Rng.baseSeed.ToString();
+            mensagemDebug = "Seed " + Rng.baseSeed + " copiada.";
+        }
+
+        if (GUI.Button(new Rect(x + 24, y + 172, 392, 44), "Reiniciar o jogo — mesma seed"))
+            GameManager.ReiniciarComSeed(Rng.baseSeed);
+        if (GUI.Button(new Rect(x + 24, y + 226, 392, 44), "Reiniciar o jogo — seed aleatória"))
+            GameManager.ReiniciarComSeed(System.DateTime.Now.GetHashCode());
+
+        GUI.Label(new Rect(x + 24, y + 290, 392, 28), "Trocar a seed (número ou palavra):");
+        GUI.SetNextControlName("CampoSeed");
+        campoSeed = GUI.TextField(new Rect(x + 24, y + 322, 392, 36), campoSeed, 40);
+        bool enterNoCampo = Event.current.type == EventType.KeyDown &&
+            (Event.current.keyCode == KeyCode.Return || Event.current.keyCode == KeyCode.KeypadEnter) &&
+            GUI.GetNameOfFocusedControl() == "CampoSeed";
+        bool habilitado = GUI.enabled;
+        GUI.enabled = !string.IsNullOrWhiteSpace(campoSeed);
+        if ((GUI.Button(new Rect(x + 24, y + 368, 392, 44), "Gerar com esta seed") || enterNoCampo) && GUI.enabled)
+            GameManager.ReiniciarComSeed(SeedDoTexto(campoSeed));
+        GUI.enabled = habilitado;
+
+        GUI.Label(new Rect(x + 24, y + 424, 392, 48),
+            "A mesma seed gera sempre o mesmo mapa, inimigos, baús e maldições.");
+        GUI.Label(new Rect(x + 24, y + 488, 392, 48), mensagemDebug);
+        if (GUI.Button(new Rect(x + 24, y + 550, 392, 42), "Voltar ao jogo — F9 / Esc")) FecharDebug();
+    }
+
+    // Numero vira a propria seed; palavra vira um numero fixo (o mesmo texto sempre da a mesma seed)
+    private static int SeedDoTexto(string texto)
+    {
+        texto = texto.Trim();
+        if (int.TryParse(texto, out int numero)) return numero;
+        unchecked
+        {
+            int hash = (int)2166136261;
+            foreach (char c in texto.ToLowerInvariant()) hash = (hash ^ c) * 16777619;
+            return hash;
+        }
     }
 
     private IEnumerator PularParaFinal(bool diretoAoBoss)

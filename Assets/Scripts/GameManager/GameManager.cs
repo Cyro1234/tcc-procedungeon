@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [DefaultExecutionOrder(-100)]
 public class GameManager : MonoBehaviour
@@ -25,6 +26,17 @@ public class GameManager : MonoBehaviour
         setBossMorreu(false);
     }
 
+    private static int? seedDoDebug;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetarSeedDoDebug() => seedDoDebug = null;
+
+    public static void ReiniciarComSeed(int novaSeed)
+    {
+        seedDoDebug = novaSeed;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -33,7 +45,12 @@ public class GameManager : MonoBehaviour
 
         int seedToUse = seed;
 
-        if (useRandomSeed)
+        if (seedDoDebug.HasValue)
+        {
+            seedToUse = seedDoDebug.Value;
+            seedDoDebug = null;
+        }
+        else if (useRandomSeed)
         {
             seedToUse = System.DateTime.Now.GetHashCode();
         }

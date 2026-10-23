@@ -665,6 +665,7 @@ public static class ItemSprites
 
     public static Sprite Obter(Chest.ItemType tipo)
     {
+        if (tipo == Chest.ItemType.PenaFenix) return PenaFenix.Icone;
         string nome = tipo switch
         {
             Chest.ItemType.Axe => "machado-heroi",

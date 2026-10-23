@@ -23,6 +23,10 @@ public class ChestSpawner : MonoBehaviour
     [SerializeField] public bool forceStartingItem = true;
     [SerializeField] private Chest.ItemType startingChestItem = Chest.ItemType.LongSword;
 
+    [Header("Teste")]
+    [Tooltip("TESTE: bau inicial sempre traz a pena da fenix.")]
+    [SerializeField] private bool penaNoBauInicial = false;
+
 
     //Lista para guardar e limpar todos os baús do andar
     private List<GameObject> spawnedChests = new List<GameObject>();
@@ -92,7 +96,8 @@ public class ChestSpawner : MonoBehaviour
         }
         GameObject initialChest = Instantiate(prefab, new Vector3(position.x, position.y, 0), Quaternion.identity);
         Chest chestScript = initialChest.GetComponent<Chest>();
-        if (chestScript != null && forceStartingItem) chestScript.ConfigurarItem(startingChestItem);
+        if (chestScript != null && penaNoBauInicial) chestScript.ConfigurarItem(Chest.ItemType.PenaFenix);
+        else if (chestScript != null && forceStartingItem) chestScript.ConfigurarItem(startingChestItem);
         InicializarBau(initialChest);
         spawnedChests.Add(initialChest);
     }
