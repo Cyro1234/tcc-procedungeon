@@ -171,14 +171,15 @@ public class EnemyMovement : MonoBehaviour
         {
             dead = true;
             bool boss = IsBoss;
+            var sequenciaFinal = boss ? GetComponentInParent<FinalBossSequence>() : null;
             RunStats.AddKill(boss);
-            GameEffects.Instance.EnemyKilled(transform.position, boss, mainRenderer);
-            DropLoot(boss);
+            GameEffects.Instance.EnemyKilled(transform.position, boss, mainRenderer, sequenciaFinal == null);
+            if (sequenciaFinal == null) DropLoot(boss);
 
             if (boss)
             {
                 GameManager.setBossMorreu(true);
-                GetComponentInParent<FinalBossSequence>()?.BossDefeated();
+                sequenciaFinal?.BossDefeated();
             }
             Destroy(gameObject);
             return;

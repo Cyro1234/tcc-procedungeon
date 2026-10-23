@@ -230,7 +230,7 @@ public class GameEffects : MonoBehaviour
         Burst(position, new Color(1f, 0.9f, 0.7f), 5, 4f, reference);
     }
 
-    public void EnemyKilled(Vector3 position, bool boss, SpriteRenderer reference)
+    public void EnemyKilled(Vector3 position, bool boss, SpriteRenderer reference, bool mostrarBanner = true)
     {
         HitStop(boss ? 0.35f : 0.07f);
         Shake(boss ? 0.9f : 0.22f);
@@ -241,7 +241,8 @@ public class GameEffects : MonoBehaviour
         if (boss)
         {
             FlashScreen(new Color(1f, 1f, 1f, 0.6f), 0.4f);
-            Banner("CHEFE DERROTADO!", "A escada foi liberada", new Color(1f, 0.85f, 0.3f), 2.5f);
+            if (mostrarBanner)
+                Banner("CHEFE DERROTADO!", "A escada foi liberada", new Color(1f, 0.85f, 0.3f), 2.5f);
         }
     }
 

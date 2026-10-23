@@ -8,6 +8,11 @@ using UnityEngine.UI;
 // A sala e dona da sequencia: a morte do boss nao interrompe o final.
 public class FinalBossSequence : MonoBehaviour
 {
+    [Header("Avanço automático")]
+    [SerializeField] private bool avancoAutomatico = true;
+    [Tooltip("Tempo de espera após a fala terminar de ser digitada.")]
+    [SerializeField, Min(0f)] private float esperaAutoAvanco = 10f;
+
     private Coco boss;
     private EnemyMovement enemy;
     private SpriteRenderer[] bossSprites;
@@ -185,9 +190,10 @@ public class FinalBossSequence : MonoBehaviour
             yield return null;
         }
         yield return null;
-        while (ConfirmHeld()) yield return null;
+        float prazo = avancoAutomatico ? Time.unscaledTime + esperaAutoAvanco : float.PositiveInfinity;
+        while (ConfirmHeld() && Time.unscaledTime < prazo) yield return null;
         // Completar a digitacao e avancar exigem apertos separados.
-        while (!ConfirmPressed()) yield return null;
+        while (!ConfirmPressed() && Time.unscaledTime < prazo) yield return null;
         yield return null;
     }
 
@@ -224,12 +230,13 @@ public class FinalBossSequence : MonoBehaviour
         var win = Box("Vitoria", root.transform, Vector2.zero, Vector2.one);
         victory = win.gameObject.AddComponent<CanvasGroup>();
         victory.alpha = 0;
-        var title = Label("Titulo", win, new Vector2(.1f, .4f), new Vector2(.9f, .65f), 72);
+        var title = Label("Titulo", win, new Vector2(.1f, .4f), new Vector2(.9f, .65f), 144);
         title.text = "Você ganhou!";
         title.alignment = TextAlignmentOptions.Center;
-        var back = Label("Menu", win, new Vector2(.1f, .25f), new Vector2(.9f, .38f), 24);
+        var back = Label("Menu", win, new Vector2(.1f, .25f), new Vector2(.9f, .38f), 48);
         back.text = "Enter / Espaço / Clique / X (A) para voltar ao menu";
         back.alignment = TextAlignmentOptions.Center;
+        back.rectTransform.offsetMin = back.rectTransform.offsetMax = new Vector2(0f, 21.6f);
         win.gameObject.SetActive(false);
     }
 

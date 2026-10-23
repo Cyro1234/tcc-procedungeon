@@ -65149,7 +65149,7 @@ MonoBehaviour:
   randomStartingChest: 0
   manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
     type: 3}
-  forceStartingItem: 1
+  forceStartingItem: 0
   startingChestItem: 13
   penaNoBauInicial: 0
 --- !u!4 &1942525113

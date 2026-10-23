@@ -60,9 +60,9 @@ public class Intro : MonoBehaviour
     [Header("Avanço automático")]
     [SerializeField] private bool avancoAutomatico = true;
     [Tooltip("Tempo de espera após a fala terminar de ser digitada.")]
-    [SerializeField, Min(0f)] private float esperaAutoAvanco = 1.5f;
+    [SerializeField, Min(0f)] private float esperaAutoAvanco = 5f;
     [Tooltip("Tempo extra por caractere, para falas longas ficarem mais tempo na tela.")]
-    [SerializeField, Min(0f)] private float esperaPorCaractere = 0.04f;
+    [SerializeField, Min(0f)] private float esperaPorCaractere = 0f;
 
     [Header("Pular introdução")]
     [SerializeField, Min(0.2f)] private float tempoParaPular = 1.5f;
