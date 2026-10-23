@@ -176,8 +176,7 @@ public class InventoryManager : MonoBehaviour
         else if (item == Chest.ItemType.PowerPotion)
         {
             var atributos = FindAnyObjectByType<PlayerStatsHandler>();
-            if (atributos == null) return false;
-            atributos.BeberPocaoPoder();
+            if (atributos == null || !atributos.BeberPocaoPoder()) return false;
         }
         else return false;
 

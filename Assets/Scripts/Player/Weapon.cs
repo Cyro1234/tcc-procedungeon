@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class Weapon : MonoBehaviour
 {
+    [SerializeField, Min(0f)] private float multiplicadorEspadaLonga = 2f;
+
     private PlayerStatsHandler stats;
     private GameObject player;
     private float multiplicadorArma = 1f;
@@ -20,6 +22,8 @@ public class Weapon : MonoBehaviour
         hitEnemies.Clear();
         var inventario = InventoryManager.Instance;
         multiplicadorArma = inventario != null ? inventario.ObterMultiplicadorDano(inventario.ObterItemSelecionado()) : 1f;
+        if (inventario != null && inventario.ObterItemSelecionado() == Chest.ItemType.LongSword)
+            multiplicadorArma *= multiplicadorEspadaLonga;
     }
 
     // Quando entra na colisao

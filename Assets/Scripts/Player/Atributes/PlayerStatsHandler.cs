@@ -24,15 +24,15 @@ public class PlayerStatsHandler : MonoBehaviour
     private float basePlayerAttackCooldown = 0f;
 
     [Header("Equipamento passivo")]
-    [SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.5f;
+    [SerializeField, Min(0f)] private float bonusVelocidadeBota = 0.15f;
     [Tooltip("Fracao somada a velocidade (0.6 = +60%). Deve ser bem maior que a da bota comum.")]
-    [SerializeField, Min(0f)] private float bonusVelocidadeBotaLendaria = 0.6f;
+    [SerializeField, Min(0f)] private float bonusVelocidadeBotaLendaria = 0.4f;
     [Tooltip("Ate esse bonus total as botas rendem inteiras (0.6 = +60%).")]
-    [SerializeField, Min(0f)] private float softCapBotas = 0.6f;
+    [SerializeField, Min(0f)] private float softCapBotas = 0.5f;
     [Tooltip("Acima do soft cap, cada bota rende so essa fracao do bonus dela (0.5 = metade).")]
     [SerializeField, Range(0f, 1f)] private float eficienciaAcimaSoftCap = 0.5f;
     [Tooltip("Bonus maximo somando todas as botas (1 = +100%, o dobro da velocidade).")]
-    [SerializeField, Min(0f)] private float hardCapBotas = 1f;
+    [SerializeField, Min(0f)] private float hardCapBotas = 0.75f;
 
     private StatModifier modificadorBota;
     public bool TemBotaEquipada => botas.Count > 0;
@@ -56,6 +56,8 @@ public class PlayerStatsHandler : MonoBehaviour
     [SerializeField, Min(0f)] private float bonusDanoPocaoPoder = 0.5f;
     [Tooltip("Duracao em segundos. 0 deixa o efeito permanente.")]
     [SerializeField, Min(0f)] private float duracaoPocaoPoder = 30f;
+    [SerializeField, Min(0f)] private float bonusDanoPocaoExtra = 0.25f;
+    [SerializeField, Min(0f)] private float bonusDanoPocaoMaximo = 1f;
     private StatModifier modificadorPocaoPoder;
     public bool PocaoPoderAtiva => modificadorPocaoPoder != null && tempModifiers.Contains(modificadorPocaoPoder);
 
@@ -93,22 +95,38 @@ public class PlayerStatsHandler : MonoBehaviour
     }
 
 
-    public void BeberPocaoPoder()
+    public bool BeberPocaoPoder()
     {
-        // Beber outra com o efeito ativo renova a duracao em vez de acumular o bonus.
-        // Permanente (duracao 0): cada pocao soma um novo bonus.
-        if (duracaoPocaoPoder > 0f && PocaoPoderAtiva)
+        Vector3 posicaoTexto = transform.position + Vector3.up * 0.8f;
+        if (duracaoPocaoPoder > 0f)
         {
-            modificadorPocaoPoder.duration = duracaoPocaoPoder;
-            GameEffects.Instance.Popup(transform.position + Vector3.up * 0.8f, "Poder renovado!", CorPocaoPoder);
-            return;
+            if (PocaoPoderAtiva)
+            {
+                modificadorPocaoPoder.duration = duracaoPocaoPoder;
+                GameEffects.Instance.Popup(posicaoTexto, "Poder renovado!", CorPocaoPoder);
+                return true;
+            }
+            modificadorPocaoPoder = new StatModifier("Pocao de poder", StatType.Damage,
+                ModifierSource.Buff, ModifierType.Percent, bonusDanoPocaoPoder, duracaoPocaoPoder);
+            AddTemporaryModifier(modificadorPocaoPoder);
+            GameEffects.Instance.Popup(posicaoTexto, $"+{bonusDanoPocaoPoder * 100f:0}% Dano!", CorPocaoPoder);
+            return true;
         }
 
+        float atual = PocaoPoderAtiva ? modificadorPocaoPoder.value : 0f;
+        if (atual >= bonusDanoPocaoMaximo - 0.0001f)
+        {
+            GameEffects.Instance.Popup(posicaoTexto, "Poder no máximo!", CorPocaoPoder);
+            return false;
+        }
+
+        float novo = Mathf.Min(bonusDanoPocaoMaximo, atual <= 0f ? bonusDanoPocaoPoder : atual + bonusDanoPocaoExtra);
+        if (modificadorPocaoPoder != null) RemoveTemporaryModifier(modificadorPocaoPoder);
         modificadorPocaoPoder = new StatModifier("Pocao de poder", StatType.Damage,
-            ModifierSource.Buff, ModifierType.Percent, bonusDanoPocaoPoder, duracaoPocaoPoder);
+            ModifierSource.Buff, ModifierType.Percent, novo, 0f);
         AddTemporaryModifier(modificadorPocaoPoder);
-        GameEffects.Instance.Popup(transform.position + Vector3.up * 0.8f, $"+{bonusDanoPocaoPoder * 100f:0}% Dano!", CorPocaoPoder);
-        Debug.Log($"Pocao de poder! Dano atual: {GetPlayerDamage()}");
+        GameEffects.Instance.Popup(posicaoTexto, $"+{(novo - atual) * 100f:0}% Dano! (total +{novo * 100f:0}%)", CorPocaoPoder);
+        return true;
     }
 
 

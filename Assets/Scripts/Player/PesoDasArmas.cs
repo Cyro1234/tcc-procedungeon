@@ -8,7 +8,7 @@ public class PesoDasArmas : MonoBehaviour
     [Tooltip("Fracao tirada da velocidade com o canhao na mao (0.3 = 30% mais lento).")]
     [SerializeField, Range(0f, 0.9f)] private float lentidaoCanhao = 0.3f;
     [Tooltip("Fracao tirada da velocidade com a espada grande na mao.")]
-    [SerializeField, Range(0f, 0.9f)] private float lentidaoEspadaGrande = 0.2f;
+    [SerializeField, Range(0f, 0.9f)] private float lentidaoEspadaGrande = 0.1f;
 
     private PlayerStatsHandler stats;
     private StatModifier modificador;

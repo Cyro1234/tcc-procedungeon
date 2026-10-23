@@ -3458,7 +3458,7 @@ MonoBehaviour:
   - isActive: 1
     displayName: Bebum
     statusEffectKind: 1
-    hasDuration: 1
+    hasDuration: 0
     isRange: 0
     fixedDuration: 180
     minDuration: 0
@@ -3482,7 +3482,7 @@ MonoBehaviour:
   - isActive: 1
     displayName: "P\xE9s Escorregadios"
     statusEffectKind: 4
-    hasDuration: 1
+    hasDuration: 0
     isRange: 0
     fixedDuration: 180
     minDuration: 0
@@ -3490,7 +3490,7 @@ MonoBehaviour:
   - isActive: 1
     displayName: Lag
     statusEffectKind: 5
-    hasDuration: 1
+    hasDuration: 0
     isRange: 0
     fixedDuration: 120
     minDuration: 0
@@ -9799,11 +9799,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da3174212ca36724d8c87e1fea6b6707, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsHandler
-  bonusVelocidadeBota: 0.2
-  bonusVelocidadeBotaLendaria: 0.8
-  softCapBotas: 0.6
+  bonusVelocidadeBota: 0.15
+  bonusVelocidadeBotaLendaria: 0.4
+  softCapBotas: 0.5
   eficienciaAcimaSoftCap: 0.5
-  hardCapBotas: 1
+  hardCapBotas: 0.75
   bonusDanoPocaoPoder: 0.5
   duracaoPocaoPoder: 0
 --- !u!114 &992072369

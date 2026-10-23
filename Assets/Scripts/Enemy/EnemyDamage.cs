@@ -4,6 +4,7 @@ using System.Collections;
 public class EnemyDamage : MonoBehaviour
 {
     [SerializeField] int damage = 1; // quantidade de dano que o inimigo da no jogador
+    [SerializeField, Min(1)] private int danoMaximo = 4;
 
     private Rigidbody2D rb;
 
@@ -32,6 +33,6 @@ public class EnemyDamage : MonoBehaviour
     {
         // Se o damage precisar continuar sendo um int para o HeartSystem, 
         float finalDamage = (damage + attackFlat) * attackMult;
-        damage = Mathf.RoundToInt(finalDamage);     // Mathf.RoundToInt aqui para arredondar o resultado float de volta para int.
+        damage = Mathf.Min(Mathf.RoundToInt(finalDamage), danoMaximo);     // Mathf.RoundToInt aqui para arredondar o resultado float de volta para int.
     }
 }

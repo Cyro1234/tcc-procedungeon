@@ -9,7 +9,7 @@ public class Cannon : MonoBehaviour
 {
     [Header("Tiro")]
     [Tooltip("Multiplica o dano do jogador (ja com pocoes e debuffs). Espadas e adaga = 1; o canhao usa o mesmo do machado (2).")]
-    [SerializeField, Min(0f)] private float multiplicadorDano = 2f;
+    [SerializeField, Min(0f)] private float multiplicadorDano = 4f;
     [SerializeField, Min(0.1f)] private float velocidadeBala = 16f;
     [Tooltip("A bala voa ate sair da tela. Isto e so um limite de seguranca, em segundos.")]
     [SerializeField, Min(0.1f)] private float tempoMaximoBala = 6f;
