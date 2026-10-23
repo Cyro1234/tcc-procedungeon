@@ -149,9 +149,26 @@ public class Xiter : MonoBehaviour
                     ? nome + " equipada." : "Não foi possível equipar a arma.";
             }
         }
-        GUI.Label(new Rect(x + 24, y + 474, 392, 55), mensagemDebug);
+        DesenharPocaoDebug(x + 24, y + 470, Chest.ItemType.HealthPotion, "Vida");
+        DesenharPocaoDebug(x + 226, y + 470, Chest.ItemType.PowerPotion, "Força");
+        GUI.Label(new Rect(x + 24, y + 510, 392, 35), mensagemDebug);
         if (GUI.Button(new Rect(x + 24, y + 550, 392, 42), "Voltar ao jogo — F9 / Esc")) FecharDebug();
         GUI.matrix = anterior;
+    }
+
+    private void DesenharPocaoDebug(float x, float y, Chest.ItemType tipo, string nome)
+    {
+        var inventario = InventoryManager.Instance;
+        bool habilitado = GUI.enabled;
+        GUI.enabled = habilitado && inventario != null;
+        int quantidade = inventario != null ? inventario.ObterQuantidade(tipo) : 0;
+        if (GUI.Button(new Rect(x, y, 190, 32), "+1 Poção de " + nome + " (" + quantidade + ")"))
+        {
+            mensagemDebug = inventario.AdicionarItem(tipo)
+                ? "Poção de " + nome + " adicionada. Total: " + inventario.ObterQuantidade(tipo) + "."
+                : "Não foi possível adicionar a poção.";
+        }
+        GUI.enabled = habilitado;
     }
 
     private static string NomeDebuff(StatusEffectKind kind) => kind switch
