@@ -420,7 +420,7 @@ GameObject:
   - component: {fileID: 44168669}
   - component: {fileID: 44168668}
   m_Layer: 5
-  m_Name: Movimentos
+  m_Name: UsarPocao
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -442,7 +442,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -775.07, y: 174.6}
+  m_AnchoredPosition: {x: -775.07, y: 182.5}
   m_SizeDelta: {x: 354.1419, y: 104.8166}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &44168668
@@ -465,7 +465,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Movimentos
+  m_text: "Usar Po\xE7\xE3o"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3223,8 +3223,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -689.50446, y: 54.000732}
-  m_SizeDelta: {x: 183.009, y: 6}
+  m_AnchoredPosition: {x: -663.68, y: 92.28}
+  m_SizeDelta: {x: 234.61, y: 6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &308375941
 MonoBehaviour:
@@ -3239,7 +3239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.11764707, g: 0.121568635, b: 0.13725491, a: 1}
+  m_Color: {r: 0.33333334, g: 0.33333334, b: 0.37647063, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5292,7 +5292,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &592420724
 RectTransform:
   m_ObjectHideFlags: 0
@@ -64061,8 +64061,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -777.9889, y: 86.65125}
-  m_SizeDelta: {x: 71.3017, y: 6}
+  m_AnchoredPosition: {x: -777.9889, y: 109.747}
+  m_SizeDelta: {x: 40.184, y: 6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1917562212
 MonoBehaviour:
@@ -64077,7 +64077,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.11764706, g: 0.12156863, b: 0.13725491, a: 1}
+  m_Color: {r: 0.33333334, g: 0.33333334, b: 0.37647063, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

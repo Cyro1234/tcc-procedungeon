@@ -44,6 +44,8 @@ public class PauseManager : MonoBehaviour
     {
         if (playerMovement == null)
             playerMovement = Object.FindAnyObjectByType<PlayerMovement>();
+
+        CanvasPorCima.Mover("[Pause]", 999, pausePanel, optionsPanel, controlsPanel);
     }
 
     private void AoPausar(InputAction.CallbackContext context)
