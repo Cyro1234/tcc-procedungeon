@@ -54,12 +54,10 @@ public class PlayerStatsHandler : MonoBehaviour
     [Header("Pocao de poder")]
     [Tooltip("Fracao somada ao dano (0.5 = +50%).")]
     [SerializeField, Min(0f)] private float bonusDanoPocaoPoder = 0.5f;
-    [Tooltip("Duracao em segundos. 0 deixa o efeito permanente.")]
-    [SerializeField, Min(0f)] private float duracaoPocaoPoder = 30f;
-    [SerializeField, Min(0f)] private float bonusDanoPocaoExtra = 0.25f;
-    [SerializeField, Min(0f)] private float bonusDanoPocaoMaximo = 1f;
+    public const float DuracaoPocaoPoder = 15f;
     private StatModifier modificadorPocaoPoder;
     public bool PocaoPoderAtiva => modificadorPocaoPoder != null && tempModifiers.Contains(modificadorPocaoPoder);
+    public float TempoPocaoPoder => PocaoPoderAtiva ? Mathf.Max(0f, modificadorPocaoPoder.duration) : 0f;
 
     // Cor usada no popup, no texto do bau e no placeholder da hotbar
     public static readonly Color CorPocaoPoder = new Color(1f, 0.55f, 0.2f);
@@ -98,38 +96,18 @@ public class PlayerStatsHandler : MonoBehaviour
     public bool BeberPocaoPoder()
     {
         Vector3 posicaoTexto = transform.position + Vector3.up * 0.8f;
-        if (duracaoPocaoPoder > 0f)
+        if (PocaoPoderAtiva)
         {
-            if (PocaoPoderAtiva)
-            {
-                modificadorPocaoPoder.duration = duracaoPocaoPoder;
-                GameEffects.Instance.Popup(posicaoTexto, "Poder renovado!", CorPocaoPoder);
-                return true;
-            }
-            modificadorPocaoPoder = new StatModifier("Pocao de poder", StatType.Damage,
-                ModifierSource.Buff, ModifierType.Percent, bonusDanoPocaoPoder, duracaoPocaoPoder);
-            AddTemporaryModifier(modificadorPocaoPoder);
-            GameEffects.Instance.Popup(posicaoTexto, $"+{bonusDanoPocaoPoder * 100f:0}% Dano!", CorPocaoPoder);
+            modificadorPocaoPoder.duration = DuracaoPocaoPoder;
+            GameEffects.Instance.Popup(posicaoTexto, "Poder renovado! 15s", CorPocaoPoder);
             return true;
         }
-
-        float atual = PocaoPoderAtiva ? modificadorPocaoPoder.value : 0f;
-        if (atual >= bonusDanoPocaoMaximo - 0.0001f)
-        {
-            GameEffects.Instance.Popup(posicaoTexto, "Poder no máximo!", CorPocaoPoder);
-            return false;
-        }
-
-        float novo = Mathf.Min(bonusDanoPocaoMaximo, atual <= 0f ? bonusDanoPocaoPoder : atual + bonusDanoPocaoExtra);
-        if (modificadorPocaoPoder != null) RemoveTemporaryModifier(modificadorPocaoPoder);
         modificadorPocaoPoder = new StatModifier("Pocao de poder", StatType.Damage,
-            ModifierSource.Buff, ModifierType.Percent, novo, 0f);
+            ModifierSource.Buff, ModifierType.Percent, bonusDanoPocaoPoder, DuracaoPocaoPoder);
         AddTemporaryModifier(modificadorPocaoPoder);
-        GameEffects.Instance.Popup(posicaoTexto, $"+{(novo - atual) * 100f:0}% Dano! (total +{novo * 100f:0}%)", CorPocaoPoder);
+        GameEffects.Instance.Popup(posicaoTexto, $"+{bonusDanoPocaoPoder * 100f:0}% Dano! 15s", CorPocaoPoder);
         return true;
     }
-
-
     public void AddSimpleModifier(StatModifier modifier)    // Adiciona um modificador permanente!!
     {
         modifiers.Add(modifier);

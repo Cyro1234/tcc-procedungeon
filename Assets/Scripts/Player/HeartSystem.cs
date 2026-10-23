@@ -375,6 +375,9 @@ public class InvertedControlsFeedback : MonoBehaviour
     private Image barra;
     private float maiorPrazo = 5f;
     private static readonly Color Roxo = new Color(.75f, .24f, 1f);
+    private GameObject painelPoder;
+    private TextMeshProUGUI textoPoder;
+    private Image barraPoder;
 
     private void Start()
     {
@@ -416,6 +419,45 @@ public class InvertedControlsFeedback : MonoBehaviour
         barra.rectTransform.pivot = new Vector2(0, 0);
         barra.rectTransform.anchoredPosition = new Vector2(10, 6);
         painel.SetActive(false);
+        CriarIndicadorPoder();
+    }
+
+    private void CriarIndicadorPoder()
+    {
+        painelPoder = new GameObject("Pocao de forca - 15 segundos", typeof(RectTransform), typeof(Image));
+        painelPoder.transform.SetParent(interfaceEfeito.transform, false);
+        var rect = painelPoder.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = new Vector2(.5f, 1);
+        rect.sizeDelta = new Vector2(650, 92);
+        var fundo = painelPoder.GetComponent<Image>();
+        fundo.color = new Color(.25f, .1f, .025f, .94f);
+        fundo.raycastTarget = false;
+        var icone = new GameObject("Pocao", typeof(RectTransform), typeof(Image));
+        icone.transform.SetParent(painelPoder.transform, false);
+        var imagem = icone.GetComponent<Image>();
+        imagem.sprite = ItemSprites.Obter(Chest.ItemType.PowerPotion);
+        imagem.preserveAspect = true;
+        imagem.raycastTarget = false;
+        imagem.rectTransform.anchoredPosition = new Vector2(-275, 3);
+        imagem.rectTransform.sizeDelta = new Vector2(45, 52);
+        var label = new GameObject("Tempo de forca restante", typeof(RectTransform), typeof(TextMeshProUGUI));
+        label.transform.SetParent(painelPoder.transform, false);
+        textoPoder = label.GetComponent<TextMeshProUGUI>();
+        textoPoder.rectTransform.sizeDelta = new Vector2(540, 70);
+        textoPoder.rectTransform.anchoredPosition = new Vector2(25, 4);
+        textoPoder.fontSize = 27;
+        textoPoder.alignment = TextAlignmentOptions.Center;
+        textoPoder.color = new Color(1f, .8f, .55f);
+        textoPoder.raycastTarget = false;
+        var linha = new GameObject("Duracao da forca", typeof(RectTransform), typeof(Image));
+        linha.transform.SetParent(painelPoder.transform, false);
+        barraPoder = linha.GetComponent<Image>();
+        barraPoder.color = PlayerStatsHandler.CorPocaoPoder;
+        barraPoder.raycastTarget = false;
+        barraPoder.rectTransform.anchorMin = barraPoder.rectTransform.anchorMax = Vector2.zero;
+        barraPoder.rectTransform.pivot = Vector2.zero;
+        barraPoder.rectTransform.anchoredPosition = new Vector2(10, 6);
+        painelPoder.SetActive(false);
     }
 
     private void LateUpdate()
@@ -423,21 +465,36 @@ public class InvertedControlsFeedback : MonoBehaviour
         if (stats == null || painel == null) return;
         float restante = stats.TempoControlesInvertidos;
         bool ativo = restante > 0 && (vida == null || !vida.IsDead);
+        float tempoPoder = stats.TempoPocaoPoder;
+        bool poderAtivo = tempoPoder > 0 && (vida == null || !vida.IsDead);
         painel.SetActive(ativo);
-        if (ativo)
+        painelPoder.SetActive(poderAtivo);
+        if (poderAtivo)
+        {
+            painelPoder.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, ativo ? -198 : -92);
+            textoPoder.text = $"FORÇA ATIVA  •  {tempoPoder:0.0}s\nDano aumentado";
+            barraPoder.rectTransform.sizeDelta = new Vector2(630 * Mathf.Clamp01(tempoPoder / PlayerStatsHandler.DuracaoPocaoPoder), 5);
+        }
+        if (ativo || poderAtivo)
         {
             if (!tingido && personagem != null) { corOriginal = personagem.color; tingido = true; }
             if (personagem != null)
             {
-                Color cor = Color.Lerp(corOriginal, Roxo, .35f + .65f * Mathf.PingPong(Time.time * 4f, 1));
+                // Um unico controlador de cor evita que os dois efeitos sobrescrevam um ao outro.
+                Color efeito = ativo && (!poderAtivo || Mathf.FloorToInt(Time.time * 3) % 2 == 0)
+                    ? Roxo : PlayerStatsHandler.CorPocaoPoder;
+                Color cor = Color.Lerp(corOriginal, efeito, .35f + .65f * Mathf.PingPong(Time.time * 4f, 1));
                 cor.a = corOriginal.a;
                 personagem.color = cor;
             }
+        }
+        else RestaurarCor();
+        if (ativo)
+        {
             maiorPrazo = Mathf.Max(maiorPrazo, restante);
             texto.text = $"CONTROLES INVERTIDOS  •  {restante:0.0}s\nEncanto da bruxinha: mova-se no sentido oposto!";
             barra.rectTransform.sizeDelta = new Vector2(630 * Mathf.Clamp01(restante / maiorPrazo), 5);
         }
-        else RestaurarCor();
     }
 
     private void RestaurarCor()
@@ -451,6 +508,7 @@ public class InvertedControlsFeedback : MonoBehaviour
     {
         RestaurarCor();
         if (painel != null) painel.SetActive(false);
+        if (painelPoder != null) painelPoder.SetActive(false);
     }
 
     private void OnDestroy()

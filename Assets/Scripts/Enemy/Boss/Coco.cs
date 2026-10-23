@@ -33,6 +33,15 @@ public class Coco : MonoBehaviour
     private Estado estado;
     private bool combateIniciado;
     private int ammo;
+    private bool recarregando;
+    public int ProjeteisRestantes => Mathf.Max(0, combateIniciado ? ammo : maxAmmo);
+    public string EstadoDisparos => estado switch
+    {
+        Estado.PreparandoDash => "PREPARANDO DASH",
+        Estado.Dash => "DASH",
+        Estado.Recuperando => "RECUPERANDO",
+        _ => ammo <= 0 || (recarregando && Time.time < proximoTiro) ? "RECARREGANDO" : "ATIRANDO"
+    };
     private int bounces;
     private float proximoTiro;
     private float proximoDash;
@@ -60,6 +69,7 @@ public class Coco : MonoBehaviour
 
     private void Start()
     {
+        if (GetComponent<BossAmmoIndicator>() == null) gameObject.AddComponent<BossAmmoIndicator>();
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null) player = playerObj.transform;
     }
@@ -79,6 +89,7 @@ public class Coco : MonoBehaviour
         {
             combateIniciado = true;
             ammo = Mathf.Max(1, maxAmmo);
+            recarregando = true;
             proximoTiro = Time.time + reloadTime;
             proximoDash = Time.time + dashCooldown;
         }
@@ -113,12 +124,14 @@ public class Coco : MonoBehaviour
         if (ammo > 0)
         {
             ammo--;
+            recarregando = false;
             Shoot();
             proximoTiro = Time.time + cooldown;
         }
         else
         {
             ammo = Mathf.Max(1, maxAmmo);
+            recarregando = true;
             proximoTiro = Time.time + reloadTime;
         }
     }
@@ -155,6 +168,7 @@ public class Coco : MonoBehaviour
         // O dash encerra a espera anterior de recarga para retomar o ataque rapidamente.
         if (ammo <= 0) ammo = Mathf.Max(1, maxAmmo);
         proximoTiro = fimEstado;
+        recarregando = false;
         proximoDash = Time.time + dashCooldown;
     }
 

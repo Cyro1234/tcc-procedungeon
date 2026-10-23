@@ -53,8 +53,7 @@ public class TileMapVisualizer : MonoBehaviour
     [SerializeField] private GameObject teleportPrefab;
 
     // LISTA DE TILES DE CADA DIFICULDADE.
-    // tile[0] eh o chao
-    // tile[1] eh a parede
+    // Primeiro tile: chao base. Ultimo tile: parede. Entre eles: detalhes opcionais.
 
     [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelFloresta;
     [SerializeField] private WeightedTable<List<TileBase>> floorTilesNivelDeserto;
@@ -70,17 +69,28 @@ public class TileMapVisualizer : MonoBehaviour
     private WeightedTable<List<TileBase>> tableTiles = null;
     private TileBase floorTileEscolhido = null;
     private TileBase wallTileEscolhido = null;
-    private List<TileBase> floorTilesNoise = null; // Para biomas com noise (Floresta)
-    private Biomas biomaAtualSetup = Biomas.Deserto;
+    private List<TileBase> floorTilesNoise = null;
+    [Serializable]
+    public class ConfiguracaoNoise
+    {
+        public bool ativo = true;
+        [Min(0.01f), Tooltip("Tamanho das manchas de detalhe.")]
+        public float escala = 8f;
+        [Range(0f, 1f), Tooltip("Quanto maior, menos detalhes aparecem. 1 remove os detalhes.")]
+        public float limite = 0.65f;
+        public ConfiguracaoNoise(float limite) { this.limite = limite; }
+    }
 
-    // Parametros de noise para Floresta
-    [SerializeField] private float noiseScale = 8f;
-    [SerializeField] private float noiseThreshold = 0.7f; // 0.0-1.0: quanto maior, mais o tile base (0) aparece
-
-    // Mapeamento de tiles para autotiling (os índices dos tiles de detalhe)
-    // Você vai configurar isso no Inspector com os índices corretos
-    private Dictionary<int, TileBase> autoTileMapping = new Dictionary<int, TileBase>();
-
+    [Header("Noise por bioma")]
+    [SerializeField] private ConfiguracaoNoise noiseFloresta = new ConfiguracaoNoise(0.5f);
+    [SerializeField] private ConfiguracaoNoise noiseDeserto = new ConfiguracaoNoise(0.65f);
+    [SerializeField] private ConfiguracaoNoise noiseCaverna = new ConfiguracaoNoise(0.65f);
+    [SerializeField] private ConfiguracaoNoise noiseAbismo = new ConfiguracaoNoise(0.65f);
+    [SerializeField] private ConfiguracaoNoise noiseInfinito = new ConfiguracaoNoise(0.65f);
+    private ConfiguracaoNoise noiseAtual;
+    private readonly Dictionary<Vector2Int, TileBase> chaoPintado = new Dictionary<Vector2Int, TileBase>();
+    private bool UsaNoise => noiseAtual != null && noiseAtual.ativo && floorTilesNoise != null && floorTilesNoise.Count > 1;
+    private bool EhDetalhe(Vector2Int pos) => noiseAtual.limite < 1f && Mathf.PerlinNoise(pos.x / Mathf.Max(0.01f, noiseAtual.escala), pos.y / Mathf.Max(0.01f, noiseAtual.escala)) >= noiseAtual.limite;
     // Estados de conexão dos vizinhos (bitwise)
     private const int UP = 1;      // Vizinho acima
     private const int DOWN = 2;    // Vizinho abaixo
@@ -141,35 +151,26 @@ public class TileMapVisualizer : MonoBehaviour
 
     public void Setup(Biomas bioma)  // Faz as escolhas do chao e parede para pintar o nivel. CHAMAR SETUP ANTES DE PINTAR TODA VEZ QUE MUDAR DE ANDAR OU PRIMEIRO ANDAR.
     {
-        biomaAtualSetup = bioma;
         tableTiles = GetTilePorBioma(bioma);
         List<TileBase> itemEscolhido = tableTiles.getRandom(Rng.dungeonRng);
-
-        if (bioma == Biomas.Floresta)
+        // Todos os biomas: chao base, detalhes opcionais e parede por ultimo.
+        floorTileEscolhido = itemEscolhido[0];
+        wallTileEscolhido = itemEscolhido[itemEscolhido.Count - 1];
+        floorTilesNoise = new List<TileBase>(itemEscolhido);
+        floorTilesNoise.RemoveAt(floorTilesNoise.Count - 1);
+        switch (bioma)
         {
-            // Para Floresta, armazenar todos os tiles de chão para usar com noise
-            floorTilesNoise = new List<TileBase>(itemEscolhido);
-            // O último item é a parede
-            if (floorTilesNoise.Count > 0)
-            {
-                wallTileEscolhido = floorTilesNoise[floorTilesNoise.Count - 1];
-                // Remove a parede da lista de tiles de chão
-                floorTilesNoise.RemoveAt(floorTilesNoise.Count - 1);
-            }
-        }
-        else
-        {
-            floorTileEscolhido = itemEscolhido[0]; // CHAO
-            wallTileEscolhido = itemEscolhido[1]; // PAREDE
-            floorTilesNoise = null;
+            case Biomas.Floresta: noiseAtual = noiseFloresta; break;
+            case Biomas.Deserto: noiseAtual = noiseDeserto; break;
+            case Biomas.Caverna: noiseAtual = noiseCaverna; break;
+            case Biomas.Abismo: noiseAtual = noiseAbismo; break;
+            default: noiseAtual = noiseInfinito; break;
         }
     }
-
-
     // Pinta o chao inteiro
     public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions, Biomas bioma)
     {
-        if (bioma == Biomas.Floresta && floorTilesNoise != null && floorTilesNoise.Count > 0)
+        if (UsaNoise)
         {
             PaintFloorTilesWithNoise(floorPositions);
         }
@@ -179,7 +180,7 @@ public class TileMapVisualizer : MonoBehaviour
         }
     }
 
-    // Pinta o chão usando Perlin Noise para variar os tiles (para Floresta)
+    // Pinta o chao usando o noise configurado para o bioma.
     private void PaintFloorTilesWithNoise(IEnumerable<Vector2Int> floorPositions)
     {
         if (floorTilesNoise == null || floorTilesNoise.Count == 0)
@@ -191,9 +192,9 @@ public class TileMapVisualizer : MonoBehaviour
 
         foreach (var position in positionsList)
         {
-            float noiseValue = Mathf.PerlinNoise(position.x / noiseScale, position.y / noiseScale);
 
-            if (noiseValue < noiseThreshold)
+
+            if (!EhDetalhe(position))
             {
                 // Tile base - pintar direto
                 PaintSingleTile(position, floorTileMap, floorTilesNoise[0]);
@@ -235,6 +236,8 @@ public class TileMapVisualizer : MonoBehaviour
 
     private TileBase GetAutoTile(int connectionState, Vector2Int position)
     {
+        // Os novos biomas possuem um detalhe unico; a floresta possui o conjunto de 16 conexoes.
+        if (floorTilesNoise.Count < 17) return floorTilesNoise[1];
         // Se não tem vizinhos, é um tile isolado
         if (connectionState == 0)
             return floorTilesNoise[1]; // Isolado
@@ -305,6 +308,7 @@ public class TileMapVisualizer : MonoBehaviour
     {
         var tilePosition = tileMap.WorldToCell((Vector3Int)position);
         tileMap.SetTile(tilePosition, tile);
+        if (tileMap == floorTileMap) chaoPintado[position] = tile;
         if (tileMap == floorTileMap && tile != null)
         {
             // Fecha fissuras de rasterizacao com zoom/posicao fracionarios da camera.
@@ -324,6 +328,7 @@ public class TileMapVisualizer : MonoBehaviour
     // Limpa todos os tilemaps. Chamar antes de pintar o proximo andar
     public void Clear()
     {
+        chaoPintado.Clear();
         floorTileMap.ClearAllTiles();
         wallTileMap.ClearAllTiles();
         walkInFrontTileMap.ClearAllTiles();
@@ -353,30 +358,12 @@ public class TileMapVisualizer : MonoBehaviour
         // remove a porta
         wallTileMap.SetTile(tilePosition, null);
 
-        // pinta o chao
-        if (biomaAtualSetup == Biomas.Floresta && floorTilesNoise != null && floorTilesNoise.Count > 0)
-        {
-            // Para Floresta com noise, usar noise para escolher o tile
-            float noiseValue = Mathf.PerlinNoise(position.x / noiseScale, position.y / noiseScale);
-
-            if (noiseValue < noiseThreshold)
-            {
-                // Tile base
-                PaintSingleTile(position, floorTileMap, floorTilesNoise[0]);
-            }
-            else
-            {
-                // Para ClearTile, usar o tile de caminho simples (índice 1)
-                // Pois não temos contexto de vizinhos aqui
-                PaintSingleTile(position, floorTileMap, floorTilesNoise[1]);
-            }
-        }
-        else
-        {
-            PaintSingleTile(position, floorTileMap, floorTileEscolhido);
-        }
+        // Restaura exatamente o detalhe que estava sob a porta.
+        TileBase tile;
+        if (!chaoPintado.TryGetValue(position, out tile))
+            tile = UsaNoise && EhDetalhe(position) ? floorTilesNoise[1] : floorTileEscolhido;
+        PaintSingleTile(position, floorTileMap, tile);
     }
-
     public void PaintTeleport(Vector2Int position)
     {
         if (currentTeleport != null)

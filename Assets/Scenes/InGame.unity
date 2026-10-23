@@ -3513,6 +3513,10 @@ MonoBehaviour:
   - {fileID: 1418963996}
   - {fileID: 537064127}
   - {fileID: 932247389}
+  duracaoFade: 0.2
+  duracaoPop: 0.25
+  intervaloEntreCartas: 0.08
+  escalaInicial: 0.6
 --- !u!1 &357362621
 GameObject:
   m_ObjectHideFlags: 0
@@ -8435,6 +8439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bd7859e4364fcc41b79501b4d9a590e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  multiplicadorEspadaLonga: 2
 --- !u!1 &878909394
 GameObject:
   m_ObjectHideFlags: 0
@@ -9799,7 +9804,6 @@ MonoBehaviour:
   eficienciaAcimaSoftCap: 0.5
   hardCapBotas: 0.75
   bonusDanoPocaoPoder: 0.5
-  duracaoPocaoPoder: 0
 --- !u!114 &992072369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11413,6 +11417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bd7859e4364fcc41b79501b4d9a590e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  multiplicadorEspadaLonga: 2
 --- !u!60 &1137364342
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -60533,6 +60538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bd7859e4364fcc41b79501b4d9a590e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  multiplicadorEspadaLonga: 2
 --- !u!60 &1468464329
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -61250,6 +61256,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bd7859e4364fcc41b79501b4d9a590e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  multiplicadorEspadaLonga: 2
 --- !u!60 &1545571409
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -61756,6 +61763,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bd7859e4364fcc41b79501b4d9a590e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
+  multiplicadorEspadaLonga: 2
 --- !u!60 &1598379087
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -63274,20 +63282,23 @@ MonoBehaviour:
   floorTilesNivelDeserto:
     items:
     - item:
-      - {fileID: -7237579563219009222, guid: 28437ac6eb36c5c4584d4248be1b4c9e, type: 3}
-      - {fileID: -7942678235459547240, guid: 28437ac6eb36c5c4584d4248be1b4c9e, type: 3}
+      - {fileID: 6446381585496149170, guid: 28437ac6eb36c5c4584d4248be1b4c9e, type: 3}
+      - {fileID: -1544604344739402714, guid: 28437ac6eb36c5c4584d4248be1b4c9e, type: 3}
+      - {fileID: 6313722292881803867, guid: 28437ac6eb36c5c4584d4248be1b4c9e, type: 3}
       weight: 1
   floorTilesNivelCaverna:
     items:
     - item:
       - {fileID: -7237579563219009222, guid: 46b6e20319c67514fa86ebc6f78cbb0d, type: 3}
+      - {fileID: -4082448425085094437, guid: 46b6e20319c67514fa86ebc6f78cbb0d, type: 3}
       - {fileID: -7942678235459547240, guid: 46b6e20319c67514fa86ebc6f78cbb0d, type: 3}
       weight: 1
   floorTilesNivelAbismo:
     items:
     - item:
-      - {fileID: 5876453611139150040, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
-      - {fileID: 2924956474026983373, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
+      - {fileID: -7237579563219009222, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
+      - {fileID: -7942678235459547240, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
+      - {fileID: -4082448425085094437, guid: c927a8aea9f32784a88d3b87114cc853, type: 3}
       weight: 1
   floorTilesNivelInfinito:
     items:
@@ -63296,8 +63307,26 @@ MonoBehaviour:
       - {fileID: 11400000, guid: c23960acbebc7e048a9f5b8869d6c0f8, type: 2}
       weight: 1
   doorTile: {fileID: 11400000, guid: 4e1e2fa91134aaf47a8d4022b0d0a6ac, type: 2}
-  noiseScale: 8
-  noiseThreshold: 0.5
+  noiseFloresta:
+    ativo: 1
+    escala: 8
+    limite: 0.5
+  noiseDeserto:
+    ativo: 1
+    escala: 8
+    limite: 0.65
+  noiseCaverna:
+    ativo: 1
+    escala: 8
+    limite: 0.65
+  noiseAbismo:
+    ativo: 1
+    escala: 8
+    limite: 0.65
+  noiseInfinito:
+    ativo: 1
+    escala: 8
+    limite: 0.65
 --- !u!4 &1749136080
 Transform:
   m_ObjectHideFlags: 0
@@ -67676,6 +67705,7 @@ MonoBehaviour:
   raio: 1.75
   multiplicadorDano: 2
   incluirTriggers: 0
+  mostrarCirculo: 0
   anguloSprite: 45
   corIndicador: {r: 1, g: 0.85, b: 0.4, a: 0.8}
   espessura: 0.06
