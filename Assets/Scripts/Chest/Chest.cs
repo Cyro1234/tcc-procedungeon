@@ -175,7 +175,7 @@ public class Chest : MonoBehaviour
         if (hs == null) return;
 
         int antes = hs.shieldHealth;
-        hs.EquipShield(amount);
+        if (antes < amount) hs.EquipShield(amount);
 
         string texto = antes >= amount ? $"{nome} (já tem um melhor)" : $"{nome}! +{amount}";
         GameEffects.Instance.ItemObtained(transform.position, texto, color, itemInside);
