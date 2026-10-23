@@ -24,7 +24,17 @@ public class DowngradeMenuManager : MonoBehaviour
     [SerializeField] private List<Button> choiceButtons;
     [SerializeField] private List<TMP_Text> choiceLabels;
 
+    [Header("Animação de entrada")]
+    [SerializeField, Min(0f)] private float duracaoFade = 0.2f;
+    [SerializeField, Min(0.01f)] private float duracaoPop = 0.25f;
+    [SerializeField, Min(0f)] private float intervaloEntreCartas = 0.08f;
+    [SerializeField, Range(0.1f, 1f)] private float escalaInicial = 0.6f;
+
     public bool IsOpen => downgradePanel != null && downgradePanel.activeSelf;
+
+    private Coroutine animacaoEntrada;
+    private bool animando;
+    private Vector3[] escalasOriginais;
 
     private AbstractDungeonGenerator pendingGenerator;
     private readonly List<RolledChoice> currentChoices = new List<RolledChoice>();
@@ -71,7 +81,7 @@ public class DowngradeMenuManager : MonoBehaviour
     // hotkey pra que as teclas 1, 2, 3 escolhem a opcao correspondente no menu de downgrade
     private void Update()
     {
-        if (!IsOpen || Keyboard.current == null) return;
+        if (!IsOpen || animando || Keyboard.current == null) return;
 
         for (int i = 0; i < currentChoices.Count && i < 9; i++)
         {
@@ -89,6 +99,7 @@ public class DowngradeMenuManager : MonoBehaviour
     private void OnDisable()
     {
         GameFlow.Changed -= AoAlterarEstado;
+        FinalizarAnimacao();
         pendingGenerator = null;
         if (downgradePanel != null) downgradePanel.SetActive(false);
         GameFlow.Resume(GameFlow.State.Downgrade);
@@ -127,6 +138,66 @@ public class DowngradeMenuManager : MonoBehaviour
         if (playerMovement != null) playerMovement.ForcarParada();
         GameFlow.Pause(GameFlow.State.Downgrade);
         downgradePanel.SetActive(true);
+
+        if (animacaoEntrada != null) StopCoroutine(animacaoEntrada);
+        animacaoEntrada = StartCoroutine(AnimarEntrada());
+    }
+
+    private System.Collections.IEnumerator AnimarEntrada()
+    {
+        if (escalasOriginais == null)
+        {
+            escalasOriginais = new Vector3[choiceButtons.Count];
+            for (int i = 0; i < choiceButtons.Count; i++)
+                escalasOriginais[i] = choiceButtons[i] != null ? choiceButtons[i].transform.localScale : Vector3.one;
+        }
+
+        var grupo = downgradePanel.GetComponent<CanvasGroup>();
+        if (grupo == null) grupo = downgradePanel.AddComponent<CanvasGroup>();
+        animando = true;
+        grupo.interactable = false;
+        grupo.alpha = 0f;
+        for (int i = 0; i < choiceButtons.Count; i++)
+            if (choiceButtons[i] != null) choiceButtons[i].transform.localScale = escalasOriginais[i] * escalaInicial;
+
+        float total = duracaoFade + intervaloEntreCartas * Mathf.Max(0, choiceButtons.Count - 1) + duracaoPop;
+        for (float t = 0f; t < total; t += Time.unscaledDeltaTime)
+        {
+            grupo.alpha = duracaoFade > 0f ? Mathf.Clamp01(t / duracaoFade) : 1f;
+            for (int i = 0; i < choiceButtons.Count; i++)
+            {
+                if (choiceButtons[i] == null) continue;
+                float p = Mathf.Clamp01((t - duracaoFade * 0.5f - intervaloEntreCartas * i) / duracaoPop);
+                choiceButtons[i].transform.localScale = escalasOriginais[i] * Mathf.LerpUnclamped(escalaInicial, 1f, VoltaComSobra(p));
+            }
+            yield return null;
+        }
+
+        animacaoEntrada = null;
+        FinalizarAnimacao();
+    }
+
+    private void FinalizarAnimacao()
+    {
+        if (animacaoEntrada != null) StopCoroutine(animacaoEntrada);
+        animacaoEntrada = null;
+        animando = false;
+        if (downgradePanel != null && downgradePanel.TryGetComponent(out CanvasGroup grupo))
+        {
+            grupo.alpha = 1f;
+            grupo.interactable = true;
+        }
+        if (escalasOriginais == null) return;
+        for (int i = 0; i < choiceButtons.Count && i < escalasOriginais.Length; i++)
+            if (choiceButtons[i] != null) choiceButtons[i].transform.localScale = escalasOriginais[i];
+    }
+
+    private static float VoltaComSobra(float p)
+    {
+        const float c1 = 1.70158f;
+        const float c3 = c1 + 1f;
+        float x = p - 1f;
+        return 1f + c3 * x * x * x + c1 * x * x;
     }
 
     private void RollChoices()
@@ -255,7 +326,7 @@ public class DowngradeMenuManager : MonoBehaviour
 
     public void SelectChoice(int index)
     {
-        if (GameFlow.Current != GameFlow.State.Downgrade || !downgradePanel.activeSelf ||
+        if (GameFlow.Current != GameFlow.State.Downgrade || !downgradePanel.activeSelf || animando ||
             index < 0 || index >= currentChoices.Count) return;
         RolledChoice choice = currentChoices[index];
 
