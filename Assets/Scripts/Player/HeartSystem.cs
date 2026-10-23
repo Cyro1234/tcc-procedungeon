@@ -55,6 +55,7 @@ public class HeartSystem : MonoBehaviour
         gameObject.AddComponent<ShieldCounterHUD>().Inicializar(this);
         gameObject.AddComponent<BootBonusHUD>().Inicializar(this, stats);
         gameObject.AddComponent<PenaFenixHUD>().Inicializar(this);
+        gameObject.AddComponent<PocaoForcaHUD>().Inicializar(this, stats);
     }
 
     void Update()
@@ -424,7 +425,7 @@ public class InvertedControlsFeedback : MonoBehaviour
 
     private void CriarIndicadorPoder()
     {
-        painelPoder = new GameObject("Pocao de forca - 15 segundos", typeof(RectTransform), typeof(Image));
+        painelPoder = new GameObject("Pocao de forca - tempo restante", typeof(RectTransform), typeof(Image));
         painelPoder.transform.SetParent(interfaceEfeito.transform, false);
         var rect = painelPoder.GetComponent<RectTransform>();
         rect.anchorMin = rect.anchorMax = new Vector2(.5f, 1);

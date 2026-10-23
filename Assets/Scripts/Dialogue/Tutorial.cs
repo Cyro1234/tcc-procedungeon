@@ -37,7 +37,7 @@ public class Tutorial : MonoBehaviour
         "Aperte QUADRADO para atacar com a arma selecionada.\nNo teclado e mouse: botão esquerdo do mouse.",
         "Aperte X ou R2 para avançar rapidamente na direção do movimento.\nO dash NÃO dá invencibilidade. Com o CANHÃO equipado, você NÃO pode usar dash: R2 atira.\nNo teclado: Espaço ou Shift.",
         "L1 seleciona a arma anterior. R1 seleciona a próxima. Ao chegar ao fim, a lista recomeça.\nO item grande no centro está equipado; os menores mostram os vizinhos.\nNo teclado e mouse: 1 / 2 ou a rodinha.",
-        "Direcional PARA CIMA usa poção de vida. PARA BAIXO usa poção de poder.\nA força dura 15 segundos: Alex pisca laranja e um contador mostra o tempo restante.\nCada uso gasta uma unidade. No teclado: Z para vida e X para poder.",
+        "Direcional PARA CIMA usa poção de vida. PARA BAIXO usa poção de poder.\nA força dura 20 segundos: Alex pisca laranja e um contador mostra o tempo restante.\nCada uso gasta uma unidade. No teclado: Z para vida e X para poder.",
         "Ao entrar por completo na sala, as portas fecham e surge fumaça nos pontos de spawn.\nDurante o aviso, os inimigos ainda não recebem dano. Prepare-se: eles aparecerão em seguida!\nBaús e portal para o boss só aparecem depois de limpar a sala.",
         "A bruxinha inverte seu movimento por 5 segundos: Alex pisca roxo e o aviso mostra o tempo restante.\nEnquanto durar, mova o analógico no sentido oposto. A inversão termina quando o contador zera.\nNos raios, procure a área segura sinalizada antes do ataque."
     };
@@ -288,7 +288,7 @@ public class Tutorial : MonoBehaviour
                 personagem.anchoredPosition + Vector2.up * 35, Mathf.Clamp01((p - .6f) / .5f));
             imagemAlex.color = p > 1.1f ? Color.Lerp(Color.white, poder ? PlayerStatsHandler.CorPocaoPoder : new Color(1, .35f, .4f), pulso) : Color.white;
             quantidades.text = $"VIDA ×{(!poder && p > 1.1f ? 2 : 3)}      PODER ×{(poder && p > 1.1f ? 1 : 2)}";
-            estadoDemo.text = poder ? "FORÇA ATIVA: 15s\nAlex pisca laranja durante o efeito." : "Poção de vida: recupera sua vida.";
+            estadoDemo.text = poder ? "FORÇA ATIVA: 20s\nAlex pisca laranja durante o efeito." : "Poção de vida: recupera sua vida.";
         }
         if (etapa == 6)
         {

@@ -54,7 +54,7 @@ public class PlayerStatsHandler : MonoBehaviour
     [Header("Pocao de poder")]
     [Tooltip("Fracao somada ao dano (0.5 = +50%).")]
     [SerializeField, Min(0f)] private float bonusDanoPocaoPoder = 0.5f;
-    public const float DuracaoPocaoPoder = 15f;
+    public const float DuracaoPocaoPoder = 20f;
     private StatModifier modificadorPocaoPoder;
     public bool PocaoPoderAtiva => modificadorPocaoPoder != null && tempModifiers.Contains(modificadorPocaoPoder);
     public float TempoPocaoPoder => PocaoPoderAtiva ? Mathf.Max(0f, modificadorPocaoPoder.duration) : 0f;
@@ -99,13 +99,13 @@ public class PlayerStatsHandler : MonoBehaviour
         if (PocaoPoderAtiva)
         {
             modificadorPocaoPoder.duration = DuracaoPocaoPoder;
-            GameEffects.Instance.Popup(posicaoTexto, "Poder renovado! 15s", CorPocaoPoder);
+            GameEffects.Instance.Popup(posicaoTexto, $"Poder renovado! {DuracaoPocaoPoder:0}s", CorPocaoPoder);
             return true;
         }
         modificadorPocaoPoder = new StatModifier("Pocao de poder", StatType.Damage,
             ModifierSource.Buff, ModifierType.Percent, bonusDanoPocaoPoder, DuracaoPocaoPoder);
         AddTemporaryModifier(modificadorPocaoPoder);
-        GameEffects.Instance.Popup(posicaoTexto, $"+{bonusDanoPocaoPoder * 100f:0}% Dano! 15s", CorPocaoPoder);
+        GameEffects.Instance.Popup(posicaoTexto, $"+{bonusDanoPocaoPoder * 100f:0}% Dano! {DuracaoPocaoPoder:0}s", CorPocaoPoder);
         return true;
     }
     public void AddSimpleModifier(StatModifier modifier)    // Adiciona um modificador permanente!!
