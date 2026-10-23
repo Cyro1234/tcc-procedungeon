@@ -644,7 +644,7 @@ MonoBehaviour:
   - sprite: {fileID: -1044048630195617781, guid: d5f96859a4a00d545b91cc1ff0a59298,
       type: 3}
     statMultipliers:
-    - bonus: 30
+    - bonus: 0.3
       bonusType: 1
       stat: 3
   - sprite: {fileID: 5669946773992402637, guid: c82017b261a842146a6e7d9b768a8938,

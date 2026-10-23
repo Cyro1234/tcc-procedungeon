@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -19,6 +20,7 @@ public class Tutorial : MonoBehaviour
     [SerializeField] private GameObject bruxinha;
     [SerializeField] private string proximaCena = "Cutscene intro";
     [SerializeField, Min(.2f)] private float tempoParaPular = 1.5f;
+    [SerializeField, Min(0f)] private float duracaoFade = .6f;
 
     private readonly string[] titulos = {
         "Mova o Alex", "Aponte o canhão", "Ataque os inimigos", "Use o dash",
@@ -42,7 +44,8 @@ public class Tutorial : MonoBehaviour
 
     private Canvas canvas;
     private RectTransform painelControle, palco, personagem, arma, mira, destaque, marcadorAnalogico;
-    private Image imagemAlex, imagemArma, brilho, progressoPulo, linhaA, linhaB, pocaoA, pocaoB;
+    private Image imagemAlex, imagemArma, brilho, progressoPulo, linhaA, linhaB, pocaoA, pocaoB, fade;
+    private Coroutine rotinaFade;
     private TextMeshProUGUI titulo, contador, acao, explicacao, estadoDemo, dica, quantidades, aviso;
     private RectTransform[] inimigos = new RectTransform[2];
     private CanvasGroup[] gruposInimigos = new CanvasGroup[2];
@@ -66,7 +69,22 @@ public class Tutorial : MonoBehaviour
         machado = ItemSprites.Obter(Chest.ItemType.Axe);
         canhao = CarregarSprite("Armas/cannon");
         MudarEtapa(0);
-        entradaLiberada = Time.unscaledTime + .35f;
+        entradaLiberada = Time.unscaledTime + Mathf.Max(.35f, duracaoFade);
+        rotinaFade = StartCoroutine(Fade(1f, 0f, null));
+    }
+
+    private IEnumerator Fade(float de, float para, System.Action aoTerminar)
+    {
+        fade.gameObject.SetActive(true);
+        for (float t = 0f; t < duracaoFade; t += Time.unscaledDeltaTime)
+        {
+            fade.color = new Color(0f, 0f, 0f, Mathf.Lerp(de, para, t / duracaoFade));
+            yield return null;
+        }
+        fade.color = new Color(0f, 0f, 0f, para);
+        fade.gameObject.SetActive(para > 0f);
+        rotinaFade = null;
+        aoTerminar?.Invoke();
     }
 
     private static Sprite CarregarSprite(string caminho)
@@ -77,9 +95,10 @@ public class Tutorial : MonoBehaviour
 
     private void Update()
     {
-        if (finalizando || canvas == null) return;
+        if (canvas == null) return;
         float t = Time.unscaledTime - inicioEtapa;
         Animar(t);
+        if (finalizando) return;
         bool algumSegurado = (Gamepad.current != null && Gamepad.current.buttonSouth.isPressed) ||
             (Keyboard.current != null && (Keyboard.current.enterKey.isPressed || Keyboard.current.spaceKey.isPressed)) ||
             (Mouse.current != null && Mouse.current.leftButton.isPressed);
@@ -134,7 +153,9 @@ public class Tutorial : MonoBehaviour
     {
         if (finalizando) return;
         finalizando = true;
-        SceneManager.LoadSceneAsync(proximaCena);
+        float inicio = fade.gameObject.activeSelf ? fade.color.a : 0f;
+        if (rotinaFade != null) StopCoroutine(rotinaFade);
+        rotinaFade = StartCoroutine(Fade(inicio, 1f, () => SceneManager.LoadSceneAsync(proximaCena)));
     }
 
     private void MudarEtapa(int indice)
@@ -363,6 +384,8 @@ public class Tutorial : MonoBehaviour
         progressoPulo = Imagem("Progresso para pular", trilho.transform, new Vector2(-290, 0), new Vector2(0, 5), null);
         progressoPulo.rectTransform.pivot = new Vector2(0, .5f);
         progressoPulo.color = Ouro;
+        fade = Imagem("Fade", go.transform, Vector2.zero, new Vector2(5000, 3000), null);
+        fade.color = Color.black;
     }
 
     private RectTransform MontarVisual(GameObject prefab, Transform pai, Vector2 pos, float altura)

@@ -2735,10 +2735,10 @@ MonoBehaviour:
     items:
     - item: {fileID: 8633272739986231165, guid: b345273adb83d5b489890b032d92087f,
         type: 3}
-      weight: 10
+      weight: 40
     - item: {fileID: 1885961500774489010, guid: 24e1bf9e9a6b0304a86728bbfdf5147f,
         type: 3}
-      weight: 100
+      weight: 60
 --- !u!4 &265426991
 Transform:
   m_ObjectHideFlags: 0
@@ -65162,13 +65162,13 @@ MonoBehaviour:
     items:
     - item: {fileID: 3527452723843563021, guid: 80ed43e93ea2e4b48adf3e37145b9aa1,
         type: 3}
-      weight: 45
+      weight: 40
     - item: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
         type: 3}
       weight: 50
     - item: {fileID: 3527452723843563021, guid: 3d48ed50318f76c4ea95ac5f1a065e94,
         type: 3}
-      weight: 5
+      weight: 10
   randomStartingChest: 0
   manualStartingChestPrefab: {fileID: 3527452723843563021, guid: 6da05bf0c313b7448b3565ea4af238a2,
     type: 3}

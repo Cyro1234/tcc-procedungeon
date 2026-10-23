@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class Weapon : MonoBehaviour
 {
     [SerializeField, Min(0f)] private float multiplicadorEspadaLonga = 2f;
+    [SerializeField, Min(0f)] private float multiplicadorAdaga = 0.6f;
 
     private PlayerStatsHandler stats;
     private GameObject player;
@@ -24,6 +25,8 @@ public class Weapon : MonoBehaviour
         multiplicadorArma = inventario != null ? inventario.ObterMultiplicadorDano(inventario.ObterItemSelecionado()) : 1f;
         if (inventario != null && inventario.ObterItemSelecionado() == Chest.ItemType.LongSword)
             multiplicadorArma *= multiplicadorEspadaLonga;
+        else if (inventario != null && inventario.ObterItemSelecionado() == Chest.ItemType.Dagger)
+            multiplicadorArma *= multiplicadorAdaga;
     }
 
     // Quando entra na colisao

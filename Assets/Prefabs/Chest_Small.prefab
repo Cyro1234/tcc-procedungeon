@@ -157,12 +157,14 @@ MonoBehaviour:
   itemTable:
     items:
     - item: 1
-      weight: 50
+      weight: 40
     - item: 6
       weight: 20
     - item: 7
       weight: 20
     - item: 10
+      weight: 10
+    - item: 8
       weight: 10
   itemInside: 0
 --- !u!95 &896005281407797099
